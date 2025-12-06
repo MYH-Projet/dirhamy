@@ -1,12 +1,18 @@
 import express, { Request, Response } from 'express';
-
 import {prisma} from "./lib/prisma"
+import cron from 'node-cron';
+import { generateDailySnapshots } from './jobs/snapshot-worker';
 
 const app = express();
 const port = 3000;
 
 
 app.use(express.json());
+
+cron.schedule('0 0 * * *', () => {
+  console.log('Cron Triggered: Running Snapshot Worker');
+  generateDailySnapshots();
+});
 
 // 2. Simple Route (Test Connection)
 app.get('/', async (req:Request, res:Response) => {
@@ -32,8 +38,8 @@ app.post('/users', async (req: Request, res: Response) => {
         motDePasse: password, // In a real app, hash this!
         comptes: {
           create: [
-            { nom: "Mon Cash", type: "Cash", solde: 0.0 },
-            { nom: "Ma Banque", type: "Banque", solde: 0.0 }
+            { nom: "Mon Cash", type: "Cash" },
+            { nom: "Ma Banque", type: "Banque"}
           ]
         }
       },
