@@ -8,6 +8,9 @@
     "dev": "tsx watch index.ts"
   },
   "type": "module",
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MYH-Projet/dirhamy.git"
