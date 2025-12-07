@@ -79,6 +79,8 @@ model Transaction {
 
   categorieId Int
   categorie   Categorie @relation(fields: [categorieId], references: [id])
+
+  @@index([compteId, date, montant])
 }
 
 model BalanceSnapshot {

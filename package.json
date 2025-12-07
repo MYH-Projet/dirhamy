@@ -4,8 +4,9 @@
   "description": "MVP développé en méthode Agile Scrum",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/index.js",
-    "dev": "tsx watch index.ts"
+    "start": "node src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "test": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --forceExit"
   },
   "type": "module",
   "prisma": {
@@ -24,10 +25,15 @@
   "homepage": "https://github.com/MYH-Projet/dirhamy#readme",
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
     "@types/pg": "^8.15.6",
+    "@types/supertest": "^6.0.3",
     "experss": "^0.0.1-security",
+    "jest": "^30.2.0",
     "prisma": "^7.1.0",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.6",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
