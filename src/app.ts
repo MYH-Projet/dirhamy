@@ -2,12 +2,19 @@ import express, { Request, Response } from 'express';
 import {prisma} from "./lib/prisma"
 import cron from 'node-cron';
 import { generateDailySnapshots } from './jobs/snapshot-worker';
+import cookieParser from 'cookie-parser';
+import authRoutes from './routers/authRouter';
+
+import {authenticateToken , AuthRequest} from './Middleware/authMiddleware'
+
+
 
 const app = express();
 
 
 
 app.use(express.json());
+app.use(cookieParser());
 
 cron.schedule('0 0 * * *', () => {
   console.log('Cron Triggered: Running Snapshot Worker');
@@ -26,5 +33,9 @@ app.get('/', async (req:Request, res:Response) => {
 });
 
 
+app.use("/api/auth",authRoutes);
+app.get('/profile', authenticateToken, (req: AuthRequest, res) => {
+  res.json({ message: 'Welcome to the protected route', user: req.user });
+});
 
 export default app;
