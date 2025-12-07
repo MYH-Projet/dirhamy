@@ -1,0 +1,100 @@
+@import url('base.css');
+
+body {
+    background-color: var(--lightest-gray-color);
+}
+
+.nav-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    height: 65px;
+    padding: var(--s-spacing) var(--large-spacing);
+    
+    background-color: var(--secondary-color);
+    box-shadow: 0px 1px 5px 0px var(--border-color);
+
+    margin-bottom: var(--large-spacing);
+
+    .nav-list {
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+
+        .nav-item{
+            padding: var(--s-spacing);
+            color: var(--gray-color);
+        }
+        .nav-item a {
+            transition: color 0.1s;
+        }
+        .nav-item a:hover {
+            color: var(--primary-color);
+        }
+    }
+    .user-name {
+        font-weight: 450;
+        color: var(--gray-color);
+    }
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+
+    width: 1100px;
+    margin: auto;
+
+}
+
+.balance-container {
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+
+    margin-bottom: var(--large-spacing);
+
+    div {
+        flex: 1;
+    }
+
+    .card {
+        padding: 24px;
+    }
+
+    .card-label {
+        font-size: 15px;
+        font-weight: 450;
+
+        margin-bottom: var(--md-spacing);
+    }
+
+    .card-balance::before {
+        content: '$';
+        margin-right: var(--xs-spacing);
+    }
+
+    .card-balance {
+        font-size: 28px;
+        font-weight: 700;
+        font-family: Arial, Helvetica, sans-serif;
+
+        letter-spacing: 1px;
+    }
+    
+    .cash-card-label, .bank-card-label {
+        color: gray;
+        opacity: 0.9;
+    }
+
+    .total-card-label {
+        opacity: 0.9;
+    }
+
+}
+
+.add-transaction-container {
+     margin-bottom: var(--large-spacing);
+}
