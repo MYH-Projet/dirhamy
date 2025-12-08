@@ -1,6 +1,6 @@
 // src/jobs/snapshot-worker.ts
 import { prisma } from '../lib/prisma'; // Adjust path to your prisma instance
-import {CompteModel} from '../generated/prisma/models/Compte'
+import {CompteModel} from '../../generated/prisma/models/Compte'
 
 
 export async function generateDailySnapshots() {

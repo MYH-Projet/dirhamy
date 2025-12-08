@@ -1,6 +1,6 @@
 // prisma/seed.ts
 import { TypeCompte, TypeTransaction } from '../generated/prisma/client'; // Your custom path
-import { prisma } from '../lib/prisma';
+import { prisma } from '../src/lib/prisma';
 
 async function main() {
   console.log('🌱 Starting seed...')

@@ -30,6 +30,7 @@ model Utilisateur {
   prenom     String
   email      String @unique
   motDePasse String
+  refreshToken String?
 
   // Relationships
   comptes    Compte[]
@@ -40,6 +41,7 @@ model Compte {
   id   Int        @id @default(autoincrement())
   nom  String
   type TypeCompte
+  
 
   // Foreign Key
   utilisateurId Int

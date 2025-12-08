@@ -2,9 +2,44 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import {prisma} from '../lib/prisma';
-import 'dotenv';
+import {UtilisateurModel} from '../../generated/prisma/models/Utilisateur'
+import dotenv from 'dotenv';
+dotenv.config();
 
 const SECRET_KEY = process.env.JWT_SECRET as string;
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET as string;
+
+const generateToken=(user:UtilisateurModel)=>{
+    const token = jwt.sign({
+            id:user.id,
+            nom:user.nom,
+            prenom:user.prenom,
+            email:user.email,
+        },SECRET_KEY,{expiresIn:'15m'})
+    
+    const refreshToken = jwt.sign({
+            id:user.id
+        },REFRESH_TOKEN_SECRET,{expiresIn:'7d'})
+
+    return { token, refreshToken };
+}
+
+const setcookies=(res:Response,token:any,refreshToken:any)=>{
+    res.cookie("jwt",token,{
+            httpOnly: true, 
+            secure: process.env.NODE_ENV === 'production', 
+            sameSite: 'strict', 
+            maxAge: 15 * 60 * 1000,
+        }
+    )
+
+    res.cookie("refreshToken",refreshToken,{
+            httpOnly: true, 
+            secure: process.env.NODE_ENV === 'production', 
+            sameSite: 'strict', 
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        })
+}
 
 export const login = async (req:Request,res:Response)=>{
     const {mail,password}=req.body;
@@ -21,21 +56,18 @@ export const login = async (req:Request,res:Response)=>{
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
+        const {token,refreshToken}=generateToken(user);
+        
 
-        const token = jwt.sign({
-            id:user.id,
-            nom:user.nom,
-            prenom:user.prenom,
-            email:user.email,
-        },SECRET_KEY,{expiresIn:'1h'})
+        await prisma.utilisateur.update({
+            where: { id: user.id },
+            data: {refreshToken:refreshToken  }
+        });
 
 
-        res.cookie("jwt",token,{
-            httpOnly: true, // Prevents JS access (XSS protection)
-            secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-            sameSite: 'strict', // CSRF protection
-            maxAge: 3600000,
-        })
+        setcookies(res,token,refreshToken);
+
+        
         res.status(201).json({ message: 'Login successful' })
     }catch(e){
         res.status(500).json({ error: 'Login failed' });
@@ -75,19 +107,16 @@ export const register = async (req: Request, res: Response) => {
         },
     });
 
-    const token = jwt.sign({
-            id:user.id,
-            nom:user.nom,
-            prenom:user.prenom,
-            email:user.email,
-        },SECRET_KEY,{expiresIn:'1h'})
+    const {token,refreshToken}=generateToken(user);
+        
 
-    res.cookie('jwt', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 3600000,
-    });
+        await prisma.utilisateur.update({
+            where: { id: user.id },
+            data: {refreshToken:refreshToken  }
+        });
+
+
+        setcookies(res,token,refreshToken);
 
     res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
@@ -97,5 +126,6 @@ export const register = async (req: Request, res: Response) => {
 
 export const logout = (req:Request,res:Response)=>{
     res.clearCookie('jwt');
+    res.clearCookie('refreshToken')
     res.json({ message: 'Logged out successfully' });
 }
