@@ -8,7 +8,7 @@ const SECRET_KEY = process.env.JWT_SECRET as string;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET as string;
 
 
-interface JwtPayload {
+export interface JwtPayload {
   id: number;
   nom: string;
   prenom: string;
@@ -17,7 +17,7 @@ interface JwtPayload {
 
 
 export interface AuthRequest extends Request {
-    user?:JwtPayload|{ id: number };
+    user?:JwtPayload;
 }
 
 
