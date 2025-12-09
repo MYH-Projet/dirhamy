@@ -1,13 +1,13 @@
 FROM nginx:alpine
 
-# Supprimer la page par défaut Nginx
-RUN rm -rf /usr/share/nginx/html/*
+# Supprimer la config par défaut d’Nginx
+RUN rm -f /etc/nginx/conf.d/default.conf
 
-# Copier tes fichiers frontend
-COPY . /usr/share/nginx/html
-
-# Copier la config nginx
+# Ajouter ta configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copier tes fichiers HTML/CSS/JS
+COPY . /usr/share/nginx/html
 
 EXPOSE 80
 
