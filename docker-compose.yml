@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:15
+    container_name: dirhamy-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dirhamy
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      args:
+        DATABASE_URL: postgresql://postgres:postgres@db:5432/dirhamy
+    container_name: dirhamy-backend
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/dirhamy
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: dirhamy-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
