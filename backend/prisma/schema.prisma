@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TypeCompte {
+  Cash
+  Banque
+}
+
+enum TypeTransaction {
+  DEPENSE
+  REVENU
+  TRANSFER
+}
+
+model Utilisateur {
+  id         Int    @id @default(autoincrement())
+  nom        String
+  prenom     String
+  email      String @unique
+  motDePasse String
+  refreshToken String?
+
+  // Relationships
+  comptes    Compte[]
+  categories Categorie[]
+}
+
+model Compte {
+  id   Int        @id @default(autoincrement())
+  nom  String
+  type TypeCompte
+  
+
+  // Foreign Key
+  utilisateurId Int
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
+
+  // Relationships
+  transactionsSent     Transaction[]     @relation("SourceAccount")
+  transactionsReceived Transaction[]     @relation("DestinationAccount")
+  snapshots            BalanceSnapshot[]
+}
+
+model Categorie {
+  id  Int    @id @default(autoincrement())
+  nom String
+
+  // Foreign Key
+  utilisateurId Int
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
+
+  // Relationships
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          Int             @id @default(autoincrement())
+  montant     Float
+  type        TypeTransaction
+  date        DateTime        @default(now())
+  description String
+
+  // Foreign Keys
+  compteId Int
+  compte   Compte @relation("SourceAccount", fields: [compteId], references: [id])
+
+  idDestination Int?
+  destination   Compte? @relation("DestinationAccount", fields: [idDestination], references: [id])
+
+  categorieId Int
+  categorie   Categorie @relation(fields: [categorieId], references: [id])
+
+  @@index([compteId, date, montant])
+}
+
+model BalanceSnapshot {
+  id    Int      @id @default(autoincrement())
+  date  DateTime // The date this "save point" was made
+  solde Float // The calculated balance at that exact moment
+
+  compteId Int
+  compte   Compte @relation(fields: [compteId], references: [id])
+
+  @@index([compteId, date]) // Important for finding the "latest" snapshot quickly
+}
