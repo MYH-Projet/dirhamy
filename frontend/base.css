@@ -1,0 +1,99 @@
+/* base.css */
+
+:root {
+    /* Color Palette */
+    --primary-color: #0d9488;
+    --lighter-primary-color: #11a094;
+    --secondary-color: white;
+    --lightest-gray-color: #f9fafb;
+    --slightly-gray-color: #959aa1;
+    --gray-color: rgb(91, 97, 105);
+    --black-text-color: #18212c;
+
+    /* Spacing */
+    --xs-spacing: 4px;
+    --s-spacing: 8px;
+    --normal-spacing: 12px;
+    --md-spacing: 16px;
+    --large-spacing: 32px;
+    --xl-spacing: 64px;
+
+    /* Other */
+    --border-radius: 8px;
+    --border-color: #aeb4bda2;
+    --secondary-border-color: #11a094a6;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: ui-sans-serif, sans-serif;
+    color: var(--black-text-color);
+}
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+input {
+    padding: var(--normal-spacing) var(--normal-spacing);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+
+    color: var(--black-text-color);
+}
+
+.btn {
+    color: white;
+    background-color: var(--primary-color);
+
+    font-weight: bold;
+    font-size: 17px;
+
+    text-align: center;
+
+    padding: var(--normal-spacing) var(--normal-spacing);
+    border: none;
+    border-radius: var(--border-radius);
+
+    box-shadow: 0px 1px 5px 0px var(--border-color);
+
+    cursor: pointer;
+
+    transition: background-color 0.1s;
+    
+}
+
+.btn:hover {
+    background-color: var(--lighter-primary-color);
+}
+
+.card {
+    padding: var(--large-spacing) var(--large-spacing);
+
+    border: none;
+
+    border-radius: var(--border-radius);
+}
+
+.primary-card {
+    color: var(--black-text-color);
+    background-color: var(--secondary-color);
+
+    box-shadow: 0px 1px 5px 0px var(--border-color);
+}
+
+.secondary-card {
+    color: var(--secondary-color);
+    background-color: var(--primary-color);
+
+    box-shadow: 0px 1px 5px 0px var(--secondary-border-color);
+}
+
+ul {
+    list-style: none;
+}
