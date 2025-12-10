@@ -39,7 +39,7 @@ a {
     text-decoration: none;
 }
 
-input {
+input, select {
     padding: var(--normal-spacing) var(--normal-spacing);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);

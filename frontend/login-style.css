@@ -21,7 +21,7 @@ body {
 
     .logo-icon {
         margin-top: var(--s-spacing);
-        margin-bottom: var(--md-spacing);
+        margin-bottom: var(--s-spacing);
     }
 
     .login-box-header {
