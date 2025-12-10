@@ -10,7 +10,7 @@
 
 <body>
     <nav class="nav-bar">
-        <img src="logo.svg" width="30" alt="logo-icon">
+        <img src="logo.svg" width="120" alt="logo-icon" class="logo-icon">
         <ul class="nav-list">
             <li class="nav-item"><a href="./transactions.html">Dashboard</a></li>
             <li class="nav-item"><a href="./transactions.html">Transactions</a></li>
@@ -22,27 +22,65 @@
     <div class="main-container">
         <div class="balance-container">
             <div class="card primary-card cash-card">
-                <p class="card-label cash-card-label">Cash Balance</p>
+                <p class="card-label cash-card-label">CASH BALANCE</p>
                 <p class="card-balance cash-card-balance">500.00</p>
             </div>
             <div class="card primary-card bank-card">
-                <p class="card-label bank-card-label">Bank Balance</p>
+                <p class="card-label bank-card-label">BANK BALANCE</p>
                 <p class="card-balance bank-card-balance">500.00</p>
             </div>
             <div class="card secondary-card total-card">
-                <p class="card-label total-card-label">Total Wealth</p>
+                <p class="card-label total-card-label">TOTAL WEALTH</p>
                 <p class="card-balance total-card-balance">1000.00</p>
             </div>
         </div>
 
         <div class="card primary-card add-transaction-container">
+            <h2>ADD NEW ENTRY</h2>
+            <form action="" class="add-transaction-form">
+                <div class="add-transaction-form-unit">
+                    <label for="transaction-form-type" class="transaction-unit-label">Type</label>
+                    <select name="transaction-type" id="transaction-form-type">
+                        <option value="expense">Expense</option>
+                        <option value="income">Income</option>
+                        <option value="transfer">Transfer</option>
+                    </select>
+                </div>
+                <div class="add-transaction-form-unit">
+                    <label for="transaction-form-type" class="transaction-unit-label">Account</label>
+                    <select name="transaction-type" id="transaction-form-account">
+                        <option value="expense">Cash</option>
+                        <option value="income">Bank</option>
+                    </select>
+                </div>
+                <div class="add-transaction-form-unit">
+                    <label for="transaction-form-date"  class="transaction-unit-label">Date</label>
+                    <input type="date" id="transaction-form-date">
+                </div>
+                <div class="add-transaction-form-unit">
+                    <label for="transaction-form-description" class="transaction-unit-label">Description</label>
+                    <input type="text" placeholder="e.g. Weekly Groceries" id="transaction-form-description">
+                </div>
+                <div class="add-transaction-form-unit">
+                    <label for="transaction-form-category" class="transaction-unit-label">Category</label>
+                    <input type="text" placeholder="e.g. Food" id="transaction-form-category">
 
+                </div>
+                <div class="add-transaction-form-unit">
+                    <label for="transaction-form-amount" class="transaction-unit-label">Amount</label>
+                    <input type="text" placeholder="e.g. 0.00" id="transaction-form-amount">
+                </div>
+                <div class="add-transaction-form-unit">
+                    <button class="btn" id="transaction-form-submit" type="submit">&#65291;</button>
+                </div>
+            </form>
         </div>
 
         <div class="card primary-card list-transaction-container">
 
         </div>
     </div>
+    <script src="./transactions-script.js"></script>
 </body>
 
 </html>
