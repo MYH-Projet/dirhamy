@@ -155,7 +155,8 @@ body {
 .transaction-unit-label {
     color: var(--gray-color);
 
-    margin-bottom: 2px;
+    margin-left: var(--xs-spacing);
+    margin-bottom: 3px;
 
     font-size: 13px;
     font-weight: 450;
