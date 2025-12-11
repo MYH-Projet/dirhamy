@@ -5,6 +5,7 @@ import { generateDailySnapshots } from './jobs/snapshot-worker';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routers/authRouter';
 import transactionRoutes from './routers/transactionRouter';
+import balanceRouters from './routers/balanceRouter'
 
 import {authenticateToken , AuthRequest} from './Middleware/authMiddleware'
 
@@ -36,6 +37,7 @@ app.get('/', async (req:Request, res:Response) => {
 
 app.use("/api/auth",authRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/balance',balanceRouters)
 app.get('/profile', authenticateToken, (req: AuthRequest, res) => {
   res.json({ message: 'Welcome to the protected route', user: req.user });
 });
