@@ -1,0 +1,98 @@
+name: CI/CD Dirhamy
+
+# Déclenchement : Push ou Pull Request sur la branche 'dev'
+on:
+  push:
+    branches: [ "infra" ]
+  pull_request:
+    branches: [ "infra" ]
+
+jobs:
+  # 🧪 JOB 1 : EXECUTION DES TESTS
+  tests:
+    runs-on: ubuntu-latest
+    
+    # On crée une DB PostgreSQL temporaire juste pour les tests
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: dirhamy_test
+        ports:
+          - 5432:5432
+        # Attendre que la DB soit prête avant de lancer les tests
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
+      - name: Installation de Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Installation des dépendances Backend
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Préparation de la Base de Données (Prisma)
+        working-directory: ./backend
+        env:
+          # On pointe vers le service postgres défini plus haut
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dirhamy_test
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+
+      - name: Lancement des Tests
+        working-directory: ./backend
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dirhamy_test
+        # Cette commande lance TOUS les tests définis dans ton package.json (Jest, etc.)
+        run: npm test
+
+  # 🐳 JOB 2 : BUILD & PUSH DOCKER (Seulement si les tests passent)
+  build-and-push:
+    needs: tests # ⚠️ Bloquant : si 'tests' échoue, on ne fait pas ça
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' # On ne push les images que sur un vrai push, pas sur une PR (optionnel)
+
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
+      - name: Connexion à Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Construction et Push du BACKEND
+      - name: Build & Push Backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: mba1342004/dirhamy-backend:latest
+
+      # Construction et Push du FRONTEND
+      - name: Build & Push Frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: mba1342004/dirhamy-frontend:latest
