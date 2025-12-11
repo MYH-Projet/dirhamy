@@ -19,10 +19,18 @@ services:
     container_name: dirhamy-backend
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/dirhamy
-    ports:
-      - "3000:3000"
     depends_on:
       - db
+    ports:
+      - "3000:3000"
+      - "5555:5555"
+    command: >
+      sh -c "
+        npx prisma migrate deploy &&
+        npx prisma db push &&
+        npx prisma generate &&
+        npm run dev
+      "
 
   frontend:
     build: ./frontend
