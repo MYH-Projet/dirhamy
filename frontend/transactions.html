@@ -53,22 +53,29 @@
                         <option value="income">Bank</option>
                     </select>
                 </div>
+                 <div class="add-transaction-form-unit invisible-unit" id="form-unit-tranfer">
+                    <label for="transaction-form-type" class="transaction-unit-label">Transfer to:</label>
+                    <select name="transaction-type" id="transaction-form-account">
+                        <option value="expense">Cash</option>
+                        <option value="income">Bank</option>
+                    </select>
+                </div>
                 <div class="add-transaction-form-unit">
                     <label for="transaction-form-date"  class="transaction-unit-label">Date</label>
                     <input type="date" id="transaction-form-date">
                 </div>
                 <div class="add-transaction-form-unit">
-                    <label for="transaction-form-description" class="transaction-unit-label">Description</label>
-                    <input type="text" placeholder="e.g. Weekly Groceries" id="transaction-form-description">
-                </div>
-                <div class="add-transaction-form-unit">
                     <label for="transaction-form-category" class="transaction-unit-label">Category</label>
                     <input type="text" placeholder="e.g. Food" id="transaction-form-category">
-
+                    
                 </div>
                 <div class="add-transaction-form-unit">
                     <label for="transaction-form-amount" class="transaction-unit-label">Amount</label>
                     <input type="text" placeholder="e.g. 0.00" id="transaction-form-amount">
+                </div>
+                <div class="add-transaction-form-unit">
+                    <label for="transaction-form-description" class="transaction-unit-label">Description</label>
+                    <input type="text" placeholder="e.g. Weekly Groceries" id="transaction-form-description">
                 </div>
                 <div class="add-transaction-form-unit">
                     <button class="btn" id="transaction-form-submit" type="submit">&#65291;</button>

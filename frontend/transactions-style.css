@@ -127,7 +127,7 @@ body {
     flex-basis: 120px;
 
     
-    input, select {
+    input,select {
         font-size: 14px;
 
 
@@ -136,12 +136,15 @@ body {
 
 }
 
+.invisible-unit {
+    display: none;
+}
+
 .add-transaction-form-unit:has(#transaction-form-description) {
     flex: 2;
 }
 
 .add-transaction-form-unit:has(#transaction-form-submit) {
-    flex-grow: 0;
     flex-basis: 90px;
 }
 
