@@ -1,33 +1,26 @@
-# Image Node compatible avec Prisma 7
-FROM node:24-alpine
+# ✅ CORRECTION : On passe sur la version LTS stable (20)
+FROM node:20-alpine
 
-# 1) Dossier de travail dans le conteneur
+# 1) Dossier de travail
 WORKDIR /app
 
 # 2) Copier les fichiers de dépendances
 COPY package.json package-lock.json ./
 
-# 3) Installer TOUTES les dépendances (dev + prod)
-#    -> nécessaire pour tsx, jest, prisma, etc.
+# 3) Installation propre (ci est mieux que install pour les builds, mais install passe aussi)
 RUN npm install
 
-# 4) Copier le code source du backend
+# 4) Copier le code source
 COPY . .
 
-# 5) Optionnel : définir la variable pour Prisma (utile si tu l'utilises dans prisma.config.ts)
-#    Elle sera écrasée par la valeur qu'on donne dans docker-compose
+# 5) Arguments et variables d'environnement
 ARG DATABASE_URL
 ENV DATABASE_URL=${DATABASE_URL}
 
-# ⚠️ On NE lance PAS prisma migrate ici !
-#    On NE lance PAS non plus prisma generate ici,
-#    car on veut qu'ils utilisent la vraie DATABASE_URL de docker-compose.
-
-# 6) Exposer le port de ton backend Express
+# 6) Documentation des ports (Informationnel pour l'infra)
 EXPOSE 3000
 EXPOSE 5555
 
-
-# 7) Commande de démarrage du conteneur
-#    Les migrations Prisma seront lancées via docker-compose (command: ...)
+# 7) Commande de démarrage
+# Note: C'est le docker-compose qui surchargera ça, mais c'est une bonne pratique de l'avoir
 CMD ["npm", "run", "dev"]
