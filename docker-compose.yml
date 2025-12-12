@@ -17,6 +17,7 @@ services:
       args:
         DATABASE_URL: postgresql://postgres:postgres@db:5432/dirhamy
     container_name: dirhamy-backend
+    restart: always
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/dirhamy
     depends_on:

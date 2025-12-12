@@ -35,9 +35,9 @@ app.get('/', async (req:Request, res:Response) => {
 });
 
 
-app.use("/api/auth",authRoutes);
-app.use('/api/transactions', transactionRoutes);
-app.use('/api/balance',balanceRouters)
+app.use("/auth",authRoutes);
+app.use('/transactions', transactionRoutes);
+app.use('/balance',balanceRouters)
 app.get('/profile', authenticateToken, (req: AuthRequest, res) => {
   res.json({ message: 'Welcome to the protected route', user: req.user });
 });
