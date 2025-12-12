@@ -3,9 +3,9 @@ name: CI/CD Dirhamy
 # Déclenchement : Push ou Pull Request sur la branche 'dev'
 on:
   push:
-    branches: [ "infra" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "infra" ]
+    branches: [ "develop" ]
 
 jobs:
   # 🧪 JOB 1 : EXECUTION DES TESTS
