@@ -21,6 +21,5 @@ loginForm.addEventListener('submit', e => {
     }) .then (res => res.json())
         .then (data => console.log(data));
 
-    window.location.replace("./transactions.html");
 }
 )

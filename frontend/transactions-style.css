@@ -12,7 +12,7 @@ body {
 
     height: 65px;
     padding: var(--s-spacing) var(--large-spacing);
-    
+
     background-color: var(--secondary-color);
     box-shadow: 0px 1px 5px 0px var(--border-color);
 
@@ -23,17 +23,20 @@ body {
         flex-direction: row;
         gap: 15px;
 
-        .nav-item{
+        .nav-item {
             padding: var(--s-spacing);
             color: var(--gray-color);
         }
+
         .nav-item a {
             transition: color 0.1s;
         }
+
         .nav-item a:hover {
             color: var(--primary-color);
         }
     }
+
     .user-name {
         font-weight: 450;
         color: var(--gray-color);
@@ -44,7 +47,7 @@ body {
     display: flex;
     flex-direction: column;
 
-    width: 1100px;
+    width: 1200px;
     margin: auto;
 
 }
@@ -52,7 +55,7 @@ body {
 .balance-container {
     display: flex;
     flex-direction: row;
-    gap: 50px;
+    gap: 30px;
 
     margin-bottom: var(--large-spacing);
 
@@ -65,8 +68,8 @@ body {
     }
 
     .card-label {
-        font-size: 15px;
-        font-weight: 450;
+        font-size: 13px;
+        font-weight: bold;
 
         margin-bottom: var(--md-spacing);
     }
@@ -77,14 +80,15 @@ body {
     }
 
     .card-balance {
-        font-size: 28px;
+        font-size: 32px;
         font-weight: 700;
         font-family: Arial, Helvetica, sans-serif;
 
         letter-spacing: 1px;
     }
-    
-    .cash-card-label, .bank-card-label {
+
+    .cash-card-label,
+    .bank-card-label {
         color: gray;
         opacity: 0.9;
     }
@@ -96,5 +100,68 @@ body {
 }
 
 .add-transaction-container {
-     margin-bottom: var(--large-spacing);
+    padding: 20px;
+    margin-bottom: var(--large-spacing);
+
+
+    h2 {
+        color: rgb(57, 61, 66);
+        font-size: 16px;
+        margin-bottom: var(--md-spacing);
+    }
+}
+
+.add-transaction-form {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+.add-transaction-form-unit {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    flex-basis: 120px;
+
+    
+
+    input, select {
+        font-size: 14px;
+
+
+        background-color: var(--lightest-gray-color);
+    }
+
+}
+
+.invisible-unit {
+    display: none;
+}
+
+.add-transaction-form-unit:has(#transaction-form-description) {
+    flex: 2;
+}
+
+.add-transaction-form-unit:has(#transaction-form-submit) {
+    flex-basis: 90px;
+}
+
+#transaction-form-type {
+    transition: background-color 0.1s;
+}
+
+#transaction-form-type:hover {
+    background-color: #e6e6e6;
+}
+.transaction-unit-label {
+    color: var(--gray-color);
+
+    margin-left: var(--xs-spacing);
+    margin-bottom: 3px;
+
+    font-size: 13px;
+    font-weight: 450;
 }
