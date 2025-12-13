@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api'
+const API_URL = '/api'
 
 const loginForm = document.querySelector('.login-form');
 
@@ -9,7 +9,7 @@ loginForm.addEventListener('submit', e => {
     e.preventDefault();
 
 
-    fetch(API_URL + '/login' , {
+    fetch(API_URL + '/auth/login' , {
         method: 'POST',
         headers: {
             'Content-type': 'application/json',

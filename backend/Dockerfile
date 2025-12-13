@@ -1,5 +1,5 @@
 # ✅ CORRECTION : On passe sur la version LTS stable (20)
-FROM node:20-alpine
+FROM node:22-alpine
 
 # 1) Dossier de travail
 WORKDIR /app
