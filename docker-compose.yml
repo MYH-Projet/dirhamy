@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   db:
     image: postgres:15
@@ -20,6 +22,9 @@ services:
     restart: always
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/dirhamy
+      PORT: "3000"
+      JWT_SECRET: anas
+      REFRESH_TOKEN_SECRET: anas
     depends_on:
       - db
     ports:
@@ -27,6 +32,11 @@ services:
       - "5555:5555"
     command: >
       sh -c "
+        echo 'Waiting for Postgres...' &&
+        until pg_isready -h db -p 5432 -U postgres; do
+          sleep 1;
+        done &&
+        echo 'Postgres is ready' &&
         npx prisma migrate deploy &&
         npx prisma db push &&
         npx prisma generate &&
@@ -34,7 +44,8 @@ services:
       "
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
     container_name: dirhamy-frontend
     ports:
       - "8080:80"
