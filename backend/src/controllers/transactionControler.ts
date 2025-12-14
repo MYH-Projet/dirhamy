@@ -169,18 +169,16 @@ export const createTransaction = async (req: AuthRequest, res: Response) => {
 }
 
 export const removeTransaction = async (req: AuthRequest, res: Response) => {
-    const TransactionId = Number(req.params.id);
-    const user = req.user as JwtPayload; 
-    const userId = Number(user.id);
+    const transactionId = Number(req.params.id);
+    const user =req.user as JwtPayload;
+    const userId = Number(user.id) ;
 
     try {
         // 1. Fetch the transaction first to know its Type and Details
         const transactionToDelete = await prisma.transaction.findFirst({
             where: { 
-                id:TransactionId,
-                compte: {
-                    utilisateurId: userId
-                }
+                id: transactionId,
+                compte: { utilisateurId: userId }
             }
         });
 
@@ -188,37 +186,83 @@ export const removeTransaction = async (req: AuthRequest, res: Response) => {
             return res.status(404).json({ error: "Transaction not found" });
         }
 
-        // --- SCENARIO A: TRANSFER (Delete Both Sides) ---
+        // --- SCENARIO A: TRANSFER (Delete Both Sides + Update Both Snapshots) ---
         if (transactionToDelete.type === TypeTransaction.TRANSFER) {
             const partnerTransaction = await prisma.transaction.findFirst({
                 where: {
                     type: TypeTransaction.TRANSFER,
-                    compteId: transactionToDelete.idDestination!, // The other account
-                    idDestination: transactionToDelete.compteId,  // Refers back to this account
-                    montant: -transactionToDelete.montant         // Inverse amount
+                    compteId: transactionToDelete.idDestination!, 
+                    idDestination: transactionToDelete.compteId,  
+                    montant: -transactionToDelete.montant         
                 }
             });
 
             if (!partnerTransaction) {
-                throw new Error("Critical Data Error: Partner transaction missing for transfer ID " + TransactionId);
+                throw new Error("Critical Data Error: Partner transaction missing for transfer ID " + transactionId);
             }
 
-            await prisma.$transaction([
-                // Delete the requested transaction
-                prisma.transaction.delete({ where: { id:TransactionId } }),
-                // Delete the partner if found (using deleteMany is safer if id is unknown)
-                prisma.transaction.delete({ where: { id: partnerTransaction.id } })
-            ]);
+            // Calculate the "Reverse" amount to fix the balance history
+            // If main was -100 (sending money), removing it means adding +100 back to history.
+            const diffMain = -Number(transactionToDelete.montant);
+            const diffPartner = -Number(partnerTransaction.montant);
 
-            return res.status(200).json({ message: "Transfer deleted (both sides)" });
+            await prisma.$transaction(async (tx) => {
+                // 1. Delete Main
+                await tx.transaction.delete({ where: { id: transactionId } });
+                
+                // 2. Delete Partner
+                await tx.transaction.delete({ where: { id: partnerTransaction.id } });
+
+                // 3. Update Main Account Snapshots
+                await tx.balanceSnapshot.updateMany({
+                    where: {
+                        compteId: transactionToDelete.compteId,
+                        date: { gte: transactionToDelete.date } // All snapshots AFTER this transaction
+                    },
+                    data: {
+                        solde: { increment: diffMain }
+                    }
+                });
+
+                // 4. Update Partner Account Snapshots
+                await tx.balanceSnapshot.updateMany({
+                    where: {
+                        compteId: partnerTransaction.compteId,
+                        date: { gte: partnerTransaction.date }
+                    },
+                    data: {
+                        solde: { increment: diffPartner }
+                    }
+                });
+            });
+
+            return res.status(200).json({ message: "Transfer deleted and balances synchronized" });
         }
 
-        // --- SCENARIO B: SIMPLE TRANSACTION (Delete Single) ---
-        await prisma.transaction.delete({
-            where: { id:TransactionId }
+        // --- SCENARIO B: SIMPLE TRANSACTION (Delete Single + Update Snapshot) ---
+        
+        // Calculate the reverse amount
+        const diff = -Number(transactionToDelete.montant);
+
+        await prisma.$transaction(async (tx) => {
+            // 1. Delete the transaction
+            await tx.transaction.delete({
+                where: { id: transactionId }
+            });
+
+            // 2. Update the snapshots
+            await tx.balanceSnapshot.updateMany({
+                where: {
+                    compteId: transactionToDelete.compteId,
+                    date: { gte: transactionToDelete.date }
+                },
+                data: {
+                    solde: { increment: diff }
+                }
+            });
         });
 
-        return res.status(200).json({ message: "Transaction deleted" });
+        return res.status(200).json({ message: "Transaction deleted and balance synchronized" });
 
     } catch (error) {
         console.error("Delete Error:", error);
@@ -228,18 +272,17 @@ export const removeTransaction = async (req: AuthRequest, res: Response) => {
 
 
 export const updateTransaction = async (req: AuthRequest, res: Response) => {
-    const TransactionId = Number(req.params.id);
-    const user = req.user as JwtPayload; 
-    const userId = Number(user.id);
+    const transactionId = Number(req.params.id);
+    const user =req.user as JwtPayload;
+    const userId = Number(user.id) ;
     const { montant, description, categorieId } = req.body; 
 
     try {
+        // 1. Fetch the existing transaction to get the OLD amount
         const existingTransaction = await prisma.transaction.findFirst({
             where: { 
-                id:TransactionId,
-                compte: {
-                    utilisateurId: userId
-                }
+                id: transactionId,
+                compte: { utilisateurId: userId }
             }
         });
 
@@ -250,54 +293,67 @@ export const updateTransaction = async (req: AuthRequest, res: Response) => {
         const amountValue = Number(montant);
         const absAmount = Math.abs(amountValue);
 
-        // --- SCENARIO A: TRANSFER (Update Both Sides) ---
+        // --- SCENARIO A: TRANSFER (Update Both Sides & Both Snapshots) ---
         if (existingTransaction.type === TypeTransaction.TRANSFER) {
             
-            // 1. Find the partner transaction
+            // Find partner
             const partnerTransaction = await prisma.transaction.findFirst({
                 where: {
                     type: TypeTransaction.TRANSFER,
                     compteId: existingTransaction.idDestination!,
                     idDestination: existingTransaction.compteId,
-                    montant: -existingTransaction.montant // Find by OLD amount
+                    montant: -existingTransaction.montant 
                 }
             });
 
             if (!partnerTransaction) {
-                throw new Error(`Critical: Partner transaction missing for transfer ${TransactionId}`);
+                throw new Error(`Critical: Partner transaction missing for transfer ${transactionId}`);
             }
 
-            // 2. Determine the new amounts
-            // If the transaction we are editing (id) is currently negative, it means this side is the Sender.
-            // So, it must REMAIN negative.
+            // Determine amounts
             const isSenderSide = existingTransaction.montant < 0;
-
             const newAmountForMain = isSenderSide ? -absAmount : absAmount;
             const newAmountForPartner = isSenderSide ? absAmount : -absAmount;
 
-            // 3. Execute Updates safely
+            // Calculate Differences for Snapshots
+            const diffMain = newAmountForMain - Number(existingTransaction.montant);
+            const diffPartner = newAmountForPartner - Number(partnerTransaction.montant);
+
             const result = await prisma.$transaction(async (tx) => {
-                // Update the main record (the one the user clicked)
+                // 1. Update Main Transaction
                 const updatedMain = await tx.transaction.update({
-                    where: { id:TransactionId },
-                    data: {
-                        description,
-                        categorieId,
-                        montant: newAmountForMain
-                    }
+                    where: { id: transactionId },
+                    data: { description, categorieId, montant: newAmountForMain }
                 });
 
-                // Update the partner record
+                // 2. Update Partner Transaction
                 const updatedPartner = await tx.transaction.update({
                     where: { id: partnerTransaction.id },
+                    data: { description, categorieId, montant: newAmountForPartner }
+                });
+
+                // 3. Update Main Account Snapshots (Add diffMain to all future snapshots)
+                await tx.balanceSnapshot.updateMany({
+                    where: {
+                        compteId: existingTransaction.compteId,
+                        date: { gte: existingTransaction.date } // Update all snapshots from that date onwards
+                    },
                     data: {
-                        description,
-                        categorieId,
-                        montant: newAmountForPartner
+                        solde: { increment: diffMain }
                     }
                 });
 
-                // Return named strictly based on logic, not variable tricks
+                // 4. Update Partner Account Snapshots (Add diffPartner)
+                await tx.balanceSnapshot.updateMany({
+                    where: {
+                        compteId: partnerTransaction.compteId,
+                        date: { gte: partnerTransaction.date }
+                    },
+                    data: {
+                        solde: { increment: diffPartner }
+                    }
+                });
+
                 return {
                     sender: isSenderSide ? updatedMain : updatedPartner,
                     receiver: isSenderSide ? updatedPartner : updatedMain
@@ -309,21 +365,38 @@ export const updateTransaction = async (req: AuthRequest, res: Response) => {
 
         // --- SCENARIO B: SIMPLE TRANSACTION ---
         let finalAmount = Math.abs(amountValue);
-        
         if (existingTransaction.type === TypeTransaction.DEPENSE) {
             finalAmount = -finalAmount;
         }
 
-        const updated = await prisma.transaction.update({
-            where: { id:TransactionId },
-            data: {
-                montant: finalAmount,
-                description,
-                categorieId,
+        // Calculate Difference
+        const diff = finalAmount - Number(existingTransaction.montant);
+
+        const result = await prisma.$transaction(async (tx) => {
+            // 1. Update Transaction
+            const updated = await tx.transaction.update({
+                where: { id: transactionId },
+                data: { montant: finalAmount, description, categorieId }
+            });
+
+            // 2. Update Snapshots
+            // If `diff` is 0 (amount didn't change), this effectively does nothing, which is fine.
+            if (diff !== 0) {
+                await tx.balanceSnapshot.updateMany({
+                    where: {
+                        compteId: existingTransaction.compteId,
+                        date: { gte: existingTransaction.date }
+                    },
+                    data: {
+                        solde: { increment: diff }
+                    }
+                });
             }
+
+            return updated;
         });
 
-        return res.status(200).json(updated);
+        return res.status(200).json(result);
 
     } catch (error) {
         console.error("Update Error:", error);
