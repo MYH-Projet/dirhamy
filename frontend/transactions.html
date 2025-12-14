@@ -48,23 +48,19 @@
                 <div class="add-transaction-form-unit">
                     <label for="transaction-form-type" class="transaction-unit-label">Type</label>
                     <select name="transaction-type" id="transaction-form-type">
-                        <option value="expense">Expense</option>
-                        <option value="income">Income</option>
-                        <option value="transfer">Transfer</option>
+                        <option value="DEPENSE">Expense</option>
+                        <option value="REVENU">Income</option>
+                        <option value="TRANSFER">Transfer</option>
                     </select>
                 </div>
                 <div class="add-transaction-form-unit">
-                    <label for="transaction-form-type" class="transaction-unit-label">Account</label>
-                    <select name="transaction-type" id="transaction-form-account">
-                        <option value="expense">Cash</option>
-                        <option value="income">Bank</option>
+                    <label for="transaction-form-from-account" class="transaction-unit-label">Account</label>
+                    <select name="transaction-account" id="transaction-form-from-account" class="transaction-form-account">
                     </select>
                 </div>
                  <div class="add-transaction-form-unit invisible-unit" id="form-unit-transfer">
-                    <label for="transaction-form-type" class="transaction-unit-label">Transfer to:</label>
-                    <select name="transaction-type" id="transaction-form-account">
-                        <option value="expense">Cash</option>
-                        <option value="income">Bank</option>
+                    <label for="transaction-form-to-account" class="transaction-unit-label">Transfer to:</label>
+                    <select name="transaction-account" id="transaction-form-to-account" class="transaction-form-account">
                     </select>
                 </div>
                 <div class="add-transaction-form-unit">
@@ -73,7 +69,8 @@
                 </div>
                 <div class="add-transaction-form-unit">
                     <label for="transaction-form-category" class="transaction-unit-label">Category</label>
-                    <input type="text" placeholder="e.g. Food" id="transaction-form-category">
+                    <select type="text" placeholder="e.g. Food" id="transaction-form-category">
+                    </select>
                 </div>
                 <div class="add-transaction-form-unit">
                     <label for="transaction-form-amount" class="transaction-unit-label">Amount</label>
@@ -81,7 +78,7 @@
                 </div>
                 <div class="add-transaction-form-unit">
                     <label for="transaction-form-description" class="transaction-unit-label">Description</label>
-                    <input type="text" placeholder="e.g. Weekly Groceries" id="transaction-form-description">
+                    <input type="text" placeholder="e.g. Weekly Groceries" id="transaction-form-description" required>
                 </div>
                 <div class="add-transaction-form-unit">
                     <button class="btn" id="transaction-form-submit" type="submit">&#65291;</button>

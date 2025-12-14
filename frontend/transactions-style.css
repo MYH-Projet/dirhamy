@@ -125,9 +125,7 @@ body {
 .add-transaction-form-unit {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    flex-basis: 120px;
-
+    flex: 1 0 120px;
     
 
     input, select {
