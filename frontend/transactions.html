@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+    
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Transactions</title>
+        <link rel="stylesheet" href="transactions-style.css">
+        <script src="./transactions-script.js"></script>
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transactions</title>
-    <link rel="stylesheet" href="transactions-style.css">
-</head>
-
-<body>
+<body class="invisible-unit">
     <nav class="nav-bar">
         <img src="logo.svg" width="120" alt="logo-icon" class="logo-icon">
         <ul class="nav-list">
@@ -16,22 +17,28 @@
             <li class="nav-item"><a href="./transactions.html">Transactions</a></li>
             <li class="nav-item"><a href="./transactions.html">Budget</a></li>
         </ul>
-        <p class="user-name">User</p>
+        <p class="user-name">d</p>
     </nav>
 
     <div class="main-container">
         <div class="balance-container">
-            <div class="card primary-card cash-card">
-                <p class="card-label cash-card-label">CASH BALANCE</p>
-                <p class="card-balance cash-card-balance">500.00</p>
+            <div class="card primary-card account-card">
+                <p class="card-label account-card-label">
+                    <span class="account-card-name"></span>
+                    <span class="account-card-type"></span>
+                </p>
+                <p class="card-balance account-card-balance"></p>
             </div>
-            <div class="card primary-card bank-card">
-                <p class="card-label bank-card-label">BANK BALANCE</p>
-                <p class="card-balance bank-card-balance">500.00</p>
+            <div class="card primary-card account-card">
+                <p class="card-label account-card-label">
+                    <span class="account-card-name"></span>
+                    <span class="account-card-type"></span>
+                </p>
+                <p class="card-balance account-card-balance"></p>
             </div>
             <div class="card secondary-card total-card">
                 <p class="card-label total-card-label">TOTAL WEALTH</p>
-                <p class="card-balance total-card-balance">1000.00</p>
+                <p class="card-balance total-card-balance"></p>
             </div>
         </div>
 
@@ -156,7 +163,6 @@
     </div>
 
 
-    <script src="./transactions-script.js"></script>
 </body>
 
 </html>

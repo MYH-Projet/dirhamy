@@ -87,8 +87,10 @@ body {
         letter-spacing: 1px;
     }
 
-    .cash-card-label,
-    .bank-card-label {
+    .account-card-label {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
         color: gray;
         opacity: 0.9;
     }
@@ -130,8 +132,6 @@ body {
 
     input, select {
         font-size: 14px;
-
-
         background-color: var(--lightest-gray-color);
     }
 

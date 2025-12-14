@@ -1,5 +1,22 @@
+
 document.addEventListener('DOMContentLoaded', () => {
-const API_URL = '/api';
+  const user = {}; 
+  const API_URL = '/api';
+  const body = document.querySelector('body');
+
+  fetch(API_URL + '/profile').then(res => res.json()).then(data => {
+    user.id = data.user.id;
+    user.name = data.user.prenom + ' ' + data.user.nom;
+    user.accounts = data.acconts;
+    renderPage(user);
+    body.classList.remove('invisible-unit');
+  });
+  
+  if(sessionStorage.getItem('message')) {
+    alert(sessionStorage.getItem('message')); // of course toast here
+  sessionStorage.removeItem('message');
+}
+
 const transactionsContainer = document.querySelector(
   '.list-transaction-container'
 );
@@ -7,11 +24,12 @@ let originalTransaction = null;
 
 const dateInput = document.querySelector('#transaction-form-date');
 
-dateInput.value = new Date().toISOString().split('T')[0]; /* look for a better way */
 
 const typeTransactionInput = document.querySelector('#transaction-form-type');
 
 const formTransferUnit = document.querySelector('#form-unit-transfer');
+
+dateInput.value = new Date().toISOString().split('T')[0]; /* look for a better way */
 
 typeTransactionInput.addEventListener('change', e => {
     if(typeTransactionInput.value === 'transfer') {
@@ -314,6 +332,62 @@ document
   });
 
 
+function renderProfile(user) {
+  const userName = document.querySelector('.user-name');
+  userName.textContent = user.name;
+}
 
-getTransactions();
+
+
+function renderBalances(user, accounts) {
+
+  const accountCards = document.querySelectorAll('.account-card');
+
+  for(let i =0 ; i < user.accounts.length ; i++) {
+    accountCards[i].querySelector('.account-card-name').textContent = user.accounts[i].nom.toUpperCase();
+    accountCards[i].querySelector('.account-card-type').textContent = user.accounts[i].type.toUpperCase();
+
+    const concernedAccount = accounts.find(account => account.accountId === user.accounts[i].id); /* this is safer code to get the exact balance for each account but i think
+     it is fair to think that they will be in the same i position*/
+    accountCards[i].querySelector('.account-card-balance').textContent  = concernedAccount.accountBalance;
+  }
+
+  const totalCardBalance = document.querySelector('.total-card-balance');
+
+  totalCardBalance.textContent = accounts.reduce((sum, account) => {
+    sum += +account.accountBalance;
+    return sum;
+  } , 0);
+}
+
+function getBalances(user) {
+  // still needs error checking
+  const balances =  [];
+  const promises = [];
+  user.accounts.forEach(account => {
+    promises.push(fetch(`${API_URL}/balance?compteId=${account.id}`)
+    .then(res => res.json())
+    .then(data => {
+      balances.push( {
+          accountId: account.id,
+          accountBalance: data.finalBalance,
+        }
+      )
+    }));
+  })
+
+  Promise.all(promises).then(
+    () => {
+      renderBalances(user, balances);
+    }
+  );
+}
+
+function renderPage(user) {
+  renderProfile(user);
+  getBalances(user);
+  getTransactions();
+}
+
+
 });

@@ -5,6 +5,12 @@ const loginForm = document.querySelector('.login-form');
 const mailInput = document.querySelector('#form-mail-input');
 const passInput = document.querySelector('#form-pass-input');
 
+
+if(sessionStorage.getItem('message')) {
+  alert(sessionStorage.getItem('message'));
+  sessionStorage.removeItem('message');
+}
+
 loginForm.addEventListener('submit', e => {
     e.preventDefault();
 
