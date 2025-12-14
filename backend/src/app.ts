@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routers/authRouter';
 import transactionRoutes from './routers/transactionRouter';
 import balanceRouters from './routers/balanceRouter'
+import categorieRoutes from './routers/categorieRoutes';
 
 import {authenticateToken , AuthRequest} from './Middleware/authMiddleware'
 
@@ -37,9 +38,17 @@ app.get('/', async (req:Request, res:Response) => {
 
 app.use("/auth",authRoutes);
 app.use('/transactions', transactionRoutes);
-app.use('/balance',balanceRouters)
-app.get('/profile', authenticateToken, (req: AuthRequest, res) => {
-  res.json({ message: 'Welcome to the protected route', user: req.user });
+app.use('/balance',balanceRouters);
+app.use('/categories', categorieRoutes);
+app.get('/profile', authenticateToken,async (req: AuthRequest, res) => {
+  
+  res.json({ 
+    message: 'Welcome to the protected route', 
+    user: req.user,
+    acconts: await prisma.compte.findMany({
+      where:{utilisateurId:req.user?.id}
+    })
+   });
 });
 
 export default app;
