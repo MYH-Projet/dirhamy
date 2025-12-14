@@ -339,3 +339,96 @@ body {
   background-color: #0f766e; /* teal foncé */
 }
 
+
+.actions-cell button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.actions-cell button:hover {
+  transform: scale(1.1);
+}
+
+.actions-cell {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: #6b7280; /* gris moderne */
+  transition: fill 0.2s ease;
+}
+
+/* Hover EDIT */
+.icon-btn.btn-edit:hover {
+  background-color: rgba(16, 185, 129, 0.12); /* vert Dirhamy */
+}
+
+.icon-btn.btn-edit:hover svg {
+  fill: #10b981;
+}
+
+/* Hover DELETE */
+.icon-btn.btn-delete:hover {
+  background-color: rgba(239, 68, 68, 0.12); /* rouge soft */
+}
+
+.icon-btn.btn-delete:hover svg {
+  fill: #ef4444;
+}
+
+/* ===== Confirm delete modal (simple + propre) ===== */
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 22px;
+  width: 370px;
+  max-width: 90%;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.modal-box h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.modal-box p {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}

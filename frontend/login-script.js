@@ -1,4 +1,4 @@
-const API_URL = '/api'
+const API_URL = '/api';
 
 const loginForm = document.querySelector('.login-form');
 
@@ -18,8 +18,11 @@ loginForm.addEventListener('submit', e => {
             mail: mailInput.value,
             password: passInput.value,
         }),
-    }) .then (res => res.json())
-        .then (data => console.log(data));
-
+    }).then (res => res.json())
+        .then (data => {
+            console.log(data);
+            window.location.replace('./transactions.html');
+        });
+    
 }
 )

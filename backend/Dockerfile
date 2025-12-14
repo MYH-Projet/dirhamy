@@ -1,4 +1,3 @@
-# ✅ CORRECTION : On passe sur la version LTS stable (20)
 FROM node:22-alpine
 
 # 1) Dossier de travail
@@ -9,6 +8,7 @@ COPY package.json package-lock.json ./
 
 # 3) Installation propre (ci est mieux que install pour les builds, mais install passe aussi)
 RUN npm install
+RUN apk add --no-cache postgresql-client
 
 # 4) Copier le code source
 COPY . .

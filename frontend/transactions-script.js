@@ -88,6 +88,7 @@ function renderTransactions(transactions) {
         <th>Category</th>
         <th>Description</th>
         <th>Amount</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -101,19 +102,44 @@ function renderTransactions(transactions) {
   .forEach(tx => {
     const row = document.createElement('tr');
 
-    row.innerHTML = `
+        row.innerHTML = `
       <td>${tx.date}</td>
       <td>${tx.category}</td>
       <td>${tx.description}</td>
       <td class="${tx.type === 'income' ? 'amount-income' : 'amount-expense'}">
         ${tx.type === 'income' ? '+' : '-'}${tx.amount} DH
       </td>
+      <td class="actions-cell">
+        <button class="icon-btn btn-edit" title="Modifier">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm18-11.5c0-.4-.16-.78-.44-1.06l-2.34-2.34a1.5 1.5 0 0 0-2.12 0l-1.83 1.83 3.75 3.75 1.83-1.83c.28-.28.44-.66.44-1.06z"/>
+          </svg>
+        </button>
+
+        <button class="icon-btn btn-delete" title="Supprimer">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 7h12v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7zm3-5h6l1 1h4v2H2V3h4l1-1z"/>
+          </svg>
+        </button>
+      </td>
+
     `;
 
-    // 👇 IMPORTANT : stocker la transaction
-    row.addEventListener('click', () => {
-      selectTransaction(tx);
-    });
+// Bouton EDIT → ouvre le modal
+row.querySelector('.btn-edit').addEventListener('click', (e) => {
+  e.stopPropagation();
+  selectTransaction(tx);
+});
+
+// Bouton DELETE → suppression directe
+row.querySelector('.btn-delete').addEventListener('click', (e) => {
+  e.stopPropagation();
+  handleDeleteTransaction(tx.id);
+});
+
+
+
+
 
     tbody.appendChild(row);
   });
@@ -139,8 +165,14 @@ function openTransactionModal(transaction) {
   document.getElementById('modal-category').value = transaction.category;
   document.getElementById('modal-description').value = transaction.description;
   document.getElementById('modal-amount').value = transaction.amount;
-
   document.getElementById('modal-save-btn').disabled = true;
+
+  document
+  .getElementById('modal-save-btn')
+  .addEventListener('click', async () => {
+    await handleUpdateTransaction();
+  });
+
 
   document.getElementById('transaction-modal-overlay')
     .classList.remove('hidden');
@@ -149,10 +181,22 @@ function openTransactionModal(transaction) {
 function closeTransactionModal() {
   document.getElementById('transaction-modal-overlay')
     .classList.add('hidden');
+
+  // Clear selection and reset original transaction so input listeners are safe
+  selectedTransaction = null;
+  originalTransaction = null;
+
+  // Ensure save button is disabled when modal closed
+  const saveBtn = document.getElementById('modal-save-btn');
+  if (saveBtn) saveBtn.disabled = true;
 }
 
 
+
 function hasTransactionChanged() {
+  // If no original transaction is loaded, consider there is no change.
+  if (!originalTransaction) return false;
+
   return (
     document.getElementById('modal-date').value !== originalTransaction.date ||
     document.getElementById('modal-type').value !== originalTransaction.type ||
@@ -175,25 +219,101 @@ function hasTransactionChanged() {
   });
 
 
-
-
-document.getElementById('modal-delete-btn').addEventListener('click', () => {
-  const confirmed = confirm(
-    'Êtes-vous sûr de vouloir supprimer cette transaction ?'
-  );
-
-  if (!confirmed) return;
-
-  console.log('Suppression confirmée (API plus tard)');
-});
-
-
-
 document.getElementById('modal-close-btn')
   .addEventListener('click', closeTransactionModal);
 
 document.getElementById('modal-cancel-btn')
   .addEventListener('click', closeTransactionModal);
+
+function handleDeleteTransaction(transactionId) {
+  openConfirmModal(async () => {
+    try {
+      const res = await fetch(`${API_URL}/transactions/${transactionId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      await getTransactions();
+    } catch (err) {
+      console.error('Delete failed:', err);
+      alert('Erreur lors de la suppression');
+    }
+  });
+}
+
+async function handleUpdateTransaction() {
+  if (!selectedTransaction) return;
+
+  try {
+    const payload = {
+      montant: Number(document.getElementById('modal-amount').value),
+      description: document.getElementById('modal-description').value,
+      categorieId: selectedTransaction.categorieId, // temporaire (select plus tard)
+    };
+
+    const res = await fetch(
+      `${API_URL}/transactions/${selectedTransaction.id}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    closeTransactionModal();
+    await getTransactions();
+
+  } catch (err) {
+    console.error('Update failed:', err);
+    alert('Erreur lors de la mise à jour');
+  }
+}
+
+
+
+let confirmCallback = null;
+
+function openConfirmModal(onConfirm) {
+  confirmCallback = onConfirm;
+
+  document
+    .getElementById('confirm-modal-overlay')
+    .classList.remove('hidden');
+}
+
+function closeConfirmModal() {
+  confirmCallback = null;
+
+  document
+    .getElementById('confirm-modal-overlay')
+    .classList.add('hidden');
+}
+
+document
+  .getElementById('confirm-cancel-btn')
+  .addEventListener('click', closeConfirmModal);
+
+document
+  .getElementById('confirm-delete-btn')
+  .addEventListener('click', async () => {
+    if (typeof confirmCallback === 'function') {
+      await confirmCallback();
+    }
+    closeConfirmModal();
+  });
+
+
 
 getTransactions();
 });
