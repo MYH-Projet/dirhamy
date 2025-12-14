@@ -40,6 +40,6 @@ router.put('/:id',authenticateToken, updateTransaction);
 // ==========================================
 // Route: DELETE /api/transactions/:id
 // Params: :id = Transaction ID
-router.delete('/:id', removeTransaction);
+router.delete('/:id', authenticateToken, removeTransaction);
 
 export default router;

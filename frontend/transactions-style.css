@@ -165,3 +165,270 @@ body {
     font-size: 13px;
     font-weight: 450;
 }
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--md-spacing);
+}
+
+.transactions-table th,
+.transactions-table td {
+  text-align: left;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.transactions-table th {
+  color: var(--gray-color);
+  font-weight: 500;
+}
+
+.transactions-table tr:not(:last-child) {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.amount-income {
+  color: #0f9d58;
+  font-weight: 600;
+}
+
+.amount-expense {
+  color: #d64545;
+  font-weight: 600;
+}
+.transactions-table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.transactions-table tbody tr:hover {
+  background-color: #f3f4f6;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal-card {
+  background: #ffffff;
+  width: 420px;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: modalFade 0.15s ease-out;
+}
+
+@keyframes modalFade {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.modal-group label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.modal-group input,
+.modal-group select {
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-primary {
+  background: #0d9488;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: #e5e7eb;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-delete {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-actions-right {
+  display: flex;
+  gap: 8px;
+}
+
+/* Save button disabled state */
+#modal-save-btn:disabled {
+  background-color: #9ca3af; /* gris */
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+#modal-save-btn:not(:disabled):hover {
+  background-color: #0f766e; /* teal foncé */
+}
+
+
+.actions-cell button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.actions-cell button:hover {
+  transform: scale(1.1);
+}
+
+.actions-cell {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: #6b7280; /* gris moderne */
+  transition: fill 0.2s ease;
+}
+
+/* Hover EDIT */
+.icon-btn.btn-edit:hover {
+  background-color: rgba(16, 185, 129, 0.12); /* vert Dirhamy */
+}
+
+.icon-btn.btn-edit:hover svg {
+  fill: #10b981;
+}
+
+/* Hover DELETE */
+.icon-btn.btn-delete:hover {
+  background-color: rgba(239, 68, 68, 0.12); /* rouge soft */
+}
+
+.icon-btn.btn-delete:hover svg {
+  fill: #ef4444;
+}
+
+/* ===== Confirm delete modal (simple + propre) ===== */
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 22px;
+  width: 370px;
+  max-width: 90%;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.modal-box h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.modal-box p {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}

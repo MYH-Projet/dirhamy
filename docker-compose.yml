@@ -11,7 +11,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      # 🔹 Bind Mount pour persister la DB sur la machine
+      - ./docker-data/postgres:/var/lib/postgresql/data
 
   backend:
     build:
@@ -30,6 +31,10 @@ services:
     ports:
       - "3000:3000"
       - "5555:5555"
+    volumes:
+      # 🔹 Bind Mount du code backend (hot reload)
+      - ./backend:/app
+      - /app/node_modules
     command: >
       sh -c "
         echo 'Waiting for Postgres...' &&
@@ -38,7 +43,6 @@ services:
         done &&
         echo 'Postgres is ready' &&
         npx prisma migrate deploy &&
-        npx prisma db push &&
         npx prisma generate &&
         npm run dev
       "
@@ -51,6 +55,7 @@ services:
       - "8080:80"
     depends_on:
       - backend
+    volumes:
+      # Bind Mount frontend 
+      - ./frontend:/usr/share/nginx/html
 
-volumes:
-  db_data:
