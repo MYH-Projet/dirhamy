@@ -11,8 +11,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      # 🔹 Bind Mount pour persister la DB sur la machine
-      - ./docker-data/postgres:/var/lib/postgresql/data
+      - dirhamy-pgdata:/var/lib/postgresql/data
 
   backend:
     build:
@@ -32,8 +31,7 @@ services:
       - "3000:3000"
       - "5555:5555"
     volumes:
-      # 🔹 Bind Mount du code backend (hot reload)
-      - ./backend:/app
+      - ./backend:/app:Z
       - /app/node_modules
     command: >
       sh -c "
@@ -56,6 +54,7 @@ services:
     depends_on:
       - backend
     volumes:
-      # Bind Mount frontend 
-      - ./frontend:/usr/share/nginx/html
+      - ./frontend:/usr/share/nginx/html:Z
 
+volumes:
+  dirhamy-pgdata:

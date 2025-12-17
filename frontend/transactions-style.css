@@ -87,8 +87,10 @@ body {
         letter-spacing: 1px;
     }
 
-    .cash-card-label,
-    .bank-card-label {
+    .account-card-label {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
         color: gray;
         opacity: 0.9;
     }
@@ -123,15 +125,11 @@ body {
 .add-transaction-form-unit {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    flex-basis: 120px;
-
+    flex: 1 0 120px;
     
 
     input, select {
         font-size: 14px;
-
-
         background-color: var(--lightest-gray-color);
     }
 
