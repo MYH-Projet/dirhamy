@@ -24,23 +24,15 @@ loginForm.addEventListener('submit', e => {
             mail: mailInput.value,
             password: passInput.value,
         }),
-
     })
     .then(res => {
-        if(res.ok) {
-            return res.json();
-        } else {
-            return null; // can i throw an error here and have it caught with .catch , i think yes an error happening means a promise not fullfilled thus i can catch
-        }
-    }) 
-    .then(data => {if(data) {  // i guess pass in the error message somehow if its possible
-        sessionStorage.setItem("message", data.message);
-        window.location.replace('./transactions.html');
-    } else {
-        alert('Invalid Credentials');// toast failed login is better, alert is enough for now
-    }}
-
-);
-
+            return res.json().then(data => {
+                if(res.ok) {
+                    sessionStorage.setItem("message", data.message);
+                    window.location.replace('./transactions.html');
+                } else {
+                    throw Error(data.message);
+                }});
+    }) .catch(err => alert(err.message));
 }
-)
+);
