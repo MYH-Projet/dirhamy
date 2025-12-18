@@ -9,7 +9,7 @@ function createSuccessToast(message) {
     return toast;
 }
 
-function createErrorToast() {
+function createErrorToast(message) {
     const toast = document.createElement('div');
 
     toast.classList.add('toast-box error-toast-box');
