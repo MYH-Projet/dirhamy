@@ -130,6 +130,7 @@ ul {
     box-shadow: 0px 1px 5px 0px var(--border-color);
 
     color: var(--black-text-color);
+    background-color: var(--secondary-color);
 
     animation: fadeInOut 3s forwards; 
 }

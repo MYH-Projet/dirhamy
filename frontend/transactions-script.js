@@ -1,8 +1,12 @@
+import { displayToast } from "./helpers/toast.js";
 
 document.addEventListener('DOMContentLoaded', () => {
   const user = {};
   const API_URL = '/api';
   const body = document.querySelector('body');
+
+  const toastContainer = document.querySelector('.toasts-container');
+
 
   fetch(API_URL + '/profile').then(res => res.json()).then(data => {
     user.id = data.user.id;
@@ -11,9 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
     return renderPage(user);
   }).then(() => body.classList.remove('invisible-unit'));
 
-  if (sessionStorage.getItem('message')) {
-    alert(sessionStorage.getItem('message')); // of course toast here
-    sessionStorage.removeItem('message');
+  const toast = JSON.parse(sessionStorage.getItem('toast'));
+  if (toast) {
+    displayToast(toastContainer, toast.message, toast.type);
+    sessionStorage.removeItem('toast');
   }
 
   const transactionsContainer = document.querySelector(

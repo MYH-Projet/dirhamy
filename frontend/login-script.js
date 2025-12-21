@@ -1,14 +1,18 @@
+import { displayToast } from "./helpers/toast.js";
+
 const API_URL = '/api';
+
+const toastContainer = document.querySelector('.toasts-container');
 
 const loginForm = document.querySelector('.login-form');
 
 const mailInput = document.querySelector('#form-mail-input');
 const passInput = document.querySelector('#form-pass-input');
 
-
-if(sessionStorage.getItem('message')) {
-  alert(sessionStorage.getItem('message'));
-  sessionStorage.removeItem('message');
+const toast = sessionStorage.getItem('toast');
+if (toast) {
+    displayToast(toastContainer, toast.message, toast.type);
+    sessionStorage.removeItem('toast');
 }
 
 loginForm.addEventListener('submit', e => {
@@ -24,15 +28,18 @@ loginForm.addEventListener('submit', e => {
             mail: mailInput.value,
             password: passInput.value,
         }),
-    })
-    .then(res => {
-            return res.json().then(data => {
-                if(res.ok) {
-                    sessionStorage.setItem("message", data.message);
-                    window.location.replace('./transactions.html');
-                } else {
-                    throw Error(data.message);
-                }});
-    }) .catch(err => alert(err.message));
+    }).then(res => {
+        return res.json().then(data => {
+            if (res.ok) {
+                sessionStorage.setItem("toast", JSON.stringify({ type: 'success', message: data.message }));
+                window.location.replace('./transactions.html');
+            } else {
+                throw Error(data.error);
+            }
+        });
+    }).catch(err => {
+        console.log(err);
+        displayToast(toastContainer, err.message, 'error');
+    });
 }
 );
