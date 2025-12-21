@@ -174,14 +174,14 @@ ul {
 }
 
 .toast-box-success::before {
-    content: url('./tick-symbol.svg');
+    content: url('./icons/tick-symbol.svg');
 
     width: 40px;
     height: 40px;
 }
 
 .toast-box-error::before {
-    content: url('./cross-symbol.svg');
+    content: url('./icons/cross-symbol.svg');
 
     width: 40px;
     height: 40px;
