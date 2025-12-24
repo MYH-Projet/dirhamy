@@ -1,9 +1,5 @@
 @import url('base.css');
 
-body {
-    background-color: var(--lightest-gray-color);
-}
-
 .nav-bar {
     display: flex;
     flex-direction: row;
@@ -36,19 +32,16 @@ body {
             color: var(--primary-color);
         }
     }
-
-    .user-name {
-        font-weight: 450;
-        color: var(--gray-color);
-    }
 }
 
 .main-container {
     display: flex;
     flex-direction: column;
 
-    width: 1200px;
-    margin: auto;
+    margin-top: 50px;
+    margin-left: 300px;
+
+    width: 75%;
 
 }
 
@@ -135,9 +128,6 @@ body {
 
 }
 
-.invisible-unit {
-    display: none;
-}
 
 .add-transaction-form-unit:has(#transaction-form-description) {
     flex: 2;
