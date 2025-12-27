@@ -1,4 +1,4 @@
-import { displayToast } from "./helpers/toast.js";
+import { displayToast } from "./components/toast.js";
 
 document.addEventListener('DOMContentLoaded', () => {
   const user = {};

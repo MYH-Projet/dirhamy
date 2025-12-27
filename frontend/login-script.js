@@ -1,4 +1,4 @@
-import { displayToast } from "./helpers/toast.js";
+import { displayToast } from "./components/toast.js";
 
 const API_URL = '/api';
 
