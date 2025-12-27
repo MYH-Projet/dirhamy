@@ -1,38 +1,5 @@
 @import url('base.css');
 
-.nav-bar {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-
-    height: 65px;
-    padding: var(--s-spacing) var(--large-spacing);
-
-    background-color: var(--secondary-color);
-    box-shadow: 0px 1px 5px 0px var(--border-color);
-
-    margin-bottom: var(--large-spacing);
-
-    .nav-list {
-        display: flex;
-        flex-direction: row;
-        gap: 15px;
-
-        .nav-item {
-            padding: var(--s-spacing);
-            color: var(--gray-color);
-        }
-
-        .nav-item a {
-            transition: color 0.1s;
-        }
-
-        .nav-item a:hover {
-            color: var(--primary-color);
-        }
-    }
-}
 
 .main-container {
     display: flex;
@@ -99,6 +66,7 @@
     margin-bottom: var(--large-spacing);
 
 
+
     h2 {
         color: rgb(57, 61, 66);
         font-size: 16px;
@@ -126,6 +94,10 @@
         background-color: var(--lightest-gray-color);
     }
 
+  }
+
+.invisible-unit {
+    display: none;
 }
 
 

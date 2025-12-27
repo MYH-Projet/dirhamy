@@ -9,7 +9,7 @@ const loginForm = document.querySelector('.login-form');
 const mailInput = document.querySelector('#form-mail-input');
 const passInput = document.querySelector('#form-pass-input');
 
-const toast = sessionStorage.getItem('toast');
+const toast = JSON.parse(sessionStorage.getItem('toast'));
 if (toast) {
     displayToast(toastContainer, toast.message, toast.type);
     sessionStorage.removeItem('toast');
@@ -31,14 +31,13 @@ loginForm.addEventListener('submit', e => {
     }).then(res => {
         return res.json().then(data => {
             if (res.ok) {
-                sessionStorage.setItem("toast", JSON.stringify({ type: 'success', message: data.message }));
+                sessionStorage.setItem('toast', JSON.stringify({ type: 'success', message: data.message }));
                 window.location.replace('./transactions.html');
             } else {
                 throw Error(data.error);
             }
         });
     }).catch(err => {
-        console.log(err);
         displayToast(toastContainer, err.message, 'error');
     });
 }

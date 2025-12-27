@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-
+  
 
   function renderTransactions(transactions) {
     transactionsContainer.innerHTML = `
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
           throw new Error(`HTTP ${res.status}`);
         }
 
-        await renderPage(user);
+        await reRenderPage(user);
       } catch (err) {
         console.error('Delete failed:', err);
         alert('Erreur lors de la suppression');
@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       closeTransactionModal();
-      await renderPage(user);
+      await reRenderPage(user);
 
     } catch (err) {
       console.error('Update failed:', err);
@@ -418,6 +418,10 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(() => renderAddTransactionContainer(user))
       .then(() => getTransactions());
   }
+  function reRenderPage(user) {
+    return getBalances(user)
+    .then(() => getTransactions());
+  }
 
   const form = document.querySelector('.add-transaction-form');
   form.addEventListener('submit', e => {
@@ -438,11 +442,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }).then(res => {
       if (res.ok) {
-        renderPage(user);
+        reRenderPage(user);
       } else {
         alert('Error');
       }
     });
   });
 
+  document.querySelector('.sidebar-disconnect').addEventListener('click', e => {
+    fetch(API_URL + '/auth/logout' , {
+      method: 'POST',
+    }).then(
+      res => {
+         return res.json().then(
+          data => {
+            if(res.ok) {
+              sessionStorage.setItem('toast', JSON.stringify({message: data.message, type: 'success'}));
+              window.location.assign('./login.html');
+            } else {
+              throw Error(data.error);
+            }
+          }
+        )
+      }
+    ).catch(err => {
+       displayToast(toastContainer, err.message , 'error');
+    })
+  })
 });

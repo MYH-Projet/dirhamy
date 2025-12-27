@@ -52,10 +52,6 @@ select {
     color: var(--black-text-color);
 }
 
-.invisible-unit {
-    display: none;
-}
-
 .btn {
     color: white;
     background-color: var(--primary-color);
