@@ -1,10 +1,12 @@
 import { displayToast } from "./components/toast.js";
+import { insertSidebar } from "./components/sidebar.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const user = {};
   const API_URL = "/api";
   const body = document.querySelector("body");
 
+  insertSidebar(body);
   const toastContainer = document.querySelector(".toasts-container");
 
   fetch(API_URL + "/profile")
