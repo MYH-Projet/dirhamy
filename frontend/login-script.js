@@ -1,46 +1,47 @@
-const API_URL = '/api';
+import { displayToast } from "./components/toast.js";
 
-const loginForm = document.querySelector('.login-form');
+const API_URL = "/api";
 
-const mailInput = document.querySelector('#form-mail-input');
-const passInput = document.querySelector('#form-pass-input');
+const toastContainer = document.querySelector(".toasts-container");
 
+const loginForm = document.querySelector(".login-form");
 
-if(sessionStorage.getItem('message')) {
-  alert(sessionStorage.getItem('message'));
-  sessionStorage.removeItem('message');
+const mailInput = document.querySelector("#form-mail-input");
+const passInput = document.querySelector("#form-pass-input");
+
+const toast = JSON.parse(sessionStorage.getItem("toast"));
+if (toast) {
+  displayToast(toastContainer, toast.message, toast.type);
+  sessionStorage.removeItem("toast");
 }
 
-loginForm.addEventListener('submit', e => {
-    e.preventDefault();
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
 
-
-    fetch(API_URL + '/auth/login', {
-        method: 'POST',
-        headers: {
-            'Content-type': 'application/json',
-        },
-        body: JSON.stringify({
-            mail: mailInput.value,
-            password: passInput.value,
-        }),
-
-    })
-    .then(res => {
-        if(res.ok) {
-            return res.json();
+  fetch(API_URL + "/auth/login", {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({
+      mail: mailInput.value,
+      password: passInput.value,
+    }),
+  })
+    .then((res) => {
+      return res.json().then((data) => {
+        if (res.ok) {
+          sessionStorage.setItem(
+            "toast",
+            JSON.stringify({ type: "success", message: data.message })
+          );
+          window.location.replace("./transactions.html");
         } else {
-            return null; // can i throw an error here and have it caught with .catch , i think yes an error happening means a promise not fullfilled thus i can catch
+          throw Error(data.error);
         }
-    }) 
-    .then(data => {if(data) {  // i guess pass in the error message somehow if its possible
-        sessionStorage.setItem("message", data.message);
-        window.location.replace('./transactions.html');
-    } else {
-        alert('Invalid Credentials');// toast failed login is better, alert is enough for now
-    }}
-
-);
-
-}
-)
+      });
+    })
+    .catch((err) => {
+      displayToast(toastContainer, err.message, "error");
+    });
+});

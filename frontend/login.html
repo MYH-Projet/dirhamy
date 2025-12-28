@@ -1,29 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login Page</title>
-    <link rel="stylesheet" href="./login-style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="./login-style.css" />
+  </head>
+  <body>
     <div class="card primary-card login-box">
-        <img src="./logo.svg" width="180" alt="Dirhamy Logo" class="logo-icon">
-        <p class="login-box-text">Please enter your details to sign in.</p>
-        <form action="" class="login-form">
-            <label for="form-mail-input" class="form-label">Email Address</label>
-            <input type="email" name="mail" id="form-mail-input" placeholder="example@example.com" required>
-            <label for="form-pass-input" class="form-label">
-                <p>Password</p>
-                <a href="./index.html" class="form-forgot-password">Forgot password?</a>
-            </label>
-            <input type="password" name="password" id="form-pass-input" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;" minlength="8" required>
-            <button type="submit" class="btn sign-in-btn">Sign in</button>
-        </form>
-        <p class="login-box-text">Don't have an account? <a href="index.html">Sign up</a></p>
+      <img
+        src="./icons/logo.svg"
+        width="180"
+        alt="Dirhamy Logo"
+        class="logo-icon"
+      />
+      <p class="login-box-text">Please enter your details to sign in.</p>
+      <form action="" class="login-form">
+        <label for="form-mail-input" class="form-label">Email Address</label>
+        <input
+          type="email"
+          name="mail"
+          id="form-mail-input"
+          placeholder="example@example.com"
+          required
+        />
+        <label for="form-pass-input" class="form-label">
+          <p>Password</p>
+          <a href="./index.html" class="form-forgot-password"
+            >Forgot password?</a
+          >
+        </label>
+        <input
+          type="password"
+          name="password"
+          id="form-pass-input"
+          placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
+          minlength="8"
+          required
+        />
+        <button type="submit" class="btn sign-in-btn">Sign in</button>
+      </form>
+      <p class="login-box-text">
+        Don't have an account? <a href="index.html">Sign up</a>
+      </p>
     </div>
 
     <p class="copyright-text">&copy; 2025 Dirhamy Inc. All rights reserved.</p>
-    <script src="./login-script.js"></script>
-</body>
+    <div class="toasts-container"></div>
+    <script type="module" src="./login-script.js"></script>
+  </body>
 </html>

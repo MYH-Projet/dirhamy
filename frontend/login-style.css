@@ -1,96 +1,94 @@
 /* style.css */
 
-@import url('base.css');
+@import url("base.css");
 
 body {
-    background-color: var(--lightest-gray-color);
+  background-color: var(--lightest-gray-color);
 }
 
 .login-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 400px;
+
+  border: none;
+
+  margin: auto;
+  margin-top: 9%;
+  padding-bottom: var(--md-spacing);
+
+  .logo-icon {
+    margin-top: var(--s-spacing);
+    margin-bottom: var(--s-spacing);
+  }
+
+  .login-box-header {
+    color: var(--black-text-color);
+    margin-bottom: var(--s-spacing);
+
+    font-size: 23px;
+    font-weight: bold;
+  }
+
+  .login-form {
     display: flex;
     flex-direction: column;
-    align-items: center;
 
-    width: 400px;
+    width: 93%;
 
-    border: none;
+    margin-bottom: var(--large-spacing);
 
-    margin: auto;
-    margin-top: 9%;
-    padding-bottom: var(--md-spacing);
+    .form-label {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
 
-    .logo-icon {
-        margin-top: var(--s-spacing);
-        margin-bottom: var(--s-spacing);
+      font-weight: 500;
+      font-size: 13px;
+
+      opacity: 0.9;
+
+      color: var(--black-text-color);
+
+      margin-bottom: 6px;
+      padding: 0 var(--xs-spacing);
     }
 
-    .login-box-header {
-        color: var(--black-text-color);
-        margin-bottom: var(--s-spacing);
-
-        font-size: 23px;
-        font-weight: bold;
+    input {
+      margin-bottom: var(--md-spacing);
+      font-size: 13px;
     }
 
-    .login-form {
-        display: flex;
-        flex-direction: column;
-
-        width: 93%;
-
-        margin-bottom: var(--large-spacing);
-
-        .form-label {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-
-            font-weight: 500;
-            font-size: 13px;
-
-            opacity: 0.9;
-
-            color: var(--black-text-color);
-
-            margin-bottom: 6px;
-            padding: 0 var(--xs-spacing);
-        }
-
-        input {
-            margin-bottom: var(--md-spacing);
-            font-size: 13px;
-        }
-
-        .form-forgot-password {
-            color: var(--primary-color);
-        }
-
-        .sign-in-btn {
-            margin-top: var(--s-spacing);
-            padding: var(--normal-spacing) var(--md-spacing);
-        }
+    .form-forgot-password {
+      color: var(--primary-color);
     }
 
-    .login-box-text {
-        color: var(--gray-color);
-        margin-bottom: 24px;
-        font-size: 14px;
-
-        a {
-            font-weight: bold;
-            color: var(--primary-color);
-        }
+    .sign-in-btn {
+      margin-top: var(--s-spacing);
+      padding: var(--normal-spacing) var(--md-spacing);
     }
+  }
 
+  .login-box-text {
+    color: var(--gray-color);
+    margin-bottom: 24px;
+    font-size: 14px;
+
+    a {
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+  }
 }
 
-
 .copyright-text {
-    margin-top: var(--large-spacing);
+  margin-top: var(--large-spacing);
 
-    font-size: 13px;
+  font-size: 13px;
 
-    color: var(--slightly-gray-color);
+  color: var(--slightly-gray-color);
 
-    text-align: center;
+  text-align: center;
 }
