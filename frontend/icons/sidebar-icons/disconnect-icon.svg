@@ -4,22 +4,31 @@
   height="24"
   viewBox="0 0 24 24"
 >
+  <!-- Door -->
+  <path
+    d="M4 3h8v18H4z"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linejoin="round"
+  />
+
+  <!-- Arrow out -->
   <polyline
-    points="4,7 14,7 11,4"
+    points="14,12 20,12 17,9"
     fill="none"
     stroke="currentColor"
     stroke-width="2"
     stroke-linecap="round"
     stroke-linejoin="round"
   />
-  <line x1="14" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="2" />
-
-  <polyline
-    points="20,17 10,17 13,20"
-    fill="none"
+  <line
+    x1="20"
+    y1="12"
+    x2="17"
+    y2="15"
     stroke="currentColor"
     stroke-width="2"
     stroke-linecap="round"
-    stroke-linejoin="round"
   />
 </svg>

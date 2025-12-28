@@ -1,53 +1,56 @@
 import { displayToast } from "./components/toast.js";
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   const user = {};
-  const API_URL = '/api';
-  const body = document.querySelector('body');
+  const API_URL = "/api";
+  const body = document.querySelector("body");
 
-  const toastContainer = document.querySelector('.toasts-container');
+  const toastContainer = document.querySelector(".toasts-container");
 
+  fetch(API_URL + "/profile")
+    .then((res) => res.json())
+    .then((data) => {
+      user.id = data.user.id;
+      user.name = data.user.prenom + " " + data.user.nom;
+      user.accounts = data.acconts;
+      return renderPage(user);
+    })
+    .then(() => body.classList.remove("invisible-unit"));
 
-  fetch(API_URL + '/profile').then(res => res.json()).then(data => {
-    user.id = data.user.id;
-    user.name = data.user.prenom + ' ' + data.user.nom;
-    user.accounts = data.acconts;
-    return renderPage(user);
-  }).then(() => body.classList.remove('invisible-unit'));
-
-  const toast = JSON.parse(sessionStorage.getItem('toast'));
+  const toast = JSON.parse(sessionStorage.getItem("toast"));
   if (toast) {
     displayToast(toastContainer, toast.message, toast.type);
-    sessionStorage.removeItem('toast');
+    sessionStorage.removeItem("toast");
   }
 
   const transactionsContainer = document.querySelector(
-    '.list-transaction-container'
+    ".list-transaction-container"
   );
   let originalTransaction = null;
 
-  const dateInput = document.querySelector('#transaction-form-date');
+  const dateInput = document.querySelector("#transaction-form-date");
 
+  const typeTransactionInput = document.querySelector("#transaction-form-type");
 
-  const typeTransactionInput = document.querySelector('#transaction-form-type');
+  const formTransferUnit = document.querySelector("#form-unit-transfer");
 
-  const formTransferUnit = document.querySelector('#form-unit-transfer');
+  dateInput.value = new Date()
+    .toISOString()
+    .split("T")[0]; /* look for a better way */
 
-  dateInput.value = new Date().toISOString().split('T')[0]; /* look for a better way */
-
-  typeTransactionInput.addEventListener('change', e => {
-    if (typeTransactionInput.value === 'TRANSFER') {
-      formTransferUnit.classList.remove('invisible-unit');
+  typeTransactionInput.addEventListener("change", (e) => {
+    if (typeTransactionInput.value === "TRANSFER") {
+      formTransferUnit.classList.remove("invisible-unit");
     } else {
-      formTransferUnit.classList.add('invisible-unit');
+      formTransferUnit.classList.add("invisible-unit");
     }
   });
 
   async function getTransactions() {
     try {
       const res = await fetch(`${API_URL}/transactions/user`, {
-        method: 'GET',
-        credentials: 'include', // IMPORTANT: JWT dans cookies
+        method: "GET",
+        credentials: "include", // IMPORTANT: JWT dans cookies
       });
 
       if (!res.ok) {
@@ -57,17 +60,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const json = await res.json();
 
       // Backend renvoie { data: [...], meta: {...} }
-      const transactions = (json.data || []).map(t => {
+      const transactions = (json.data || []).map((t) => {
         const amountAbs = Math.abs(Number(t.montant));
 
         // couleur: income si montant positif, expense si négatif
-        const uiType = Number(t.montant) > 0 ? 'income' : 'expense';
+        const uiType = Number(t.montant) > 0 ? "income" : "expense";
 
         return {
           id: t.id,
-          date: (t.date || '').slice(0, 10),
-          category: t.categorie?.nom || '—',
-          description: t.description || '—',
+          date: (t.date || "").slice(0, 10),
+          category: t.categorie?.nom || "—",
+          description: t.description || "—",
           amount: amountAbs,
           type: uiType,
 
@@ -78,15 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       renderTransactions(transactions);
     } catch (err) {
-      console.error('GET transactions failed:', err);
+      console.error("GET transactions failed:", err);
       transactionsContainer.innerHTML = `
       <h3>Recent Transactions</h3>
       <p>Erreur lors du chargement des transactions</p>
     `;
     }
   }
-
-  
 
   function renderTransactions(transactions) {
     transactionsContainer.innerHTML = `
@@ -100,8 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const table = document.createElement('table');
-    table.classList.add('transactions-table');
+    const table = document.createElement("table");
+    table.classList.add("transactions-table");
 
     table.innerHTML = `
     <thead>
@@ -116,20 +117,20 @@ document.addEventListener('DOMContentLoaded', () => {
     <tbody></tbody>
   `;
 
-    const tbody = table.querySelector('tbody');
+    const tbody = table.querySelector("tbody");
 
     transactions
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .slice(0, 5)
-      .forEach(tx => {
-        const row = document.createElement('tr');
+      .forEach((tx) => {
+        const row = document.createElement("tr");
 
         row.innerHTML = `
       <td>${tx.date}</td>
       <td>${tx.category}</td>
       <td>${tx.description}</td>
-      <td class="${tx.type === 'income' ? 'amount-income' : 'amount-expense'}">
-        ${tx.type === 'income' ? '+' : '-'}${tx.amount} DH
+      <td class="${tx.type === "income" ? "amount-income" : "amount-expense"}">
+        ${tx.type === "income" ? "+" : "-"}${tx.amount} DH
       </td>
       <td class="actions-cell">
         <button class="icon-btn btn-edit" title="Modifier">
@@ -148,24 +149,19 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
 
         // Bouton EDIT → ouvre le modal
-        row.querySelector('.btn-edit').addEventListener('click', (e) => {
+        row.querySelector(".btn-edit").addEventListener("click", (e) => {
           e.stopPropagation();
           selectTransaction(tx);
         });
 
         // Bouton DELETE → suppression directe
-        row.querySelector('.btn-delete').addEventListener('click', (e) => {
+        row.querySelector(".btn-delete").addEventListener("click", (e) => {
           e.stopPropagation();
           handleDeleteTransaction(tx.id);
         });
 
-
-
-
-
         tbody.appendChild(row);
       });
-
 
     transactionsContainer.appendChild(table);
   }
@@ -173,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function selectTransaction(transaction) {
     selectedTransaction = transaction;
-    console.log('Transaction sélectionnée:', selectedTransaction);
+    console.log("Transaction sélectionnée:", selectedTransaction);
     openTransactionModal(transaction);
   }
 
@@ -182,77 +178,88 @@ document.addEventListener('DOMContentLoaded', () => {
 
     originalTransaction = { ...transaction };
 
-    document.getElementById('modal-date').value = transaction.date;
-    document.getElementById('modal-type').value = transaction.type;
-    document.getElementById('modal-category').value = transaction.category;
-    document.getElementById('modal-description').value = transaction.description;
-    document.getElementById('modal-amount').value = transaction.amount;
-    document.getElementById('modal-save-btn').disabled = true;
+    document.getElementById("modal-date").value = transaction.date;
+    document.getElementById("modal-type").value = transaction.type;
+    document.getElementById("modal-category").value = transaction.category;
+    document.getElementById("modal-description").value =
+      transaction.description;
+    document.getElementById("modal-amount").value = transaction.amount;
+    document.getElementById("modal-save-btn").disabled = true;
 
     document
-      .getElementById('modal-save-btn')
-      .addEventListener('click', async () => {
+      .getElementById("modal-save-btn")
+      .addEventListener("click", async () => {
         await handleUpdateTransaction();
       });
 
-
-    document.getElementById('transaction-modal-overlay')
-      .classList.remove('hidden');
+    document
+      .getElementById("transaction-modal-overlay")
+      .classList.remove("hidden");
   }
 
   function closeTransactionModal() {
-    document.getElementById('transaction-modal-overlay')
-      .classList.add('hidden');
+    document
+      .getElementById("transaction-modal-overlay")
+      .classList.add("hidden");
 
     // Clear selection and reset original transaction so input listeners are safe
     selectedTransaction = null;
     originalTransaction = null;
 
     // Ensure save button is disabled when modal closed
-    const saveBtn = document.getElementById('modal-save-btn');
+    const saveBtn = document.getElementById("modal-save-btn");
     if (saveBtn) saveBtn.disabled = true;
   }
-
-
 
   function hasTransactionChanged() {
     // If no original transaction is loaded, consider there is no change.
     if (!originalTransaction) return false;
 
     return (
-      document.getElementById('modal-date').value !== originalTransaction.date ||
-      document.getElementById('modal-type').value !== originalTransaction.type ||
-      document.getElementById('modal-category').value !== originalTransaction.category ||
-      document.getElementById('modal-description').value !== originalTransaction.description ||
-      Number(document.getElementById('modal-amount').value || 0) !== originalTransaction.amount
+      document.getElementById("modal-date").value !==
+        originalTransaction.date ||
+      document.getElementById("modal-type").value !==
+        originalTransaction.type ||
+      document.getElementById("modal-category").value !==
+        originalTransaction.category ||
+      document.getElementById("modal-description").value !==
+        originalTransaction.description ||
+      Number(document.getElementById("modal-amount").value || 0) !==
+        originalTransaction.amount
     );
   }
 
-  ['modal-date', 'modal-type', 'modal-category', 'modal-description', 'modal-amount']
-    .forEach(id => {
-      document.getElementById(id).addEventListener('input', () => {
-        const changed = hasTransactionChanged();
-        const saveBtn = document.getElementById('modal-save-btn');
+  [
+    "modal-date",
+    "modal-type",
+    "modal-category",
+    "modal-description",
+    "modal-amount",
+  ].forEach((id) => {
+    document.getElementById(id).addEventListener("input", () => {
+      const changed = hasTransactionChanged();
+      const saveBtn = document.getElementById("modal-save-btn");
 
-        saveBtn.disabled = !changed;
+      saveBtn.disabled = !changed;
 
-        console.log('Form changed:', changed);
-      });
+      console.log("Form changed:", changed);
     });
+  });
 
+  document
+    .getElementById("modal-close-btn")
+    .addEventListener("click", closeTransactionModal);
 
-  document.getElementById('modal-close-btn')
-    .addEventListener('click', closeTransactionModal);
-
-  document.getElementById('modal-cancel-btn')
-    .addEventListener('click', closeTransactionModal);
+  document
+    .getElementById("modal-cancel-btn")
+    .addEventListener("click", closeTransactionModal);
 
   function handleDeleteTransaction(transactionId) {
     openConfirmModal(async () => {
       try {
         const res = await fetch(`${API_URL}/transactions/${transactionId}`, {
-          method: 'DELETE',
-          credentials: 'include',
+          method: "DELETE",
+          credentials: "include",
         });
 
         if (!res.ok) {
@@ -261,8 +268,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         await reRenderPage(user);
       } catch (err) {
-        console.error('Delete failed:', err);
-        alert('Erreur lors de la suppression');
+        console.error("Delete failed:", err);
+        alert("Erreur lors de la suppression");
       }
     });
   }
@@ -272,19 +279,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const payload = {
-        montant: Number(document.getElementById('modal-amount').value),
-        description: document.getElementById('modal-description').value,
+        montant: Number(document.getElementById("modal-amount").value),
+        description: document.getElementById("modal-description").value,
         categorieId: selectedTransaction.categorieId, // temporaire (select plus tard)
       };
 
       const res = await fetch(
         `${API_URL}/transactions/${selectedTransaction.id}`,
         {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          credentials: 'include',
+          credentials: "include",
           body: JSON.stringify(payload),
         }
       );
@@ -295,68 +302,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
       closeTransactionModal();
       await reRenderPage(user);
-
     } catch (err) {
-      console.error('Update failed:', err);
-      alert('Erreur lors de la mise à jour');
+      console.error("Update failed:", err);
+      alert("Erreur lors de la mise à jour");
     }
   }
-
-
 
   let confirmCallback = null;
 
   function openConfirmModal(onConfirm) {
     confirmCallback = onConfirm;
 
-    document
-      .getElementById('confirm-modal-overlay')
-      .classList.remove('hidden');
+    document.getElementById("confirm-modal-overlay").classList.remove("hidden");
   }
 
   function closeConfirmModal() {
     confirmCallback = null;
 
-    document
-      .getElementById('confirm-modal-overlay')
-      .classList.add('hidden');
+    document.getElementById("confirm-modal-overlay").classList.add("hidden");
   }
 
   document
-    .getElementById('confirm-cancel-btn')
-    .addEventListener('click', closeConfirmModal);
+    .getElementById("confirm-cancel-btn")
+    .addEventListener("click", closeConfirmModal);
 
   document
-    .getElementById('confirm-delete-btn')
-    .addEventListener('click', async () => {
-      if (typeof confirmCallback === 'function') {
+    .getElementById("confirm-delete-btn")
+    .addEventListener("click", async () => {
+      if (typeof confirmCallback === "function") {
         await confirmCallback();
       }
       closeConfirmModal();
     });
 
-
   function renderProfile(user) {
-    const userName = document.querySelector('.user-name');
+    const userName = document.querySelector(".user-name");
     userName.textContent = user.name;
   }
 
-
-
   function renderBalances(user, accounts) {
-
-    const accountCards = document.querySelectorAll('.account-card');
+    const accountCards = document.querySelectorAll(".account-card");
 
     for (let i = 0; i < user.accounts.length; i++) {
-      accountCards[i].querySelector('.account-card-name').textContent = user.accounts[i].nom.toUpperCase();
-      accountCards[i].querySelector('.account-card-type').textContent = user.accounts[i].type.toUpperCase();
+      accountCards[i].querySelector(".account-card-name").textContent =
+        user.accounts[i].nom.toUpperCase();
+      accountCards[i].querySelector(".account-card-type").textContent =
+        user.accounts[i].type.toUpperCase();
 
-      const concernedAccount = accounts.find(account => account.accountId === user.accounts[i].id); /* this is safer code to get the exact balance for each account but i think
+      const concernedAccount = accounts.find(
+        (account) => account.accountId === user.accounts[i].id
+      ); /* this is safer code to get the exact balance for each account but i think
      it is fair to think that they will be in the same i position*/
-      accountCards[i].querySelector('.account-card-balance').textContent = concernedAccount.accountBalance;
+      accountCards[i].querySelector(".account-card-balance").textContent =
+        concernedAccount.accountBalance;
     }
 
-    const totalCardBalance = document.querySelector('.total-card-balance');
+    const totalCardBalance = document.querySelector(".total-card-balance");
 
     totalCardBalance.textContent = accounts.reduce((sum, account) => {
       sum += +account.accountBalance;
@@ -368,47 +369,46 @@ document.addEventListener('DOMContentLoaded', () => {
     // still needs error checking
     const balances = [];
     const promises = [];
-    user.accounts.forEach(account => {
-      promises.push(fetch(`${API_URL}/balance?compteId=${account.id}`)
-        .then(res => res.json())
-        .then(data => {
-          balances.push({
-            accountId: account.id,
-            accountBalance: data.finalBalance,
-          }
-          )
-        }));
-    })
+    user.accounts.forEach((account) => {
+      promises.push(
+        fetch(`${API_URL}/balance?compteId=${account.id}`)
+          .then((res) => res.json())
+          .then((data) => {
+            balances.push({
+              accountId: account.id,
+              accountBalance: data.finalBalance,
+            });
+          })
+      );
+    });
 
-    return Promise.all(promises).then(
-      () => {
-        renderBalances(user, balances);
-      }
-    );
+    return Promise.all(promises).then(() => {
+      renderBalances(user, balances);
+    });
   }
 
   function renderAddTransactionContainer(user) {
-    const accountForms = document.querySelectorAll('.transaction-form-account');
-    accountForms.forEach(accountForm => {
-      user.accounts.forEach(account => {
-        const option = document.createElement('option');
+    const accountForms = document.querySelectorAll(".transaction-form-account");
+    accountForms.forEach((accountForm) => {
+      user.accounts.forEach((account) => {
+        const option = document.createElement("option");
         option.value = account.id;
         option.textContent = account.nom;
         accountForm.appendChild(option);
-      })
+      });
     });
-    return fetch(API_URL + '/categories')
-      .then(res => res.json())
-      .then(data => {
-        const transactionForm = document.querySelector('#transaction-form-category');
-        data.forEach(
-          category => {
-            const option = document.createElement('option');
-            option.value = category.id;
-            option.textContent = category.nom
-            transactionForm.appendChild(option);
-          }
+    return fetch(API_URL + "/categories")
+      .then((res) => res.json())
+      .then((data) => {
+        const transactionForm = document.querySelector(
+          "#transaction-form-category"
         );
+        data.forEach((category) => {
+          const option = document.createElement("option");
+          option.value = category.id;
+          option.textContent = category.nom;
+          transactionForm.appendChild(option);
+        });
       });
   }
 
@@ -419,54 +419,59 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(() => getTransactions());
   }
   function reRenderPage(user) {
-    return getBalances(user)
-    .then(() => getTransactions());
+    return getBalances(user).then(() => getTransactions());
   }
 
-  const form = document.querySelector('.add-transaction-form');
-  form.addEventListener('submit', e => {
+  const form = document.querySelector(".add-transaction-form");
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
-    fetch(API_URL + '/transactions', {
-      method: 'POST',
+    fetch(API_URL + "/transactions", {
+      method: "POST",
       headers: {
-        'Content-type': 'application/json',
+        "Content-type": "application/json",
       },
       body: JSON.stringify({
-        montant: +document.querySelector('#transaction-form-amount').value,
-        type: document.querySelector('#transaction-form-type').value,
-        description: document.querySelector('#transaction-form-description').value,
-        compteId: +document.querySelector('#transaction-form-from-account').value,
-        idDestination: +document.querySelector('#transaction-form-to-account').value,
-        categorieId: +document.querySelector('#transaction-form-category').value,
+        montant: +document.querySelector("#transaction-form-amount").value,
+        type: document.querySelector("#transaction-form-type").value,
+        description: document.querySelector("#transaction-form-description")
+          .value,
+        compteId: +document.querySelector("#transaction-form-from-account")
+          .value,
+        idDestination: +document.querySelector("#transaction-form-to-account")
+          .value,
+        categorieId: +document.querySelector("#transaction-form-category")
+          .value,
       }),
-
-    }).then(res => {
+    }).then((res) => {
       if (res.ok) {
         reRenderPage(user);
       } else {
-        alert('Error');
+        alert("Error");
       }
     });
   });
 
-  document.querySelector('.sidebar-disconnect').addEventListener('click', e => {
-    fetch(API_URL + '/auth/logout' , {
-      method: 'POST',
-    }).then(
-      res => {
-         return res.json().then(
-          data => {
-            if(res.ok) {
-              sessionStorage.setItem('toast', JSON.stringify({message: data.message, type: 'success'}));
-              window.location.assign('./login.html');
+  document
+    .querySelector(".sidebar-disconnect")
+    .addEventListener("click", (e) => {
+      fetch(API_URL + "/auth/logout", {
+        method: "POST",
+      })
+        .then((res) => {
+          return res.json().then((data) => {
+            if (res.ok) {
+              sessionStorage.setItem(
+                "toast",
+                JSON.stringify({ message: data.message, type: "success" })
+              );
+              window.location.assign("./login.html");
             } else {
               throw Error(data.error);
             }
-          }
-        )
-      }
-    ).catch(err => {
-       displayToast(toastContainer, err.message , 'error');
-    })
-  })
+          });
+        })
+        .catch((err) => {
+          displayToast(toastContainer, err.message, "error");
+        });
+    });
 });
