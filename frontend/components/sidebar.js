@@ -10,14 +10,14 @@ function createSidebar() {
   sidebarHeader.classList.add("sidebar-header");
 
   promises.push(
-    fetch("./icons/logo.svg")
+    fetch("../../icons/logo.svg")
       .then((res) => res.text())
       .then((text) => {
         sidebarHeader.innerHTML = text;
         const btn = document.createElement("button");
         btn.classList.add("sidebar-resize-btn");
         promises.push(
-          fetch("./icons/sidebar-icons/hamburger-icon.svg")
+          fetch("../../icons/sidebar-icons/hamburger-icon.svg")
             .then((res) => res.text())
             .then((text) => {
               btn.innerHTML = text;
@@ -37,10 +37,10 @@ function createSidebar() {
   const listItemOne = document.createElement("li");
   listItemOne.classList.add("sidebar-link");
   const anchorOne = document.createElement("a");
-  anchorOne.href = "./transactions.html";
+  anchorOne.href = "../transactions/transactions.html";
 
   promises.push(
-    fetch("./icons/sidebar-icons/transactions-icon.svg")
+    fetch("../../icons/sidebar-icons/transactions-icon.svg")
       .then((res) => res.text())
       .then((text) => {
         anchorOne.innerHTML = text;
@@ -55,10 +55,10 @@ function createSidebar() {
   const listItemTwo = document.createElement("li");
   listItemTwo.classList.add("sidebar-link");
   const anchorTwo = document.createElement("a");
-  anchorTwo.href = "./categories.html";
+  anchorTwo.href = "../categories/categories.html";
 
   promises.push(
-    fetch("./icons/sidebar-icons/categories-icon.svg")
+    fetch("../../icons/sidebar-icons/categories-icon.svg")
       .then((res) => res.text())
       .then((text) => {
         anchorTwo.innerHTML = text;
@@ -73,10 +73,10 @@ function createSidebar() {
   const listItemThree = document.createElement("li");
   listItemThree.classList.add("sidebar-link");
   const anchorThree = document.createElement("a");
-  anchorThree.href = "./budget.html";
+  anchorThree.href = "../budget/budget.html";
 
   promises.push(
-    fetch("./icons/sidebar-icons/budget-icon.svg")
+    fetch("../../icons/sidebar-icons/budget-icon.svg")
       .then((res) => res.text())
       .then((text) => {
         anchorThree.innerHTML = text;
@@ -87,6 +87,24 @@ function createSidebar() {
   );
   listItemThree.appendChild(anchorThree);
   list.appendChild(listItemThree);
+
+  const listItemFour = document.createElement("li");
+  listItemFour.classList.add("sidebar-link");
+  const anchorFour = document.createElement("a");
+  anchorFour.href = "../chatbot/chatbot.html";
+
+  promises.push(
+    fetch("../../icons/sidebar-icons/chatbot-icon.svg")
+      .then((res) => res.text())
+      .then((text) => {
+        anchorFour.innerHTML = text;
+        const span = document.createElement("span");
+        span.textContent = "Chatbot";
+        anchorFour.appendChild(span);
+      })
+  );
+  listItemFour.appendChild(anchorFour);
+  list.appendChild(listItemFour);
 
   sidebarNav.appendChild(list);
   sidebar.append(sidebarNav);
@@ -112,7 +130,7 @@ function createSidebar() {
   disconnectBtn.classList.add("sidebar-disconnect");
 
   promises.push(
-    fetch("./icons/sidebar-icons/disconnect-icon.svg")
+    fetch("../../icons/sidebar-icons/disconnect-icon.svg")
       .then((res) => res.text())
       .then((text) => {
         disconnectBtn.innerHTML = text;
