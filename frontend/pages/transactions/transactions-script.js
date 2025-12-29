@@ -1,5 +1,5 @@
-import { displayToast } from "./components/toast.js";
-import { insertSidebar } from "./components/sidebar.js";
+import { displayToast } from "../../components/toast.js";
+import { insertSidebar } from "../../components/sidebar.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const user = {};
