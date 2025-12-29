@@ -25,11 +25,11 @@ enum TypeTransaction {
 }
 
 model Utilisateur {
-  id         Int    @id @default(autoincrement())
-  nom        String
-  prenom     String
-  email      String @unique
-  motDePasse String
+  id           Int     @id @default(autoincrement())
+  nom          String
+  prenom       String
+  email        String  @unique
+  motDePasse   String
   refreshToken String?
 
   // Relationships
@@ -41,7 +41,6 @@ model Compte {
   id   Int        @id @default(autoincrement())
   nom  String
   type TypeCompte
-  
 
   // Foreign Key
   utilisateurId Int
@@ -54,8 +53,9 @@ model Compte {
 }
 
 model Categorie {
-  id  Int    @id @default(autoincrement())
-  nom String
+  id    Int    @id @default(autoincrement())
+  nom   String
+  limit Float?
 
   // Foreign Key
   utilisateurId Int
@@ -63,6 +63,20 @@ model Categorie {
 
   // Relationships
   transactions Transaction[]
+  snapshots    BudgetSnapshot[]
+}
+
+model BudgetSnapshot {
+  id        Int      @id @default(autoincrement())
+  monthDate DateTime // Store as 1st of the month (e.g., 2025-12-01T00:00:00Z)
+  limit     Float // The budget set for this month
+  spend     Float    @default(0) // The calculated total spent (Cached)
+
+  categorieId Int
+  categorie   Categorie @relation(fields: [categorieId], references: [id])
+
+  // Ensure unique snapshot per category per month
+  @@unique([categorieId, monthDate])
 }
 
 model Transaction {
