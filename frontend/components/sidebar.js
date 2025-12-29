@@ -118,11 +118,11 @@ function createSidebar() {
 
   const sidebarProfileIcon = document.createElement("div");
   sidebarProfileIcon.classList.add("sidebar-profile-icon");
-  sidebarProfileIcon.textContent = "JD";
+  sidebarProfileIcon.textContent = "";
 
   const userName = document.createElement("p");
   userName.classList.add("user-name");
-  userName.textContent = "Jhon Doe";
+  userName.textContent = "";
 
   sidebarProfile.append(sidebarProfileIcon, userName);
 
