@@ -1,12 +1,19 @@
 import express, { Request, Response } from 'express';
 import {prisma} from "./lib/prisma"
+
+
 import cron from 'node-cron';
 import { generateDailySnapshots } from './jobs/snapshot-worker';
+import { updateBudgetSnapshots } from './jobs/BudgetSnapshots'
+
 import cookieParser from 'cookie-parser';
+
+
 import authRoutes from './routers/authRouter';
 import transactionRoutes from './routers/transactionRouter';
 import balanceRouters from './routers/balanceRouter'
 import categorieRoutes from './routers/categorieRoutes';
+import budgetRouter from './routers/budgetRoutes'
 
 import {authenticateToken , AuthRequest} from './Middleware/authMiddleware'
 
@@ -22,6 +29,10 @@ app.use(cookieParser());
 cron.schedule('0 0 * * *', () => {
   console.log('Cron Triggered: Running Snapshot Worker');
   generateDailySnapshots();
+});
+cron.schedule("0 0 */15 * *", () => {
+  updateBudgetSnapshots()
+    .catch(e => console.error("Job Failed:", e));
 });
 
 app.get('/', async (req:Request, res:Response) => {
@@ -40,6 +51,7 @@ app.use("/auth",authRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/balance',balanceRouters);
 app.use('/categories', categorieRoutes);
+app.use('/budget',budgetRouter);
 app.get('/profile', authenticateToken,async (req: AuthRequest, res) => {
   
   res.json({ 
