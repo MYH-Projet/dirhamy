@@ -7,6 +7,27 @@
     <link rel="stylesheet" href="./categories-style.css" />
   </head>
   <body>
+    <main class="main-container">
+      <section class="card primary-card add-entity-container">
+        <h2 class="add-entity-title">ADD NEW CATEGORY</h2>
+        <form action="" class="add-entity-form">
+          <div class="form-unit">
+            <input class="form-field" type="text" placeholder="Category name" />
+          </div>
+          <button type="submit" class="form-submit-btn btn">&#65291;</button>
+        </form>
+      </section>
+      <table class="list-entity-container card primary-card">
+        <thead>
+          <tr>
+            <th>Category Name</th>
+            <th class="action-btns">Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="modal-container"></div>
+    </main>
     <script src="./categories-script.js" type="module"></script>
   </body>
 </html>
