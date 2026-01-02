@@ -26,7 +26,39 @@
         </thead>
         <tbody></tbody>
       </table>
-      <div class="modal-container"></div>
+      <div class="modal-background"></div>
+      <div class="modal delete-modal delete-category-modal">
+        <form>
+          <h2>Delete this category</h2>
+
+          <p>This action is irreversible. Do you want to continue?</p>
+
+          <div class="action-btns">
+            <button type="submit" class="cancel-btn">Cancel</button>
+            <button type="submit" class="delete-btn">Delete</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal action-modal edit-category-modal">
+        <div class="modal-header"><h2>Edit this category</h2></div>
+
+        <form>
+          <div class="form-unit">
+            <label for="category-name" class="form-label">Category Name</label>
+            <input
+              type="text"
+              name="category-name"
+              id="category-name-field"
+              class="form-field"
+            />
+          </div>
+          <div class="action-btns modal-footer">
+            <button type="submit" class="cancel-btn">Cancel</button>
+            <button type="submit" class="action-btn">Save</button>
+          </div>
+        </form>
+      </div>
     </main>
     <script src="./categories-script.js" type="module"></script>
   </body>
