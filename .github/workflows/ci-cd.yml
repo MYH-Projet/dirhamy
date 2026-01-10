@@ -16,7 +16,7 @@ jobs:
 # =========================
 # CI – TESTS & BUILD
 # =========================
-ci:
+ ci:
   runs-on: ubuntu-latest
 
   steps:
@@ -56,7 +56,7 @@ ci:
 # =========================
 # CD – PROD (EC2)
 # =========================
-deploy:
+ deploy:
   if: github.ref == 'refs/heads/main'
   runs-on: ubuntu-latest
   needs: ci
