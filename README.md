@@ -1,2 +1,2 @@
-# dirhamy
-MVP développé en méthode Agile Scrum
+# dirhamy Nda
+MVP développé en méthode Agile Scrum.
