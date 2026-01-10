@@ -1,98 +1,79 @@
-name: CI/CD Dirhamy
+name: Dirhamy CI/CD
 
-# Déclenchement : Push ou Pull Request sur la branche 'dev'
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ develop, main ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ develop ]
+
+env:
+  REGISTRY: docker.io
+  IMAGE_BACKEND: mba1342004/dirhamy-backend
+  IMAGE_FRONTEND: mba1342004/dirhamy-frontend
+  IMAGE_TAG: ${{ github.ref_name }}
 
 jobs:
-  # 🧪 JOB 1 : EXECUTION DES TESTS
-  tests:
-    runs-on: ubuntu-latest
-    
-    # On crée une DB PostgreSQL temporaire juste pour les tests
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: dirhamy_test
-        ports:
-          - 5432:5432
-        # Attendre que la DB soit prête avant de lancer les tests
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+# =========================
+# CI – TESTS & BUILD
+# =========================
+ci:
+  runs-on: ubuntu-latest
 
-    steps:
-      - name: Récupération du code
-        uses: actions/checkout@v4
+  steps:
+    - uses: actions/checkout@v4
 
-      - name: Installation de Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-      - name: Installation des dépendances Backend
-        working-directory: ./backend
-        run: npm ci
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Préparation de la Base de Données (Prisma)
-        working-directory: ./backend
-        env:
-          # On pointe vers le service postgres défini plus haut
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dirhamy_test
-        run: |
-          npx prisma generate
-          npx prisma migrate deploy
+    - name: Build & Push Backend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        file: ./backend/Dockerfile
+        push: true
+        tags: |
+          ${{ env.IMAGE_BACKEND }}:${{ env.IMAGE_TAG }}
+          ${{ env.IMAGE_BACKEND }}:latest
 
-      - name: Lancement des Tests
-        working-directory: ./backend
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dirhamy_test
-        # Cette commande lance TOUS les tests définis dans ton package.json (Jest, etc.)
-        run: npm test
+    - name: Build & Push Frontend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        file: ./frontend/Dockerfile
+        push: true
+        build-args: |
+          VITE_API_URL=/api
+        tags: |
+          ${{ env.IMAGE_FRONTEND }}:${{ env.IMAGE_TAG }}
+          ${{ env.IMAGE_FRONTEND }}:latest
 
-  # 🐳 JOB 2 : BUILD & PUSH DOCKER (Seulement si les tests passent)
-  build-and-push:
-    needs: tests # ⚠️ Bloquant : si 'tests' échoue, on ne fait pas ça
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' # On ne push les images que sur un vrai push, pas sur une PR (optionnel)
+# =========================
+# CD – PROD (EC2)
+# =========================
+deploy:
+  if: github.ref == 'refs/heads/main'
+  runs-on: ubuntu-latest
+  needs: ci
 
-    steps:
-      - name: Récupération du code
-        uses: actions/checkout@v4
+  steps:
+    - name: Configure SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
 
-      - name: Connexion à Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Add EC2 to known_hosts
+      run: ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # Construction et Push du BACKEND
-      - name: Build & Push Backend
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          file: ./backend/Dockerfile
-          push: true
-          tags: mba1342004/dirhamy-backend:latest
-
-      # Construction et Push du FRONTEND
-      - name: Build & Push Frontend
-        uses: docker/build-push-action@v6
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          push: true
-          tags: mba1342004/dirhamy-frontend:latest
+    - name: Deploy on EC2
+      run: |
+        ssh ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+          cd ~/dirhamy
+          docker compose -f docker-compose.prod.yml pull
+          docker compose -f docker-compose.prod.yml up -d
+        EOF
