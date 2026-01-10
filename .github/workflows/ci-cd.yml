@@ -2,7 +2,7 @@ name: Dirhamy CI/CD
 
 on:
   push:
-    branches: [ develop, main ]
+    branches: [ develop, main, infra ]
   pull_request:
     branches: [ develop ]
 
