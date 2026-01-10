@@ -1,11 +1,15 @@
-name: CI/CD Dirhamy
+name: Dirhamy CI/CD
 
-# Déclenchement : Push ou Pull Request sur la branche 'dev'
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "develop", "main" ]
   pull_request:
     branches: [ "develop" ]
+
+env:
+  REGISTRY: docker.io
+  IMAGE_BACKEND: mba1342004/dirhamy-backend
+  IMAGE_FRONTEND: mba1342004/dirhamy-frontend
 
 jobs:
   # 🧪 JOB 1 : EXECUTION DES TESTS
@@ -59,40 +63,79 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/dirhamy_test
         # Cette commande lance TOUS les tests définis dans ton package.json (Jest, etc.)
         run: npm test
-
-  # 🐳 JOB 2 : BUILD & PUSH DOCKER (Seulement si les tests passent)
+  # -----------------------------------
+  # CI: build + push images to DockerHub
+  # only on push to develop (not PR)
+  # -----------------------------------
   build-and-push:
-    needs: tests # ⚠️ Bloquant : si 'tests' échoue, on ne fait pas ça
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' # On ne push les images que sur un vrai push, pas sur une PR (optionnel)
+    needs: tests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
 
     steps:
-      - name: Récupération du code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Connexion à Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Setup Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Construction et Push du BACKEND
-      - name: Build & Push Backend
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & push backend (latest + develop)
         uses: docker/build-push-action@v6
         with:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: mba1342004/dirhamy-backend:latest
+          tags: |
+            ${{ env.IMAGE_BACKEND }}:latest
+            ${{ env.IMAGE_BACKEND }}:develop
 
-      # Construction et Push du FRONTEND
-      - name: Build & Push Frontend
+      - name: Build & push frontend (latest + develop)
         uses: docker/build-push-action@v6
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: mba1342004/dirhamy-frontend:latest
+          build-args: |
+            VITE_API_URL=/api
+            NODE_ENV=production
+          tags: |
+            ${{ env.IMAGE_FRONTEND }}:latest
+            ${{ env.IMAGE_FRONTEND }}:develop
+
+  # ----------------------------
+  # CD: deploy on EC2
+  # only when main changes (merge develop -> main)
+  # ----------------------------
+  deploy-prod:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Configure SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+
+      - name: Add EC2 host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy via docker compose (pull latest)
+        run: |
+          ssh ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+            set -e
+            cd ~/dirhamy
+
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d
+
+            docker image prune -f
+          EOF
