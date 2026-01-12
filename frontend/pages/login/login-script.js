@@ -37,7 +37,7 @@ loginForm.addEventListener("submit", (e) => {
           );
           window.location.replace("../transactions/transactions.html");
         } else {
-          throw Error(data.error);
+          throw Error(data.error || data.message);
         }
       });
     })

@@ -27,38 +27,35 @@
         <tbody></tbody>
       </table>
       <div class="modal-background"></div>
-      <div class="modal delete-modal delete-category-modal">
-        <form>
-          <h2>Delete this category</h2>
 
-          <p>This action is irreversible. Do you want to continue?</p>
+      <form action="" class="modal delete-modal delete-category-modal">
+        <h2>Delete this category</h2>
 
-          <div class="action-btns">
-            <button type="submit" class="cancel-btn">Cancel</button>
-            <button type="submit" class="delete-btn">Delete</button>
-          </div>
-        </form>
-      </div>
+        <p>This action is irreversible. Do you want to continue?</p>
 
-      <div class="modal action-modal edit-category-modal">
-        <div class="modal-header"><h2>Edit this category</h2></div>
+        <div class="action-btns">
+          <button type="submit" class="cancel-btn">Cancel</button>
+          <button type="submit" class="delete-btn">Delete</button>
+        </div>
+      </form>
 
-        <form>
-          <div class="form-unit">
-            <label for="category-name" class="form-label">Category Name</label>
-            <input
-              type="text"
-              name="category-name"
-              id="category-name-field"
-              class="form-field"
-            />
-          </div>
-          <div class="action-btns modal-footer">
-            <button type="submit" class="cancel-btn">Cancel</button>
-            <button type="submit" class="action-btn">Save</button>
-          </div>
-        </form>
-      </div>
+      <form action="" class="modal action-modal edit-category-modal">
+        <h2 class="modal-header">Edit this category</h2>
+        <div class="form-unit">
+          <label for="category-name" class="form-label">Category Name</label>
+          <input
+            type="text"
+            name="category-name"
+            id="category-name-field"
+            class="form-field"
+          />
+        </div>
+
+        <div class="action-btns modal-footer">
+          <button type="submit" class="cancel-btn">Cancel</button>
+          <button type="submit" class="action-btn">Save</button>
+        </div>
+      </form>
     </main>
     <script src="./categories-script.js" type="module"></script>
   </body>
