@@ -1,3 +1,4 @@
+import { displayToast } from "../../components/toast.js";
 import {
   loadInitialStructure,
   deleteIcon,
@@ -87,7 +88,16 @@ function showEditCategoryModal(category) {
   const modalBackground = document.querySelector(".modal-background");
   const editModal = document.querySelector(".edit-category-modal");
 
-  editModal.querySelector("#category-name-field").value = category.nom;
+  /*
+  This is good if we have a lot of fields i kept it here for future reference but now its just overhead
+  you just pass in fields instead of just nameField
+  const fields = {
+    nom : editIcon.querySelector("#category-name-field"),
+  }
+  */
+  const nameField = editModal.querySelector("#category-name-field");
+
+  nameField.value = category.nom;
 
   modalBackground.style.display = "block";
   editModal.style.display = "block";
@@ -96,17 +106,62 @@ function showEditCategoryModal(category) {
     e.preventDefault();
 
     if (e.submitter.classList.contains("action-btn")) {
+      submitEditCategoryModel(category, modalBackground, editModal, nameField);
     } else if (e.submitter.classList.contains("cancel-btn")) {
-      removeEditCategoryModal(category, modalBackground, editModal);
+      cancelEditCategoryModel(category, modalBackground, editModal, nameField);
     }
   });
 }
-function removeEditCategoryModal(category, modalBackground, editModal) {
+
+function submitEditCategoryModel(
+  category,
+  modalBackground,
+  editModal,
+  nameField
+) {
+  return fetch(API_URL + "/categories" + "/" + category.id, {
+    method: "PUT",
+    headers: {
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({
+      nom: nameField.value,
+    }),
+  }).then((res) =>
+    res.json().then((data) => {
+      modalBackground.style.display = "none";
+      editModal.style.display = "none";
+      nameField.value = "";
+
+      if (res.ok) {
+        return getCategories().then(() => {
+          displayToast(
+            document.querySelector(".toasts-container"),
+            "Category modified with success",
+            "success"
+          );
+        });
+      } else {
+        displayToast(
+          document.querySelector(".toasts-container"),
+          data.message || data.error,
+          "error"
+        );
+      }
+    })
+  );
+}
+function cancelEditCategoryModel(
+  category,
+  modalBackground,
+  editModal,
+  nameField
+) {
   modalBackground.style.display = "none";
   editModal.style.display = "none";
-  editModal.querySelector("#category-name-field").value = "";
+  nameField.value = "";
 
-  // This is to remove the previous event listeners, there is another way to try later
+  // This is to remove the previous event listeners, there is another way to try later .removeEventListener
   editModal.parentElement.replaceChild(editModal.cloneNode(true), editModal);
 }
 function showDeleteCategoryModal(category) {
