@@ -1,10 +1,10 @@
 /*
   VERY IMPORTANT TODOS
-    implement add category,
     finish designing the modals,
+    Deal with toasts / promises problems
     add rerendering logic on fail fetching user if its not done already
 
-    refactor res.ok -> toast logic in function
+    refactor this 'res.ok -> toast' logic in a function if possible
 */
 
 import { displayToast } from "../../components/toast.js";
