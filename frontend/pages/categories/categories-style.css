@@ -165,10 +165,11 @@ table.list-entity-container {
     flex-direction: column;
     gap: var(--s-spacing);
 
+    margin-bottom: var(--normal-spacing);
     padding: 0 22px;
 
     input {
-      padding: var(--normal-spacing);
+      padding: 10px var(--normal-spacing);
     }
     select {
       transition: background-color 0.1s;
@@ -178,8 +179,12 @@ table.list-entity-container {
       background-color: #e6e6e6;
     }
   }
-  .form-unit:first-child {
+
+  .form-unit.first-unit {
     margin-top: var(--md-spacing);
+  }
+  .form-unit.last-unit {
+    margin-bottom: 22px;
   }
   .form-label {
     color: rgb(82, 88, 95);
@@ -192,7 +197,6 @@ table.list-entity-container {
   }
 
   .action-btns {
-    margin-top: var(--s-spacing);
     display: flex;
 
     justify-content: flex-end;
@@ -241,6 +245,8 @@ table.list-entity-container {
   }
   p {
     font-size: 15px;
+    margin-top: var(--s-spacing);
+    margin-bottom: 24px;
     color: rgb(69, 73, 78);
   }
 }
