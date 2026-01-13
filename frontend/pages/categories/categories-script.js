@@ -1,7 +1,5 @@
 /*
   VERY IMPORTANT TODOS
-    finish designing the modals,
-    Deal with toasts / promises problems
     add rerendering logic on fail fetching user if its not done already
 
     refactor this 'res.ok -> toast' logic in a function if possible
