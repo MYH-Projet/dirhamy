@@ -1,10 +1,36 @@
-import { displayToast } from "./components/toast.js";
+import { displayToast } from "../../components/toast.js";
+import { insertSidebar } from "../../components/sidebar.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const user = {};
   const API_URL = "/api";
   const body = document.querySelector("body");
 
+  insertSidebar(body).then(() => {
+    document
+      .querySelector(".sidebar-disconnect")
+      .addEventListener("click", (e) => {
+        fetch(API_URL + "/auth/logout", {
+          method: "POST",
+        })
+          .then((res) => {
+            return res.json().then((data) => {
+              if (res.ok) {
+                sessionStorage.setItem(
+                  "toast",
+                  JSON.stringify({ message: data.message, type: "success" })
+                );
+                window.location.assign("./login.html");
+              } else {
+                throw Error(data.error);
+              }
+            });
+          })
+          .catch((err) => {
+            displayToast(toastContainer, err.message, "error");
+          });
+      });
+  });
   const toastContainer = document.querySelector(".toasts-container");
 
   fetch(API_URL + "/profile")
@@ -335,10 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
       closeConfirmModal();
     });
 
-  function renderProfile(user) {
-    const userName = document.querySelector(".user-name");
-    userName.textContent = user.name;
-  }
+  function renderProfile(user) {}
 
   function renderBalances(user, accounts) {
     const accountCards = document.querySelectorAll(".account-card");
@@ -450,28 +473,4 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-
-  document
-    .querySelector(".sidebar-disconnect")
-    .addEventListener("click", (e) => {
-      fetch(API_URL + "/auth/logout", {
-        method: "POST",
-      })
-        .then((res) => {
-          return res.json().then((data) => {
-            if (res.ok) {
-              sessionStorage.setItem(
-                "toast",
-                JSON.stringify({ message: data.message, type: "success" })
-              );
-              window.location.assign("./login.html");
-            } else {
-              throw Error(data.error);
-            }
-          });
-        })
-        .catch((err) => {
-          displayToast(toastContainer, err.message, "error");
-        });
-    });
 });

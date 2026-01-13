@@ -1,4 +1,4 @@
-import { displayToast } from "./components/toast.js";
+import { displayToast } from "../../components/toast.js";
 
 const API_URL = "/api";
 
@@ -35,9 +35,9 @@ loginForm.addEventListener("submit", (e) => {
             "toast",
             JSON.stringify({ type: "success", message: data.message })
           );
-          window.location.replace("./transactions.html");
+          window.location.replace("../transactions/transactions.html");
         } else {
-          throw Error(data.error);
+          throw Error(data.error || data.message);
         }
       });
     })
