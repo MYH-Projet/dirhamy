@@ -5,6 +5,8 @@
     add rerendering logic on fail fetching user if its not done already
 
     refactor this 'res.ok -> toast' logic in a function if possible
+    
+    maybe refactor the removeeventlistener logic its too much repetition
 */
 
 import { displayToast } from "../../components/toast.js";
@@ -66,9 +68,15 @@ function getCategories() {
 }
 
 function renderCategories(categories) {
-  const tableBody = document.querySelector("table.list-entity-container tbody");
+  let tableBody = document.querySelector("table.list-entity-container tbody");
 
-  tableBody.innerHTML = "";
+  // this clears the table boody and removes previous event listeners
+  // to test if thrre is a way to create then append but make sure to remove previous tbody
+  // or maybe remove the event listening logic from render categories which i think is best
+  tableBody.parentElement.replaceChild(tableBody.cloneNode(), tableBody);
+
+  // requery the new tbody
+  tableBody = document.querySelector("table.list-entity-container tbody");
 
   categories.forEach((category) => {
     const tableRow = createCategoryRow(category);
@@ -170,7 +178,12 @@ function showEditCategoryModal(category) {
       const newCategoryFields = {
         nom: nameField.value,
       };
-      submitEditCategory(category, newCategoryFields);
+      submitEditCategory(category, newCategoryFields).then(() =>
+        editModal.parentElement.replaceChild(
+          editModal.cloneNode(true),
+          editModal
+        )
+      );
     } else if (e.submitter.classList.contains("cancel-btn")) {
       // remove the event listener, to try using removeEventListener later
       editModal.parentElement.replaceChild(
@@ -225,10 +238,15 @@ function showDeleteCategoryModal(category) {
     deleteModal.style.display = "none";
 
     if (e.submitter.classList.contains("delete-btn")) {
-      submitDeleteCategory(category);
+      submitDeleteCategory(category).then(() =>
+        deleteModal.parentElement.replaceChild(
+          deleteModal.cloneNode(true),
+          deleteModal
+        )
+      );
     } else if (e.submitter.classList.contains("cancel-btn")) {
       // Again removing the eventlistener
-      editModal.parentElement.replaceChild(
+      deleteModal.parentElement.replaceChild(
         deleteModal.cloneNode(true),
         deleteModal
       );
