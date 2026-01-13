@@ -5,7 +5,7 @@
     add rerendering logic on fail fetching user if its not done already
 
     refactor this 'res.ok -> toast' logic in a function if possible
-    
+
     maybe refactor the removeeventlistener logic its too much repetition
 */
 
@@ -24,6 +24,8 @@ loadInitialStructure(user).then(() => {
   // write your code here
   getCategories();
 });
+
+wireTableEvents();
 
 document.querySelector(".add-entity-form").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -68,20 +70,18 @@ function getCategories() {
 }
 
 function renderCategories(categories) {
-  let tableBody = document.querySelector("table.list-entity-container tbody");
+  const tableBody = document.querySelector("table.list-entity-container tbody");
 
-  // this clears the table boody and removes previous event listeners
-  // to test if thrre is a way to create then append but make sure to remove previous tbody
-  // or maybe remove the event listening logic from render categories which i think is best
-  tableBody.parentElement.replaceChild(tableBody.cloneNode(), tableBody);
-
-  // requery the new tbody
-  tableBody = document.querySelector("table.list-entity-container tbody");
+  tableBody.innerHTML = "";
 
   categories.forEach((category) => {
     const tableRow = createCategoryRow(category);
     tableBody.appendChild(tableRow);
   });
+}
+
+function wireTableEvents() {
+  const tableBody = document.querySelector("table.list-entity-container tbody");
   tableBody.addEventListener("click", (e) => {
     const editIconBehavior = checkCategoryIconClick(
       tableBody,
@@ -107,7 +107,6 @@ function renderCategories(categories) {
     }
   });
 }
-
 function createCategoryRow(category) {
   const tableRow = document.createElement("tr");
   const categoryName = document.createElement("td");
@@ -160,6 +159,14 @@ function showEditCategoryModal(category) {
   const fields = {
     nom : editIcon.querySelector("#category-name-field"),
   }
+
+  i wish i could separate the showing of modal from the event wiring but the modal is linked 
+  to a certain category state/value and so i have to know which category to submit and i'll be able 
+  to have only one event listener, 
+  i could use local storage to get the data to change but it will be slow plus i'll have 
+  to hanndle deleting the local storage after leaving the page
+  the other way is global variables which is nice it works and i think its fine to change it but 
+  now is this way better vs global variables? that's to think about later 
   */
   const nameField = editModal.querySelector("#category-name-field");
 
