@@ -1,3 +1,12 @@
+/*
+  VERY IMPORTANT TODOS
+    implement add category,
+    finish designing the modals,
+    add rerendering logic on fail fetching user if its not done already
+
+    refactor res.ok -> toast logic in function
+*/
+
 import { displayToast } from "../../components/toast.js";
 import {
   loadInitialStructure,
@@ -14,6 +23,42 @@ loadInitialStructure(user).then(() => {
   getCategories();
 });
 
+document.querySelector(".add-entity-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const nameFormField = document.querySelector("#name-form-field");
+  fetch(API_URL + "/categories/", {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({
+      nom: nameFormField.value,
+    }),
+  }).then((res) =>
+    res.json().then((data) => {
+      nameFormField.value = "";
+      if (res.ok) {
+        document
+          .querySelector("table.list-entity-container tbody")
+          .appendChild(createCategoryRow(data));
+
+        displayToast(
+          document.querySelector(".toasts-container"),
+          "Adding category was successful",
+          "success"
+        );
+      } else {
+        displayToast(
+          document.querySelector(".toasts-container"),
+          data.error || data.message,
+          "error"
+        );
+      }
+    })
+  );
+});
+
 function getCategories() {
   return fetch(API_URL + "/categories")
     .then((res) => res.json())
@@ -26,42 +71,51 @@ function renderCategories(categories) {
   tableBody.innerHTML = "";
 
   categories.forEach((category) => {
-    const tableRow = document.createElement("tr");
-    const categoryName = document.createElement("td");
-    categoryName.textContent = category.nom;
-
-    const actionBtnsRow = document.createElement("td");
-    actionBtnsRow.classList.add("action-btns");
-    actionBtnsRow.dataset.id = category.id;
-
-    actionBtnsRow.innerHTML = editIcon + deleteIcon;
-
-    tableRow.append(categoryName, actionBtnsRow);
+    const tableRow = createCategoryRow(category);
     tableBody.appendChild(tableRow);
   });
   tableBody.addEventListener("click", (e) => {
-    const editIconBehavior = chechIconClick(tableBody, e.target, "edit-icon");
-    const deleteIconBehavior = chechIconClick(
+    const editIconBehavior = checkCategoryIconClick(
+      tableBody,
+      e.target,
+      "edit-icon"
+    );
+    const deleteIconBehavior = checkCategoryIconClick(
       tableBody,
       e.target,
       "delete-icon"
     );
 
     if (editIconBehavior.isClicked) {
-      showEditCategoryModal(
-        categories.find((category) => category.id === editIconBehavior.entityId)
-      );
+      showEditCategoryModal({
+        nom: editIconBehavior.categoryName,
+        id: editIconBehavior.entityId,
+      });
     } else if (deleteIconBehavior.isClicked) {
-      showDeleteCategoryModal(
-        categories.find(
-          (category) => category.id === deleteIconBehavior.entityId
-        )
-      );
+      showDeleteCategoryModal({
+        nom: deleteIconBehavior.categoryName,
+        id: deleteIconBehavior.entityId,
+      });
     }
   });
 }
 
-function chechIconClick(table, node, className) {
+function createCategoryRow(category) {
+  const tableRow = document.createElement("tr");
+  const categoryName = document.createElement("td");
+  categoryName.textContent = category.nom;
+
+  const actionBtnsRow = document.createElement("td");
+  actionBtnsRow.classList.add("action-btns");
+  actionBtnsRow.dataset.id = category.id;
+
+  actionBtnsRow.innerHTML = editIcon + deleteIcon;
+
+  tableRow.append(categoryName, actionBtnsRow);
+  return tableRow;
+}
+
+function checkCategoryIconClick(table, node, className) {
   const svg = node.closest("svg");
 
   const res = {
@@ -80,6 +134,7 @@ function chechIconClick(table, node, className) {
   if (svg.classList.contains(className)) {
     res.isClicked = true;
     res.entityId = +svg.parentElement.dataset.id;
+    res.categoryName = svg.parentElement.previousSibling.textContent;
     return res;
   } else {
     res.isClicked = false;
