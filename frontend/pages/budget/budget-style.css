@@ -1,1 +1,40 @@
 @import url("../base.css");
+
+.budget-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  .header-text {
+    h1 {
+      font-size: 23px;
+      color: var(--black-text-color);
+
+      margin-bottom: var(--xs-spacing);
+    }
+    p {
+      font-size: 14px;
+      color: #777171;
+    }
+  }
+  .add-budget-limit-btn {
+    align-self: center;
+
+    padding: var(--normal-spacing) 20px;
+
+    font-size: 16px;
+    font-weight: 450;
+  }
+}
+
+.good-budget-status {
+}
+
+.on-track-budget-status {
+}
+
+.warning-budget-status {
+}
+
+.over-budget-status {
+}
