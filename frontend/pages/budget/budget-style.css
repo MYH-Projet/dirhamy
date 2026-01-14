@@ -5,6 +5,8 @@
   flex-direction: row;
   justify-content: space-between;
 
+  margin-bottom: 45px;
+
   .header-text {
     h1 {
       font-size: 23px;
@@ -26,7 +28,113 @@
     font-weight: 450;
   }
 }
+.list-budget-limits {
+  --warning-color: #f27928;
+  --warning-background: #f2792826;
+  --on-track-color: rgb(255, 174, 0);
+  --good-color: green;
+  --over-color: red;
 
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+.budget-card {
+  padding: 20px 17px;
+}
+
+.budget-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: var(--xs-spacing);
+
+  h2 {
+    color: var(--black-text-color);
+
+    font-size: 18px;
+  }
+
+  .action-btns {
+    display: flex;
+    gap: 25px;
+
+    margin-right: var(--normal-spacing);
+
+    svg {
+      color: rgb(101, 106, 112);
+
+      width: 17px;
+
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+
+    svg:hover {
+      color: rgb(154, 158, 162);
+    }
+  }
+}
+
+.budget-progress-bar {
+  display: flex;
+  flex-direction: row;
+
+  height: 10px;
+
+  margin-bottom: var(--xs-spacing);
+
+  border: none;
+  border-radius: 15px;
+
+  overflow: hidden;
+
+  .progress-used {
+    background-color: #e8650d;
+    flex: 0.925;
+  }
+  .progress-left {
+    background-color: #e3e3e3;
+    flex: 0.075;
+  }
+}
+.budget-card-amounts {
+  font-size: 15px;
+
+  color: rgb(85, 89, 94);
+
+  margin-bottom: var(--md-spacing);
+
+  .spent-amount,
+  .limit-amount {
+    color: var(--black-text-color);
+  }
+
+  .middot {
+    margin: 0 var(--s-spacing);
+  }
+}
+
+.budget-card-stats {
+  display: flex;
+  justify-content: space-between;
+
+  margin-bottom: var(--normal-spacing);
+
+  color: #777171;
+  font-size: 14px;
+}
+
+.budget-card-message {
+  font-weight: 450;
+
+  padding: var(--s-spacing) var(--normal-spacing);
+  border-radius: var(--border-radius);
+  font-size: 14px;
+}
 .good-budget-status {
 }
 
@@ -34,6 +142,12 @@
 }
 
 .warning-budget-status {
+  color: #e8650d;
+  background-color: #f2792817;
+}
+
+.warning-budget-status::before {
+  content: "!";
 }
 
 .over-budget-status {

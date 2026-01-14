@@ -474,10 +474,12 @@ table.list-entity-container {
     svg {
       color: rgb(101, 106, 112);
       cursor: pointer;
+
+      transition: color 0.15s;
     }
 
     svg:hover {
-      color: rgb(101, 106, 112);
+      color: rgb(154, 158, 162);
     }
   }
   thead,
