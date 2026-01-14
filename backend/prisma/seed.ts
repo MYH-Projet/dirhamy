@@ -1,161 +1,158 @@
-// prisma/seed.ts
-import { TypeCompte, TypeTransaction } from '../generated/prisma/client'; // Your custom path
-import { prisma } from '../src/lib/prisma';
+import { PrismaClient, TypeCompte, TypeTransaction } from '../generated/prisma/client'; 
+import { PrismaPg } from '@prisma/adapter-pg'
+import "dotenv/config";
+import pg from "pg";
+import bcrypt from 'bcryptjs';
+
+const connectionString = process.env.DATABASE_URL;
+const pool = new pg.Pool({connectionString});
+
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
-  console.log('🌱 Starting seed...')
+  console.log('🌱 Starting seed...');
 
-  // 1. Clean up the database (Order matters for Foreign Keys!)
-  // We must delete the children (Snapshots/Transactions) before the parents (Accounts)
-  await prisma.balanceSnapshot.deleteMany() // <--- NEW: Clean up snapshots
-  await prisma.transaction.deleteMany()
-  await prisma.categorie.deleteMany()
-  await prisma.compte.deleteMany()
-  await prisma.utilisateur.deleteMany()
-  
-  console.log('🧹 Database cleaned.')
+  // 1. Cleanup: Delete existing data to prevent conflicts (Order matters due to Foreign Keys)
+  // We use deleteMany() instead of truncating to be safe with FK constraints
+  await prisma.balanceSnapshot.deleteMany();
+  await prisma.budgetSnapshot.deleteMany();
+  await prisma.transaction.deleteMany();
+  await prisma.categorie.deleteMany();
+  await prisma.compte.deleteMany();
+  await prisma.utilisateur.deleteMany();
 
-  // 2. Create User and Categories
-  // Note: We removed 'solde' from the account creation because that column no longer exists.
-  // We will add "Initial Deposit" transactions later to set the starting money.
+  console.log('🧹 Database cleaned');
+
+  // 2. Create a User
+  // In a real app, you would hash this password using bcrypt. 
+  // For seeding, we'll use a dummy hash or plain text depending on your auth setup.
   const user = await prisma.utilisateur.create({
     data: {
-      nom: 'Dupont',
-      prenom: 'Jean',
-      email: 'jean.dupont@test.com',
-      motDePasse: 'supersecret123', 
-      
-      comptes: {
-        create: [
-          { nom: 'Portefeuille (Cash)', type: TypeCompte.Cash },
-          { nom: 'Compte Courant (Banque)', type: TypeCompte.Banque },
-        ],
-      },
-
-      categories: {
-        create: [
-          { nom: 'Alimentation' },
-          { nom: 'Salaire' },
-          { nom: 'Transport' },
-          { nom: 'Loisirs' },
-          { nom: 'Virement Interne' }, 
-          { nom: 'Solde Initial' } // Added for initial deposits
-        ],
-      },
+      nom: 'Doe',
+      prenom: 'John',
+      email: 'john.doe@example.com',
+      motDePasse: await bcrypt.hash('password123',10), // Example hash for "password123"
     },
-    include: {
-      comptes: true,
-      categories: true,
-    },
-  })
+  });
 
-  console.log(`👤 Created user: ${user.prenom} ${user.nom}`)
+  console.log(`👤 Created User: ${user.email}`);
 
-  // 3. Retrieve IDs
-  const cashAccount = user.comptes.find(c => c.type === TypeCompte.Cash)!
-  const bankAccount = user.comptes.find(c => c.type === TypeCompte.Banque)!
+  // 3. Create Categories
+  const catGroceries = await prisma.categorie.create({
+    data: { nom: 'Groceries', limit: 500.0, utilisateurId: user.id },
+  });
+  const catRent = await prisma.categorie.create({
+    data: { nom: 'Rent', limit: 1200.0, utilisateurId: user.id },
+  });
+  const catSalary = await prisma.categorie.create({
+    data: { nom: 'Salary', limit: null, utilisateurId: user.id },
+  });
+  const catTransport = await prisma.categorie.create({
+    data: { nom: 'Transport', limit: 100.0, utilisateurId: user.id },
+  });
 
-  const catFood = user.categories.find(c => c.nom === 'Alimentation')!
-  const catSalary = user.categories.find(c => c.nom === 'Salaire')!
-  const catTransfer = user.categories.find(c => c.nom === 'Virement Interne')!
-  const catInitial = user.categories.find(c => c.nom === 'Solde Initial')!
+  // 4. Create Accounts
+  const bankAccount = await prisma.compte.create({
+    data: { nom: 'Main Bank', type: TypeCompte.Banque, utilisateurId: user.id },
+  });
 
-  // 4. Create Transactions
-  console.log('💸 Creating transactions...')
+  const cashWallet = await prisma.compte.create({
+    data: { nom: 'Cash Wallet', type: TypeCompte.Cash, utilisateurId: user.id },
+  });
 
-  // --- Step A: Set Initial Balances (Since we removed 'solde' column) ---
-  // We create "Fake" income to represent the money they started with.
-  await prisma.transaction.createMany({
-    data: [
-      {
-        montant: 50.00, // Positive (Income)
-        type: TypeTransaction.REVENU,
-        description: 'Solde au démarrage',
-        date: new Date('2023-10-01T00:00:00Z'), // Old date
-        compteId: cashAccount.id,
-        categorieId: catInitial.id
-      },
-      {
-        montant: 1500.00, // Positive (Income)
-        type: TypeTransaction.REVENU,
-        description: 'Solde au démarrage',
-        date: new Date('2023-10-01T00:00:00Z'),
-        compteId: bankAccount.id,
-        categorieId: catInitial.id
-      }
-    ]
-  })
+  // 5. Create Transactions (History for the current month and last month)
+  const today = new Date();
+  const lastMonth = new Date(new Date().setMonth(today.getMonth() - 1));
 
-  // --- Step B: Regular Transactions ---
-
-  // 1. Income (Salary)
+  // --- Last Month Transactions ---
+  
+  // Salary Income
   await prisma.transaction.create({
     data: {
-      montant: 2500.00, // Positive
+      montant: 3000.0,
       type: TypeTransaction.REVENU,
-      description: 'Salaire Octobre',
-      date: new Date('2023-10-28T09:00:00Z'),
+      date: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1), // 1st of last month
+      description: 'Monthly Salary',
       compteId: bankAccount.id,
       categorieId: catSalary.id,
     },
-  })
+  });
 
-  // 2. Expense (Lunch) -> IMPORTANT: Use Negative Number for Expenses
-  // This allows our Snapshot Worker to just SUM() the column.
+  // Rent Expense
   await prisma.transaction.create({
     data: {
-      montant: -12.50, // <--- NEGATIVE because it is money leaving
+      montant: 1200.0,
       type: TypeTransaction.DEPENSE,
-      description: 'Sandwicherie',
-      date: new Date('2023-10-29T12:30:00Z'),
-      compteId: cashAccount.id,
-      categorieId: catFood.id,
+      date: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 2),
+      description: 'December Rent',
+      compteId: bankAccount.id,
+      categorieId: catRent.id,
     },
-  })
+  });
 
-  // 3. Transfer (Bank -> Cash)
-  // We use an interactive transaction to create TWO records.
-  // Record 1: Remove money from Bank
-  // Record 2: Add money to Cash
-  // This ensures both accounts update correctly in your Snapshot Worker.
-  await prisma.$transaction(async (tx) => {
-      const amount = 100.00;
+  // ATM Withdrawal (Transfer from Bank to Cash)
+  // Note: Transfers need a source (compteId) and destination (idDestination)
+  await prisma.transaction.create({
+    data: {
+      montant: 200.0,
+      type: TypeTransaction.TRANSFER,
+      date: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 5),
+      description: 'ATM Withdrawal',
+      compteId: bankAccount.id, // Source
+      idDestination: cashWallet.id, // Destination
+      categorieId: catTransport.id, // Just tagging it generally, or you might have a "Transfer" category
+    },
+  });
 
-      // Sender (Bank) - Negative Amount
-      await tx.transaction.create({
-        data: {
-            montant: -amount, // Negative
-            type: TypeTransaction.TRANSFER,
-            description: 'Retrait Distributeur (Envoi)',
-            date: new Date('2023-10-30T18:00:00Z'),
-            compteId: bankAccount.id,      // Linked to Bank
-            idDestination: cashAccount.id, // Just for reference
-            categorieId: catTransfer.id,
-        },
-      })
+  // --- This Month Transactions ---
 
-      // Receiver (Cash) - Positive Amount
-      await tx.transaction.create({
-        data: {
-            montant: amount, // Positive
-            type: TypeTransaction.TRANSFER,
-            description: 'Retrait Distributeur (Reçu)',
-            date: new Date('2023-10-30T18:00:00Z'),
-            compteId: cashAccount.id,      // Linked to Cash
-            idDestination: bankAccount.id, // Just for reference
-            categorieId: catTransfer.id,
-        },
-      })
-  })
+  // Grocery Shopping (Cash)
+  await prisma.transaction.create({
+    data: {
+      montant: 85.50,
+      type: TypeTransaction.DEPENSE,
+      date: new Date(), // Now
+      description: 'Supermarket Run',
+      compteId: cashWallet.id,
+      categorieId: catGroceries.id,
+    },
+  });
 
-  console.log('✅ Seeding finished.')
+  console.log('💸 Created Transactions');
+
+  // 6. Create Snapshots
+  
+  // Budget Snapshot (e.g., How much we spent on Groceries last month)
+  // Let's pretend last month we spent 450 out of 500 limit on Groceries
+  await prisma.budgetSnapshot.create({
+    data: {
+      monthDate: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1), // First day of last month
+      limit: 500.0,
+      spend: 450.0,
+      categorieId: catGroceries.id,
+    },
+  });
+
+  // Balance Snapshot (e.g., Record what the Bank Account balance was 10 days ago)
+  // This is useful for drawing charts of balance history
+  await prisma.balanceSnapshot.create({
+    data: {
+      date: new Date(new Date().setDate(today.getDate() - 10)), // 10 days ago
+      solde: 1800.0, // Calculated balance at that time
+      compteId: bankAccount.id,
+    },
+  });
+
+  console.log('📸 Created Snapshots');
+  console.log('✅ Seeding finished.');
 }
 
 main()
   .catch((e) => {
-    console.error(e)
-    process.exit(1)
+    console.error(e);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
+    await prisma.$disconnect();
+  });
