@@ -8,6 +8,10 @@ COPY package.json package-lock.json ./
 
 # 3) Installation propre (ci est mieux que install pour les builds, mais install passe aussi)
 RUN npm install
+# Add this line to switch mirrors to Cloudflare (often faster/more reliable)
+RUN sed -i 's/dl-cdn.alpinelinux.org/dl-cdn.alpinelinux.org/g' /etc/apk/repositories
+# Actually, let's use a specific reliable mirror like this:
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.edge.kernel.org/g' /etc/apk/repositories
 RUN apk add --no-cache postgresql-client
 
 # 4) Copier le code source

@@ -82,7 +82,7 @@ async function main() {
   // Rent Expense
   await prisma.transaction.create({
     data: {
-      montant: 1200.0,
+      montant: -1200.0,
       type: TypeTransaction.DEPENSE,
       date: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 2),
       description: 'December Rent',
@@ -110,7 +110,7 @@ async function main() {
   // Grocery Shopping (Cash)
   await prisma.transaction.create({
     data: {
-      montant: 85.50,
+      montant: -85.50,
       type: TypeTransaction.DEPENSE,
       date: new Date(), // Now
       description: 'Supermarket Run',
