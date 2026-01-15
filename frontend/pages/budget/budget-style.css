@@ -29,11 +29,14 @@
   }
 }
 .list-budget-limits {
-  --warning-color: #f27928;
-  --warning-background: #f2792826;
-  --on-track-color: rgb(255, 174, 0);
-  --good-color: green;
-  --over-color: red;
+  --warning-color: #e8650d;
+  --warning-background: #f2792815;
+  --on-track-color: rgb(246, 201, 0);
+  --on-track-background: rgba(246, 201, 0, 0.062);
+  --good-color: rgb(47, 162, 24);
+  --good-background: rgba(47, 162, 24, 0.043);
+  --over-color: rgb(217, 19, 12);
+  --over-background: rgba(217, 19, 12, 0.04);
 
   display: flex;
   flex-direction: column;
@@ -93,7 +96,6 @@
   overflow: hidden;
 
   .progress-used {
-    background-color: #e8650d;
     flex: 0.925;
   }
   .progress-left {
@@ -131,24 +133,44 @@
 .budget-card-message {
   font-weight: 450;
 
+  display: flex;
+  align-items: center;
+  gap: var(--s-spacing);
+
   padding: var(--s-spacing) var(--normal-spacing);
   border-radius: var(--border-radius);
   font-size: 14px;
 }
+
+.good-progress-used {
+  background-color: var(--good-color);
+}
+.on-track-progress-used {
+  background-color: var(--on-track-color);
+}
+.warning-progress-used {
+  background-color: var(--warning-color);
+}
+.over-progress-used {
+  background-color: var(--over-color);
+}
+
 .good-budget-status {
+  color: var(--good-color);
+  background-color: var(--good-background);
 }
 
 .on-track-budget-status {
+  color: var(--on-track-color);
+  background-color: var(--on-track-background);
 }
 
 .warning-budget-status {
-  color: #e8650d;
-  background-color: #f2792817;
-}
-
-.warning-budget-status::before {
-  content: "!";
+  color: var(--warning-color);
+  background-color: var(--warning-background);
 }
 
 .over-budget-status {
+  color: var(--over-color);
+  background-color: var(--over-background);
 }

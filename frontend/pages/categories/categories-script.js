@@ -183,11 +183,11 @@ function showEditCategoryModal(category) {
       const newCategoryFields = {
         nom: nameField.value,
       };
-      submitEditCategory(category, newCategoryFields).then(() =>
-        editModal.parentElement.replaceChild(
-          editModal.cloneNode(true),
-          editModal
-        )
+      submitEditCategory(category, newCategoryFields);
+
+      editModal.parentElement.replaceChild(
+        editModal.cloneNode(true),
+        editModal
       );
     } else if (e.submitter.classList.contains("cancel-btn")) {
       // remove the event listener, to try using removeEventListener later
@@ -196,8 +196,6 @@ function showEditCategoryModal(category) {
         editModal
       );
     }
-
-    nameField.value = "";
   });
 }
 
