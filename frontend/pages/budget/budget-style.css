@@ -33,7 +33,7 @@
   --warning-background: #f2792815;
   --on-track-color: rgb(246, 201, 0);
   --on-track-background: rgba(246, 201, 0, 0.062);
-  --good-color: rgb(47, 162, 24);
+  --good-color: var(--primary-color);
   --good-background: rgba(47, 162, 24, 0.043);
   --over-color: rgb(217, 19, 12);
   --over-background: rgba(217, 19, 12, 0.04);

@@ -99,6 +99,11 @@ select {
   box-shadow: 0px 1px 5px 0px var(--secondary-border-color);
 }
 
+.main-container {
+  margin-left: 260px;
+  padding: 50px 45px;
+}
+
 ul {
   list-style: none;
 }
@@ -368,10 +373,6 @@ ul {
 }
 
 /*Importent repeated styles like crud and modals*/
-.main-container {
-  margin-left: 260px;
-  padding: 50px 45px;
-}
 
 .add-entity-container {
   width: 100%;
