@@ -103,9 +103,7 @@ function createBudgetCard(budgetStatus) {
     if (editIconBehavior.isClicked) {
       showEditLimitModal(budgetStatus);
     } else if (deleteIconBehavior.isClicked) {
-      const deleteModal = document.querySelector(".delete-budget-modal");
-      modalBackground.style.display = "block";
-      deleteModal.style.display = "block";
+      showDeleteLimitModal(budgetStatus);
     }
   });
 
@@ -198,6 +196,8 @@ function showEditLimitModal(budgetStatus) {
   nameField.value = budgetStatus.categoryName;
 
   editModal.addEventListener("submit", (e) => {
+    e.preventDefault();
+
     if (e.submitter.classList.contains("cancel-btn")) {
     } else if (e.submitter.classList.contains("action-btn")) {
       const fields = {
@@ -251,6 +251,30 @@ function showSetLimitModal(categories) {
     setLimitModal.style.display = "none";
   });
 }
+function showDeleteLimitModal(budgetStatus) {
+  const modalBackground = document.querySelector(".modal-background");
+  const deleteModal = document.querySelector(".delete-budget-modal");
+
+  const newCleanModal = deleteModal.cloneNode(true);
+  newCleanModal.reset();
+
+  modalBackground.style.display = "block";
+  deleteModal.style.display = "block";
+
+  deleteModal.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    if (e.submitter.classList.contains("cancel-btn")) {
+    } else if (e.submitter.classList.contains("delete-btn")) {
+      submitDeleteLimit(budgetStatus.categoryId);
+    }
+
+    deleteModal.parentElement.replaceChild(newCleanModal, deleteModal);
+
+    modalBackground.style.display = "none";
+    newCleanModal.style.display = "none";
+  });
+}
 
 function submitSetLimit(fields) {
   fetch(API_URL + "/budget/limit", {
@@ -259,6 +283,29 @@ function submitSetLimit(fields) {
       "Content-type": "application/json",
     },
     body: JSON.stringify(fields),
+  }).then((res) =>
+    res.json().then((data) => {
+      if (res.ok) {
+        return getBudgetStatuses().then(
+          displayToast(
+            document.querySelector(".toasts-container"),
+            data.message,
+            "success"
+          )
+        );
+      } else {
+        displayToast(
+          document.querySelector(".toasts-container"),
+          data.message || data.error,
+          "error"
+        );
+      }
+    })
+  );
+}
+function submitDeleteLimit(categoryId) {
+  fetch(API_URL + "/budget/limit/" + categoryId, {
+    method: "DELETE",
   }).then((res) =>
     res.json().then((data) => {
       if (res.ok) {
