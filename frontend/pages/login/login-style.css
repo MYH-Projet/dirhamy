@@ -66,6 +66,8 @@ body {
     }
 
     .sign-in-btn {
+      font-weight: bold;
+
       margin-top: var(--s-spacing);
       padding: var(--normal-spacing) var(--md-spacing);
     }

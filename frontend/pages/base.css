@@ -60,7 +60,6 @@ input:disabled {
   color: white;
   background-color: var(--primary-color);
 
-  font-weight: bold;
   font-size: 17px;
 
   text-align: center;
@@ -397,35 +396,35 @@ ul {
   flex-wrap: wrap;
   gap: 15px;
   justify-content: center;
+  align-items: flex-end;
 
   .form-unit {
-    flex: 1 0 120px;
+    flex: 1 0 150px;
 
     select {
       transition: background-color 0.1s;
     }
 
     select:hover {
-      background-color: #e6e6e6;
+      background-color: #f3f3f3;
     }
   }
   .form-label {
     color: var(--gray-color);
 
     margin-left: var(--xs-spacing);
-    margin-bottom: 3px;
-
     font-size: 13px;
     font-weight: 450;
   }
   .form-field {
+    margin-top: 2px;
     width: 100%;
     font-size: 14px;
     background-color: var(--lightest-gray-color);
   }
 
   .form-submit-btn {
-    flex-basis: 90px;
+    flex: 0 0 120px;
   }
 }
 

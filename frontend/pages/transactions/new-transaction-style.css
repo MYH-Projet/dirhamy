@@ -1,0 +1,5 @@
+@import url("../base.css");
+
+.add-entity-container .form-unit:has(#add-description-field) {
+  flex-basis: 300px;
+}
