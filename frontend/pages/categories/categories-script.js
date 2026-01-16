@@ -120,33 +120,6 @@ function createCategoryRow(category) {
   return tableRow;
 }
 
-function checkCategoryIconClick(table, node, className) {
-  const svg = node.closest("svg");
-
-  const res = {
-    isClicked: null,
-    entityId: null,
-  };
-  if (!svg) {
-    res.isClicked = false;
-    return res;
-  }
-  if (!table.contains(svg)) {
-    res.isClicked = false;
-    return res;
-  }
-
-  if (svg.classList.contains(className)) {
-    res.isClicked = true;
-    res.entityId = +svg.parentElement.dataset.id;
-    res.categoryName = svg.parentElement.previousSibling.textContent;
-    return res;
-  } else {
-    res.isClicked = false;
-    return res;
-  }
-}
-
 function showEditCategoryModal(category) {
   const modalBackground = document.querySelector(".modal-background");
   const editModal = document.querySelector(".edit-category-modal");
@@ -183,11 +156,11 @@ function showEditCategoryModal(category) {
       const newCategoryFields = {
         nom: nameField.value,
       };
-      submitEditCategory(category, newCategoryFields).then(() =>
-        editModal.parentElement.replaceChild(
-          editModal.cloneNode(true),
-          editModal
-        )
+      submitEditCategory(category, newCategoryFields);
+
+      editModal.parentElement.replaceChild(
+        editModal.cloneNode(true),
+        editModal
       );
     } else if (e.submitter.classList.contains("cancel-btn")) {
       // remove the event listener, to try using removeEventListener later
@@ -196,8 +169,6 @@ function showEditCategoryModal(category) {
         editModal
       );
     }
-
-    nameField.value = "";
   });
 }
 
@@ -285,4 +256,31 @@ function submitDeleteCategory(category) {
       }
     })
   );
+}
+
+function checkCategoryIconClick(table, node, className) {
+  const svg = node.closest("svg");
+
+  const res = {
+    isClicked: null,
+    entityId: null,
+  };
+  if (!svg) {
+    res.isClicked = false;
+    return res;
+  }
+  if (!table.contains(svg)) {
+    res.isClicked = false;
+    return res;
+  }
+
+  if (svg.classList.contains(className)) {
+    res.isClicked = true;
+    res.entityId = +svg.parentElement.dataset.id;
+    res.categoryName = svg.parentElement.previousSibling.textContent;
+    return res;
+  } else {
+    res.isClicked = false;
+    return res;
+  }
 }

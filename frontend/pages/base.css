@@ -51,6 +51,11 @@ select {
   color: var(--black-text-color);
 }
 
+input:disabled {
+  background-color: gray;
+}
+/* important styles to read/ get familiar with */
+
 .btn {
   color: white;
   background-color: var(--primary-color);
@@ -97,12 +102,19 @@ select {
   box-shadow: 0px 1px 5px 0px var(--secondary-border-color);
 }
 
+.main-container {
+  margin-left: 260px;
+  padding: 50px 45px;
+}
+
 ul {
   list-style: none;
 }
 
+/* Toast styles */
+
 .toasts-container {
-  position: absolute;
+  position: fixed;
   bottom: var(--large-spacing);
 
   right: var(--large-spacing);
@@ -201,6 +213,8 @@ ul {
     opacity: 0;
   }
 }
+
+/* Sidebar styles */
 
 .sidebar {
   position: fixed;
@@ -359,4 +373,273 @@ ul {
   transform: translateY(-2px);
 
   box-shadow: 0px 0px 10px 0px #c422227a;
+}
+
+/*Importent repeated styles like crud and modals*/
+
+.add-entity-container {
+  width: 100%;
+
+  padding: 20px;
+  margin-bottom: var(--large-spacing);
+
+  background-color: var(--secondary-color);
+}
+
+.add-entity-title {
+  color: rgb(57, 61, 66);
+  font-size: 16px;
+  margin-bottom: var(--md-spacing);
+}
+.add-entity-form {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+
+  .form-unit {
+    flex: 1 0 120px;
+
+    select {
+      transition: background-color 0.1s;
+    }
+
+    select:hover {
+      background-color: #e6e6e6;
+    }
+  }
+  .form-label {
+    color: var(--gray-color);
+
+    margin-left: var(--xs-spacing);
+    margin-bottom: 3px;
+
+    font-size: 13px;
+    font-weight: 450;
+  }
+  .form-field {
+    width: 100%;
+    font-size: 14px;
+    background-color: var(--lightest-gray-color);
+  }
+
+  .form-submit-btn {
+    flex-basis: 90px;
+  }
+}
+
+.list-entity-container {
+  padding: 20px;
+}
+
+table.list-entity-container {
+  width: 100%;
+  border-collapse: collapse;
+  tr {
+    display: flex;
+    flex-direction: row;
+  }
+
+  tbody tr {
+    padding: 20px 25px;
+  }
+  tbody tr:hover {
+    background-color: #f9fafbbc;
+  }
+  thead tr {
+    padding: 15px 25px;
+  }
+  thead tr,
+  tbody tr:not(:last-child) {
+    border-bottom: #f6f6f6 2px solid;
+  }
+
+  th {
+    color: rgb(69, 73, 78);
+  }
+  td {
+    color: var(--black-text-color);
+  }
+  th,
+  td {
+    flex: 3 0;
+    text-align: left;
+    font-size: 15px;
+  }
+  .action-btns {
+    flex: 2 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+
+    svg {
+      color: rgb(101, 106, 112);
+      cursor: pointer;
+
+      transition: color 0.15s;
+    }
+
+    svg:hover {
+      color: rgb(154, 158, 162);
+    }
+  }
+  thead,
+  tbody {
+    display: block;
+  }
+}
+
+.modal-background {
+  display: none;
+
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  z-index: 10;
+
+  background-color: rgba(100, 100, 100, 0.325);
+}
+.modal {
+  z-index: 100;
+
+  background-color: var(--secondary-color);
+
+  position: fixed;
+  top: 45%;
+  left: 50%;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--normal-spacing);
+
+  transform: translateY(-50%) translateX(-50%);
+
+  border: none;
+  border-radius: var(--border-radius);
+
+  .modal-header {
+    border-bottom: #efefef 2px solid;
+    padding: 22px;
+  }
+
+  .modal-footer {
+    padding: 18px 22px;
+
+    border-top: #efefef 2px solid;
+  }
+
+  .form-unit {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-spacing);
+
+    margin-bottom: var(--normal-spacing);
+    padding: 0 22px;
+
+    input {
+      padding: 10px var(--normal-spacing);
+    }
+    select {
+      transition: background-color 0.1s;
+    }
+
+    select:hover {
+      background-color: #e6e6e6;
+    }
+  }
+
+  .form-unit.first-unit {
+    margin-top: var(--md-spacing);
+  }
+  .form-unit.last-unit {
+    margin-bottom: 22px;
+  }
+  .form-label {
+    color: rgb(82, 88, 95);
+
+    font-size: 15px;
+  }
+  .form-field {
+    font-size: 16px;
+    background-color: var(--secondary-color);
+  }
+
+  .form-field:disabled {
+    background-color: #e5e5e5;
+  }
+  .action-btns {
+    display: flex;
+
+    justify-content: flex-end;
+    gap: var(--normal-spacing);
+  }
+  .cancel-btn {
+  }
+  button {
+    padding: var(--s-spacing) var(--md-spacing);
+    border: none;
+    border-radius: var(--border-radius);
+
+    font-size: 17px;
+
+    cursor: pointer;
+    transition: background-color 0.1s;
+  }
+  .action-btn {
+    color: white;
+    background-color: var(--primary-color);
+  }
+  .action-btn:hover {
+    background-color: #10b7a9;
+  }
+  .delete-btn {
+    background-color: #e02727;
+    color: var(--secondary-color);
+  }
+  .delete-btn:hover {
+    background-color: var(--redish-color);
+  }
+  .cancel-btn {
+    color: rgb(82, 88, 95);
+  }
+}
+
+.delete-modal {
+  display: none;
+  width: 400px;
+  padding: 22px;
+
+  h2 {
+    color: var(--black-text-color);
+    font-size: 19px;
+    font-weight: 700;
+  }
+  p {
+    font-size: 15px;
+    margin-top: var(--s-spacing);
+    margin-bottom: 24px;
+    color: rgb(69, 73, 78);
+  }
+}
+
+.action-modal {
+  display: none;
+
+  width: 420px;
+
+  h2 {
+    color: var(--black-text-color);
+    font-size: 19px;
+    font-weight: 700;
+  }
+  p {
+    font-size: 15px;
+    color: rgb(69, 73, 78);
+  }
 }
