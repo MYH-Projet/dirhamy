@@ -51,6 +51,9 @@ select {
   color: var(--black-text-color);
 }
 
+input:disabled {
+  background-color: gray;
+}
 /* important styles to read/ get familiar with */
 
 .btn {
@@ -111,7 +114,7 @@ ul {
 /* Toast styles */
 
 .toasts-container {
-  position: absolute;
+  position: fixed;
   bottom: var(--large-spacing);
 
   right: var(--large-spacing);
@@ -567,6 +570,9 @@ table.list-entity-container {
     background-color: var(--secondary-color);
   }
 
+  .form-field:disabled {
+    background-color: #e5e5e5;
+  }
   .action-btns {
     display: flex;
 

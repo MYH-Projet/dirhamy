@@ -88,6 +88,27 @@ function createBudgetCard(budgetStatus) {
   actionBtns.innerHTML = editIcon + deleteIcon;
   actionBtns.dataset.id = budgetStatus.categoryId;
 
+  actionBtns.addEventListener("click", (e) => {
+    const editIconBehavior = checkCategoryIconClick(
+      actionBtns,
+      e.target,
+      "edit-icon"
+    );
+    const deleteIconBehavior = checkCategoryIconClick(
+      actionBtns,
+      e.target,
+      "delete-icon"
+    );
+
+    if (editIconBehavior.isClicked) {
+      showEditLimitModal(budgetStatus);
+    } else if (deleteIconBehavior.isClicked) {
+      const deleteModal = document.querySelector(".delete-budget-modal");
+      modalBackground.style.display = "block";
+      deleteModal.style.display = "block";
+    }
+  });
+
   cardHeader.append(categoryName, actionBtns);
 
   const cardAmounts = document.createElement("p");
@@ -159,6 +180,38 @@ function fetchAndShowSetLimitModal() {
     .then((data) => {
       showSetLimitModal(data);
     });
+}
+
+function showEditLimitModal(budgetStatus) {
+  const modalBackground = document.querySelector(".modal-background");
+  const editModal = document.querySelector(".edit-budget-modal");
+
+  const newCleanModal = editModal.cloneNode(true);
+  newCleanModal.reset();
+
+  modalBackground.style.display = "block";
+  editModal.style.display = "block";
+
+  const limitField = editModal.querySelector("#edit-category-limit-field");
+  limitField.value = budgetStatus.limit;
+  const nameField = editModal.querySelector("#category-name-field");
+  nameField.value = budgetStatus.categoryName;
+
+  editModal.addEventListener("submit", (e) => {
+    if (e.submitter.classList.contains("cancel-btn")) {
+    } else if (e.submitter.classList.contains("action-btn")) {
+      const fields = {
+        categoryId: budgetStatus.categoryId,
+        limit: limitField.value,
+      };
+      submitSetLimit(fields);
+    }
+
+    editModal.parentElement.replaceChild(newCleanModal, editModal);
+
+    modalBackground.style.display = "none";
+    newCleanModal.style.display = "none";
+  });
 }
 
 function showSetLimitModal(categories) {
@@ -258,5 +311,30 @@ function budgetPercentages(percentage) {
       cardIcon: overIcon,
       cardMessage: `Over budget`,
     };
+  }
+}
+
+export function checkCategoryIconClick(table, node, className) {
+  const svg = node.closest("svg");
+
+  const res = {
+    isClicked: null,
+    entityId: null,
+  };
+  if (!svg) {
+    res.isClicked = false;
+    return res;
+  }
+  if (!table.contains(svg)) {
+    res.isClicked = false;
+    return res;
+  }
+
+  if (svg.classList.contains(className)) {
+    res.isClicked = true;
+    return res;
+  } else {
+    res.isClicked = false;
+    return res;
   }
 }

@@ -32,9 +32,9 @@
     margin-bottom: var(--md-spacing);
   }
 
-  .card-balance::before {
-    content: "$";
-    margin-right: var(--xs-spacing);
+  .card-balance::after {
+    content: "DH";
+    margin-left: var(--xs-spacing);
   }
 
   .card-balance {

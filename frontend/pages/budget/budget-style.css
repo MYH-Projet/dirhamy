@@ -29,9 +29,9 @@
   }
 }
 .list-budget-limits {
-  --warning-color: #e8650d;
+  --warning-color: rgb(246, 138, 0);
   --warning-background: #f2792815;
-  --on-track-color: rgb(246, 201, 0);
+  --on-track-color: rgb(246, 196, 0);
   --on-track-background: rgba(246, 201, 0, 0.062);
   --good-color: var(--primary-color);
   --good-background: rgba(47, 162, 24, 0.043);

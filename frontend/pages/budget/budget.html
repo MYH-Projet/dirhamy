@@ -35,13 +35,28 @@
 
     <form action="" class="modal action-modal edit-budget-modal">
       <h2 class="modal-header">Edit this budget</h2>
-      <div class="form-unit first-unit last-unit">
-        <label for="category-name" class="form-label">Budget Name</label>
+      <div class="form-unit first-unit">
+        <label for="category-name-field" class="form-label"
+          >Category Name</label
+        >
         <input
           type="text"
           name="category-name"
           id="category-name-field"
           class="form-field"
+          disabled
+        />
+      </div>
+      <div class="form-unit last-unit">
+        <label for="category-name-field" class="form-label"
+          >Monthly Limit (DH)</label
+        >
+        <input
+          type="text"
+          name="category-name"
+          id="edit-category-limit-field"
+          class="form-field"
+          placeholder="e.g. 2000"
         />
       </div>
 
