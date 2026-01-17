@@ -25,6 +25,7 @@ services:
       PORT: "3000"
       JWT_SECRET: anas
       REFRESH_TOKEN_SECRET: anas
+      GEMINI_API_KEY: AIzaSyB1hmBH-Q3lQeUsYBCHFrU89DGeRAkyf88
     depends_on:
       - db
     ports:

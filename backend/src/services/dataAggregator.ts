@@ -76,7 +76,7 @@ export async function dataAggregator(userId: number): Promise<string> {
 
 
   // Savings goals (Objectif)
-
+/*
   const goals = await prisma.objectif.findMany({
     where: { utilisateurId: userId },
     select: {
@@ -87,7 +87,7 @@ export async function dataAggregator(userId: number): Promise<string> {
       dateCible: true,
     },
   });
-
+*/
 
 
   const context = {
@@ -96,7 +96,7 @@ export async function dataAggregator(userId: number): Promise<string> {
     balances,
     transactions,
     budgets,
-    goals,
+    //goals,
   };
 
   return JSON.stringify(context);
