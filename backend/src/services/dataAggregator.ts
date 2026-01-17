@@ -1,82 +1,83 @@
-import {prisma} from "../lib/prisma";
-//this function return all the user's data needed to give to the fucking ai model
-// i hope ts works
-export async function dataAggregator(userId: number) : Promise<string>{
+import { prisma } from "../lib/prisma";
 
-  // Default user related data (user profile)
+export async function dataAggregator(userId: number): Promise<string> {
+
+  // User profile(his basic infos and shit)
+
   const userProfile = await prisma.utilisateur.findUnique({
-    where:{
-      id : userId
-    },
-    select :{
-      id: true, nom : true, prenom : true, email : true
-    }
+    where: { id: userId },
+    select: { id: true, nom: true, prenom: true, email: true },
   });
 
 
   // Accounts
-  const account = await prisma.compte.findMany({
-    where:{
-      id : userId
+
+  const accounts = await prisma.compte.findMany({
+    where: { utilisateurId: userId },
+    select: { id: true, nom: true, type: true },
+  });
+
+
+  // Latest balances (from BalanceSnapshot: viva anas)
+
+  const balances = await prisma.balanceSnapshot.findMany({
+    where: {
+      compte: { utilisateurId: userId },
     },
+    orderBy: { date: "desc" },
+    distinct: ["compteId"], // keep only the most recent snapshot per account
     select: {
-      id: true, nom: true, type: true
-    }
-  })
-
-  // Balance informations from the balance snapshot (viva anas)
-  const balance = await prisma.balanceSnapshot.findMany({
-    where :{
-      id : userId
+      compteId: true,   // useful to match balances and  accounts
+      date: true,
+      solde: true, 
     },
-    orderBy :{ date : "desc"},
-    distinct :["compteId"],
-    select :{
-      id:true, date: true, solde: true
-    }
-  })
+  });
 
-  // Transactions in the last 30 days
+
+  // Recent transactions (last 30 days)
+
   const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate()-30);
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
   const transactions = await prisma.transaction.findMany({
-    where :{
-      compte :{ utilisateurId : userId },
-      date : thirtyDaysAgo
+    where: {
+      compte: { utilisateurId: userId },
+      date: { gte: thirtyDaysAgo },
     },
-    select :{
-      id : true,
+    select: {
+      id: true,
       montant: true,
       type: true,
       date: true,
-      description : true,
-      compte : { select : {nom: true}},
-      categorie: { select : {nom: true}}
-
-    }
-  });
-
-  // Budget Snapshot
-  const budget = await prisma.BudgetSnapshot.findMany({
-    where :{
-      categorie :{ select : {utilisateurId: userId}}
+      description: true,
+      compte: { select: { nom: true } },
+      categorie: { select: { nom: true } },
     },
-    orderBy:{monthDate :"desc"},
-    distinct :["categorieId"],
-    select:{
-      id: true,
-      categorieId : true,
-      limit: true,
-      spend : true,
-      monthDate: true,
-      categorie : {select : {nom :true }}
-    }
   });
 
 
-  // the freacking Goals 🔥
-    const goals = await prisma.objectif.findMany({
+  // Latest budget snapshots (from BudgetSnapshot)
+
+  const budgets = await prisma.budgetSnapshot.findMany({
+    where: {
+      categorie: { utilisateurId: userId },
+    },
+    orderBy: { monthDate: "desc" },
+    distinct: ["categorieId"], // keep only the most recent per category
+    select: {
+      id: true,
+      categorieId: true,
+      limit: true,
+      spend: true,
+      monthDate: true,
+      categorie: { select: { nom: true } },
+    },
+  });
+
+
+  // Savings goals (Objectif)
+
+  const goals = await prisma.objectif.findMany({
     where: { utilisateurId: userId },
     select: {
       id: true,
@@ -87,14 +88,16 @@ export async function dataAggregator(userId: number) : Promise<string>{
     },
   });
 
+
+
   const context = {
     userProfile,
-    account,
-    balance,
+    accounts,
+    balances,
     transactions,
-    budget,
-    goals
-  }
+    budgets,
+    goals,
+  };
 
   return JSON.stringify(context);
 }
