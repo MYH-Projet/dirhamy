@@ -49,22 +49,36 @@
   }
 }
 
+table.list-entity-container {
+  .amount-column {
+    flex: 2 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 550;
+  }
+  .type-column {
+    font-weight: 550;
+  }
+}
+
 .add-entity-container .form-unit:has(#add-description-field) {
   flex-basis: 300px;
 }
 
-#add-transfer-to-field {
+.add-entity-container .form-unit:has(#add-transfer-to-field) {
   display: none;
 }
 
 .expense-color {
-  color: var(--redish-color);
+  color: var(--redish-color) !important;
 }
 
 .income-color {
-  color: var(--primary-color);
+  color: var(--primary-color) !important;
 }
 
 .transfer-color {
-  color: rgb(20, 17, 185);
+  color: rgb(32, 99, 255) !important;
 }

@@ -1,4 +1,3 @@
-import { displayToast } from "../../components/toast.js";
 import {
   loadInitialStructure,
   deleteIcon,
@@ -9,6 +8,7 @@ import {
   showDeleteEntityModal,
   toastNotis,
 } from "../../utils/utils.js";
+import { displayToast } from "../../components/toast.js";
 
 const user = {};
 
@@ -46,7 +46,7 @@ function getAccountBalances(user) {
       fetch(API_URL + "/balance?compteId=" + account.id).then((res) =>
         res.json().then((data) => {
           if (res.ok) {
-            account.balance = data.balance;
+            account.balance = data.finalBalance;
           } else {
             displayToast(
               document.querySelector(".toasts-container"),
@@ -67,13 +67,19 @@ function getAccountBalances(user) {
 function renderAccounts(user) {
   const balanceCardsContainer = document.querySelector(".balance-container");
 
+  balanceCardsContainer.innerHTML = `<article class="card secondary-card total-card">
+          <p class="card-label total-card-label">TOTAL WEALTH</p>
+          <p class="card-balance total-card-balance"></p>
+        </article>`;
   let totalBalance = 0;
 
   user.accounts.forEach((account) => {
     const balanceCard = createBalanceCard(account);
-
     totalBalance += account.balance;
-    balanceCardsContainer.append(balanceCard);
+    balanceCardsContainer.insertBefore(
+      balanceCard,
+      balanceCardsContainer.firstChild,
+    );
   });
 
   document.querySelector(".total-card-balance").textContent = totalBalance;
@@ -87,11 +93,11 @@ function createBalanceCard(account) {
   cardLabel.classList.add("card-label", "account-card-label");
   const accountName = document.createElement("span");
   accountName.classList.add("account-card-name");
-  accountName.textContent = account.nom;
+  accountName.textContent = account.nom.toUpperCase();
 
   const accountType = document.createElement("span");
   accountType.classList.add("account-card-type");
-  accountType.textContent = account.type;
+  accountType.textContent = account.type.toUpperCase();
 
   cardLabel.append(accountName, accountType);
 
@@ -109,10 +115,12 @@ function getTransactions() {
 
 function renderTransactions(transactions) {
   transactions = transactions.data;
-  tbody = document.querySelector("table.list-entity-container tbody");
-  transactions.toSorted().forEach((transaction) => {
+
+  const tableBody = document.querySelector("table.list-entity-container tbody");
+  tableBody.innerHTML = "";
+  transactions.forEach((transaction) => {
     const tableRow = createTransactionRow(transaction);
-    tbody.append(tableRow);
+    tableBody.append(tableRow);
   });
 }
 
@@ -126,18 +134,18 @@ function createTransactionRow(transaction) {
   const transactionClass = getTransactionTypeClass[transaction.type];
 
   const transactionType = document.createElement("td");
-  transactionType.classList.add(transactionClass);
+  transactionType.classList.add(transactionClass, "type-column");
   transactionType.textContent = getTransactionTypeName[transaction.type];
 
   const transactionCategory = document.createElement("td");
-  transactionCategory.textContent = transaction.category.nom;
+  transactionCategory.textContent = transaction.categorie.nom;
   transactionCategory.dataset.categoryId = transaction.categoryId;
 
   const transactionDescription = document.createElement("td");
   transactionDescription.textContent = transaction.description;
 
   const transactionAmount = document.createElement("td");
-  transactionAmount.classList.add(transactionClass);
+  transactionAmount.classList.add(transactionClass, "amount-column");
   transactionAmount.textContent = transaction.montant;
 
   const actionBtns = document.createElement("td");
@@ -165,12 +173,16 @@ function fetchAndRenderAddTransactionContainer(user) {
           "#add-transfer-to-field",
         );
 
+        const dateArray = new Date().toISOString().split(":");
+        dateArray.pop();
+        document.querySelector("#add-date-field").value = dateArray.join(":");
+
         user.accounts.forEach((account) => {
           const option = document.createElement("option");
           option.value = account.id;
           option.textContent = account.nom;
           selectAccount.append(option);
-          selectAccountToField.append(option.clodeNode());
+          selectAccountToField.append(option.cloneNode(true));
         });
 
         const selectCategory = document.querySelector("#add-category-field");
@@ -216,24 +228,30 @@ function wireTableEvents() {
 
 function wireAddContainerEvents() {
   document.querySelector("#add-type-field").addEventListener("change", (e) => {
-    const transferToField = document.querySelector("#add-transfer-to-field");
+    const transferToUnit = document.querySelector(
+      ".add-entity-container .form-unit:has(#add-transfer-to-field)",
+    );
     if (e.target.value === "TRANSFER") {
-      transferToField.style.display = "block";
+      transferToUnit.style.display = "block";
     } else {
-      transferToField.style.display = "none";
+      transferToUnit.style.display = "none";
     }
   });
 
-  document.querySelector("#add-entity-form").addEventListener("submit", (e) => {
+  document.querySelector(".add-entity-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const fields = {
-      montant: document.querySelector("#add-amount-field").value,
+      montant: +document.querySelector("#add-amount-field").value,
+      date: new Date(
+        document.querySelector("#add-date-field").value,
+      ).toISOString(),
       type: document.querySelector("#add-type-field").value,
       description: document.querySelector("#add-description-field").value,
-      compteId: document.querySelector("#add-account-field").value,
-      categoryId: document.querySelector("#add-category-field").value,
-      idDestination: document.querySelector("#add-transfer-to-field").value,
+      compteId: +document.querySelector("#add-account-field").value,
+      categorieId: +document.querySelector("#add-category-field").value,
+      idDestination: +document.querySelector("#add-transfer-to-field").value,
     };
+    console.log(fields);
     submitActionEntity(API_URL + "/transactions", fields, refreshPage, "POST");
     e.target.reset();
   });
@@ -257,7 +275,7 @@ function showEditTransactionModal(transaction) {
     typeField.value = transaction.type;
     const categoryField = editModal.querySelector("#edit-category-field");
     categoryField.value = transaction.categoryId;
-    const descriptionField = editModal.querySelector("#edit-description.field");
+    const descriptionField = editModal.querySelector("#edit-description-field");
     descriptionField.value = transaction.description;
     const amountField = editModal.querySelector("#edit-amount-field");
     amountField.value = transaction.amount;
@@ -309,7 +327,7 @@ function submitDeleteTransaction(transactionId) {
 }
 
 function refreshPage() {
-  return Promise.all([getAccountBalances(), getTransactions()]);
+  return Promise.all([getAccountBalances(user), getTransactions()]);
 }
 function checkTransactionIconClick(table, node, className) {
   const svg = node.closest("svg");

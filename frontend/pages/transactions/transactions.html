@@ -4,26 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Transactions</title>
-    <link rel="stylesheet" href="new-transaction-style.css" />
-    <script src="./new-transactions-script.js"></script>
+    <link rel="stylesheet" href="transactions-style.css" />
   </head>
   <body>
     <main class="main-container">
       <section class="balance-container">
-        <article class="card primary-card account-card">
-          <p class="card-label account-card-label">
-            <span class="account-card-name"></span>
-            <span class="account-card-type"></span>
-          </p>
-          <p class="card-balance account-card-balance"></p>
-        </article>
-        <article class="card primary-card account-card">
-          <p class="card-label account-card-label">
-            <span class="account-card-name"></span>
-            <span class="account-card-type"></span>
-          </p>
-          <p class="card-balance account-card-balance"></p>
-        </article>
         <article class="card secondary-card total-card">
           <p class="card-label total-card-label">TOTAL WEALTH</p>
           <p class="card-balance total-card-balance"></p>
@@ -61,7 +46,7 @@
           <div class="form-unit">
             <label for="add-date-field" class="form-label">Date</label>
             <input
-              type="date"
+              type="datetime-local"
               name="date"
               id="add-date-field"
               class="form-field"
@@ -109,7 +94,7 @@
             <th>Type</th>
             <th>Category</th>
             <th>Description</th>
-            <th>Amount (DH)</th>
+            <th class="amount-column">Amount (DH)</th>
             <th class="action-btns">Actions</th>
           </tr>
         </thead>
@@ -134,7 +119,12 @@
       <h2 class="modal-header">Edit this transaction</h2>
       <div class="form-unit first-unit">
         <label for="edit-date-field" class="form-field">Date</label>
-        <input type="date" name="date" id="edit-date-field" disabled />
+        <input
+          type="datetime-local"
+          name="date"
+          id="edit-date-field"
+          disabled
+        />
       </div>
       <div class="form-unit">
         <label for="edit-type-field">Type</label>
@@ -163,5 +153,6 @@
       </div>
     </form>
     <div class="toasts-container"></div>
+    <script src="./transactions-script.js" type="module"></script>
   </body>
 </html>
