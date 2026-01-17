@@ -13,6 +13,9 @@ import {
   deleteIcon,
   editIcon,
   API_URL,
+  fetchAndRender,
+  showDeleteEntityModal,
+  submitActionEntity,
 } from "../../utils/utils.js";
 
 const user = {};
@@ -48,23 +51,21 @@ document.querySelector(".add-entity-form").addEventListener("submit", (e) => {
         displayToast(
           document.querySelector(".toasts-container"),
           "Adding category was successful",
-          "success"
+          "success",
         );
       } else {
         displayToast(
           document.querySelector(".toasts-container"),
           data.error || data.message,
-          "error"
+          "error",
         );
       }
-    })
+    }),
   );
 });
 
 function getCategories() {
-  return fetch(API_URL + "/categories")
-    .then((res) => res.json())
-    .then((data) => renderCategories(data));
+  return fetchAndRender(API_URL + "/categories", renderCategories);
 }
 
 function renderCategories(categories) {
@@ -84,12 +85,12 @@ function wireTableEvents() {
     const editIconBehavior = checkCategoryIconClick(
       tableBody,
       e.target,
-      "edit-icon"
+      "edit-icon",
     );
     const deleteIconBehavior = checkCategoryIconClick(
       tableBody,
       e.target,
-      "delete-icon"
+      "delete-icon",
     );
 
     if (editIconBehavior.isClicked) {
@@ -160,101 +161,37 @@ function showEditCategoryModal(category) {
 
       editModal.parentElement.replaceChild(
         editModal.cloneNode(true),
-        editModal
+        editModal,
       );
     } else if (e.submitter.classList.contains("cancel-btn")) {
       // remove the event listener, to try using removeEventListener later
       editModal.parentElement.replaceChild(
         editModal.cloneNode(true),
-        editModal
+        editModal,
       );
     }
   });
 }
 
 function submitEditCategory(category, newCategoryFields) {
-  return fetch(API_URL + "/categories/" + category.id, {
-    method: "PUT",
-    headers: {
-      "Content-type": "application/json",
-    },
-    body: JSON.stringify(newCategoryFields),
-  }).then((res) =>
-    res.json().then((data) => {
-      if (res.ok) {
-        return getCategories().then(() => {
-          displayToast(
-            document.querySelector(".toasts-container"),
-            "Category modified with success",
-            "success"
-          );
-        });
-      } else {
-        displayToast(
-          document.querySelector(".toasts-container"),
-          /* right now i want to see the backend message of error if its not good change it to a normal default message*/
-          data.message || data.error,
-          "error"
-        );
-      }
-    })
+  return submitActionEntity(
+    API_URL + "/categories/" + category.id,
+    newCategoryFields,
+    getCategories,
+    "PUT",
   );
 }
 
 function showDeleteCategoryModal(category) {
-  const modalBackground = document.querySelector(".modal-background");
-  const deleteModal = document.querySelector(".delete-category-modal");
-  modalBackground.style.display = "block";
-  deleteModal.style.display = "block";
-
-  deleteModal.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    modalBackground.style.display = "none";
-    deleteModal.style.display = "none";
-
-    if (e.submitter.classList.contains("delete-btn")) {
-      submitDeleteCategory(category).then(() =>
-        deleteModal.parentElement.replaceChild(
-          deleteModal.cloneNode(true),
-          deleteModal
-        )
-      );
-    } else if (e.submitter.classList.contains("cancel-btn")) {
-      // Again removing the eventlistener
-      deleteModal.parentElement.replaceChild(
-        deleteModal.cloneNode(true),
-        deleteModal
-      );
-    }
-  });
+  showDeleteEntityModal("category", category.id, submitDeleteCategory);
 }
 
-function submitDeleteCategory(category) {
-  return fetch(API_URL + "/categories/" + category.id, {
-    method: "DELETE",
-    headers: {
-      "Content-type": "application/json",
-    },
-  }).then((res) =>
-    res.json().then((data) => {
-      if (res.ok) {
-        return getCategories().then(() =>
-          displayToast(
-            document.querySelector(".toasts-container"),
-            "Success deleting that category",
-            "success"
-          )
-        );
-      } else {
-        displayToast(
-          document.querySelector(".toasts-container"),
-          /* right now i want to see the backend message of error if its not good change it to a normal default message*/
-          data.error || data.message,
-          "error"
-        );
-      }
-    })
+function submitDeleteCategory(categoryId) {
+  return submitActionEntity(
+    API_URL + "/categories" + categoryId,
+    null,
+    getCategories,
+    "DELETE",
   );
 }
 

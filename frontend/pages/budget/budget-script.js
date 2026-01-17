@@ -3,6 +3,9 @@ import {
   editIcon,
   deleteIcon,
   loadInitialStructure,
+  fetchAndRender,
+  submitActionEntity,
+  showDeleteEntityModal,
 } from "../../utils/utils.js";
 import { displayToast } from "../../components/toast.js";
 
@@ -49,17 +52,12 @@ document.querySelector(".header-text p").textContent +=
 document
   .querySelector(".add-budget-limit-btn")
   .addEventListener("click", (e) => {
-    fetchAndShowSetLimitModal();
+    fetchAndRender(API_URL + "/categories", showSetLimitModal);
   });
 
 // Functions from now on
 function getBudgetStatuses() {
-  return (
-    fetch(API_URL + "/budget/status")
-      .then((res) => res.json())
-      // double check if data is object that hold data arrayso data.data or data array directly
-      .then((data) => renderBudgetStatuses(data))
-  );
+  return fetchAndRender(API_URL + "/budget/status", renderBudgetStatuses);
 }
 
 function renderBudgetStatuses(budgetStatuses) {
@@ -92,12 +90,12 @@ function createBudgetCard(budgetStatus) {
     const editIconBehavior = checkCategoryIconClick(
       actionBtns,
       e.target,
-      "edit-icon"
+      "edit-icon",
     );
     const deleteIconBehavior = checkCategoryIconClick(
       actionBtns,
       e.target,
-      "delete-icon"
+      "delete-icon",
     );
 
     if (editIconBehavior.isClicked) {
@@ -167,17 +165,10 @@ function createBudgetCard(budgetStatus) {
     cardAmounts,
     progressBar,
     cardStats,
-    cardMessage
+    cardMessage,
   );
 
   return budgetCard;
-}
-function fetchAndShowSetLimitModal() {
-  fetch(API_URL + "/categories")
-    .then((res) => res.json())
-    .then((data) => {
-      showSetLimitModal(data);
-    });
 }
 
 function showEditLimitModal(budgetStatus) {
@@ -252,78 +243,23 @@ function showSetLimitModal(categories) {
   });
 }
 function showDeleteLimitModal(budgetStatus) {
-  const modalBackground = document.querySelector(".modal-background");
-  const deleteModal = document.querySelector(".delete-budget-modal");
-
-  const newCleanModal = deleteModal.cloneNode(true);
-  newCleanModal.reset();
-
-  modalBackground.style.display = "block";
-  deleteModal.style.display = "block";
-
-  deleteModal.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    if (e.submitter.classList.contains("cancel-btn")) {
-    } else if (e.submitter.classList.contains("delete-btn")) {
-      submitDeleteLimit(budgetStatus.categoryId);
-    }
-
-    deleteModal.parentElement.replaceChild(newCleanModal, deleteModal);
-
-    modalBackground.style.display = "none";
-    newCleanModal.style.display = "none";
-  });
+  showDeleteEntityModal("budget", budgetStatus.categoryId, submitDeleteLimit);
 }
 
 function submitSetLimit(fields) {
-  fetch(API_URL + "/budget/limit", {
-    method: "POST",
-    headers: {
-      "Content-type": "application/json",
-    },
-    body: JSON.stringify(fields),
-  }).then((res) =>
-    res.json().then((data) => {
-      if (res.ok) {
-        return getBudgetStatuses().then(
-          displayToast(
-            document.querySelector(".toasts-container"),
-            data.message,
-            "success"
-          )
-        );
-      } else {
-        displayToast(
-          document.querySelector(".toasts-container"),
-          data.message || data.error,
-          "error"
-        );
-      }
-    })
+  return submitActionEntity(
+    API_URL + "/budget/limit",
+    fields,
+    getBudgetStatuses,
+    "POST",
   );
 }
 function submitDeleteLimit(categoryId) {
-  fetch(API_URL + "/budget/limit/" + categoryId, {
-    method: "DELETE",
-  }).then((res) =>
-    res.json().then((data) => {
-      if (res.ok) {
-        return getBudgetStatuses().then(
-          displayToast(
-            document.querySelector(".toasts-container"),
-            data.message,
-            "success"
-          )
-        );
-      } else {
-        displayToast(
-          document.querySelector(".toasts-container"),
-          data.message || data.error,
-          "error"
-        );
-      }
-    })
+  return submitActionEntity(
+    API_URL + "/budget/limit/" + categoryId,
+    null,
+    getBudgetStatuses,
+    "DELETE",
   );
 }
 

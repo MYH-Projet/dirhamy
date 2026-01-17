@@ -3,7 +3,10 @@ import {
   loadInitialStructure,
   deleteIcon,
   editIcon,
+  fetchAndRender,
   API_URL,
+  submitActionEntity,
+  showDeleteEntityModal,
 } from "../../utils/utils.js";
 
 const user = {};
@@ -14,13 +17,23 @@ const getTransactionTypeClass = {
   TRANSFER: "transfer-color",
 };
 
+const getTransactionTypeName = {
+  DEPENSE: "Expense",
+  REVENU: "Income",
+  TRANSFER: "Transfer",
+};
+
 // Create Initial Structure and populate the user object
 loadInitialStructure(user).then(() => {
   // write your code here
   getAccountBalances(user);
   fetchAndRenderAddTransactionContainer(user);
+
+  // get transactions
   getTransactions();
 });
+
+// setting up events
 
 // Populates the user object with the new balance
 function getAccountBalances(user) {
@@ -89,22 +102,11 @@ function createBalanceCard(account) {
 }
 
 function getTransactions() {
-  return fetch(API_URL + "/transactions/user").then((res) =>
-    res.json().then((data) => {
-      if (res.ok) {
-        renderTransactions(data.data);
-      } else {
-        displayToast(
-          document.querySelector(".toasts-container"),
-          data.error || data.message,
-          "error",
-        );
-      }
-    }),
-  );
+  return fetchAndRender(API_URL + "/transactions/user", renderTransactions);
 }
 
 function renderTransactions(transactions) {
+  transactions = transactions.data;
   tbody = document.querySelector("table.list-entity-container tbody");
   transactions.toSorted().forEach((transaction) => {
     const tableRow = createTransactionRow(transaction);
@@ -123,7 +125,7 @@ function createTransactionRow(transaction) {
 
   const transactionType = document.createElement("td");
   transactionType.classList.add(transactionClass);
-  transactionType.textContent = capitalizeString(transaction.type);
+  transactionType.textContent = getTransactionTypeName[transaction.type];
 
   const transactionCategory = document.createElement("td");
   transactionCategory.textContent = transaction.category.nom;
@@ -153,7 +155,7 @@ function createTransactionRow(transaction) {
 }
 
 function fetchAndRenderAddTransactionContainer(user) {
-  fetch(API_URL + "/categories").then((res) =>
+  return fetch(API_URL + "/categories").then((res) =>
     res.json().then((data) => {
       if (res.ok) {
         const selectAccount = document.querySelector("#add-account-field");
@@ -180,20 +182,155 @@ function fetchAndRenderAddTransactionContainer(user) {
       }
     }),
   );
-
-  return null;
 }
 
 function wireTableEvents() {
-  document
-    .querySelector("table.list-entity-container tbody")
-    .addEventListener("click", (e) => {
-      const editIconBehavior = checkTransactionIconBehavior();
-      const deleteIconBehavior = checkTransactionIconBehavior();
-    });
+  const tbody = document.querySelector("table.list-entity-container tbody");
+
+  tbody.addEventListener("click", (e) => {
+    const editIconBehavior = checkTransactionIconClick(
+      tbody,
+      e.target,
+      "edit-icon",
+    );
+    const deleteIconBehavior = checkTransactionIconClick(
+      tbody,
+      e.target,
+      "delete-icon",
+    );
+
+    if (editIconBehavior.isClicked) {
+      showEditTransactionModal(editIconBehavior);
+    } else if (deleteIconBehavior.isClicked) {
+      showDeleteTransactionModal(deleteIconBehavior);
+    }
+  });
 }
 
-function capitalizeString(string) {
-  const lowerCase = string.toLowerCase();
-  return lowerCase.charAt(0).toUpperCase() + lowerCase.slice(1);
+function showEditTransactionModal(transaction) {
+  return fetchAndRender(API_URL + "/categories", (categories) => {
+    categories.forEach((category) => {
+      const option = document.createElement("option");
+      option.value = category.id;
+      option.textContent = category.nom;
+      document.querySelector("#edit-category-field").append(option);
+    });
+  }).then(() => {
+    const modalBackground = document.querySelector(".modal-background");
+    const editModal = document.querySelector(".edit-transaction-modal");
+    const newModal = editModal.cloneNode(true);
+
+    const dateField = editModal.querySelector("#edit-date-field");
+    dateField.value = transaction.date;
+    const typeField = editModal.querySelector("#edit-type-field");
+    typeField.value = transaction.type;
+    const categoryField = editModal.querySelector("#edit-category-field");
+    categoryField.value = transaction.categoryId;
+    const descriptionField = editModal.querySelector("#edit-description.field");
+    descriptionField.value = transaction.description;
+    const amountField = editModal.querySelector("#edit-amount-field");
+    amountField.value = transaction.amount;
+
+    modalBackground.style.display = "block";
+    editModal.style.display = "block";
+
+    editModal.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      if (e.submitter.classList.contains("action-btn")) {
+        const newFields = {
+          montant: amountField.value,
+          description: descriptionField.value,
+          categoryId: categoryField.value,
+        };
+        submitEditTransaction(transaction.id, newFields);
+      } else if (e.submitter.classList.contains("cancel-btn")) {
+      }
+
+      modalBackground.style.display = "none";
+      editModal.style.display = "none";
+
+      editModal.parentElement.replaceChild(newModal, editModal);
+    });
+  });
+}
+
+function submitEditTransaction(transactionId, newFields) {
+  return submitActionEntity(
+    API_URL + "/transactions/" + transactionId,
+    newFields,
+    refreshPage,
+    "PUT",
+  );
+}
+
+function showDeleteTransactionModal(transaction) {
+  showDeleteEntityModal("transaction", transaction.id, submitDeleteTransaction);
+}
+
+function submitDeleteTransaction(transactionId) {
+  return submitActionEntity(
+    API_URL + "/transactions/" + transactionId,
+    null,
+    refreshPage,
+    "DELETE",
+  );
+}
+
+function refreshPage() {
+  return Promise.all([getAccountBalances(), getTransactions()]);
+}
+function checkTransactionIconClick(table, node, className) {
+  const svg = node.closest("svg");
+
+  let res = {
+    isClicked: null,
+  };
+  if (!svg) {
+    res.isClicked = false;
+    return res;
+  }
+  if (!table.contains(svg)) {
+    res.isClicked = false;
+    return res;
+  }
+
+  const tableRow = svg.closest("tr");
+
+  res = { ...res, ...getNeededTransactionData(tableRow) };
+
+  if (svg.classList.contains(className)) {
+    res.isClicked = true;
+    return res;
+  } else {
+    res.isClicked = false;
+    return res;
+  }
+}
+
+function getNeededTransactionData(tableRow) {
+  const transactionData = {};
+
+  let currentTd = tableRow.firstChild;
+  transactionData.id = tableRow.dataset.id;
+  transactionData.date = currentTd.textContent;
+
+  currentTd = currentTd.nextSibling;
+  transactionData.type = getKeyByValue(
+    getTransactionTypeName,
+    currentTd.textContent,
+  );
+
+  currentTd = currentTd.nextSibling;
+  transactionData.categoryName = currentTd.textContent;
+  transactionData.categoryId = currentTd.dataset.categoryId;
+
+  currentTd = currentTd.nextSibling;
+  transactionData.amount = Math.abs(+currentTd.textContent);
+
+  return transactionData;
+}
+
+function getKeyByValue(object, value) {
+  return Object.keys(object).find((key) => object[key] === value);
 }
