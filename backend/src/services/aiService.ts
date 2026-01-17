@@ -12,6 +12,8 @@ export async function generateResponse(userMessage: string, userData: string){
         your job is to help the user manage their money,educate them and help them acheinve financial literacy and freedom\n
         you'll be dealing mainly with young adults and students in morocco so adopt a friendly tone that aligns with their culture.\n
         your replies should be in english and they should be short and to the point\n
+        your replies shouldn't contain ** ** at all beceause it doesn't represent bold text in html\n
+        your replies should be well formated and have "\\n" to make it readable\n
         Response should be logical, easy to understand and based on the user's data provided below\n
         user data : ${userData}\n
         user message : ${userMessage}`;

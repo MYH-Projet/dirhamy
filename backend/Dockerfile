@@ -17,6 +17,9 @@ RUN apk add --no-cache postgresql-client
 # 4) Copier le code source
 COPY . .
 
+# Generate Prisma Client
+RUN npx prisma generate
+
 # 5) Arguments et variables d'environnement
 ARG DATABASE_URL
 ENV DATABASE_URL=${DATABASE_URL}

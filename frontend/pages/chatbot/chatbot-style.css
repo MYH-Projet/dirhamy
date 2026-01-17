@@ -1,1 +1,72 @@
 @import url("../base.css");
+
+/* Chatbot container uses existing design tokens */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: var(--normal-spacing);
+  overflow-y: auto;
+}
+
+.message {
+  margin-bottom: var(--s-spacing);
+  max-width: 70%;
+  padding: var(--xs-spacing) var(--s-spacing);
+  border-radius: var(--border-radius);
+  line-height: 1.4;
+}
+
+.message.user {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  align-self: flex-end;
+}
+
+.message.ai {
+  background-color: var(--secondary-color);
+  color: var(--black-text-color);
+  align-self: flex-start;
+}
+
+.chat-input {
+  display: flex;
+  padding: var(--normal-spacing);
+  border-top: 1px solid var(--border-color);
+  background-color: var(--lightest-gray-color);
+}
+
+.chat-input textarea {
+  flex: 1;
+  resize: none;
+  padding: var(--xs-spacing);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.chat-input button {
+  margin-left: var(--xs-spacing);
+  padding: var(--xs-spacing) var(--s-spacing);
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.chat-input button:hover {
+  background-color: var(--lighter-primary-color);
+}
