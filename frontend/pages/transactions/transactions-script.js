@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
               if (res.ok) {
                 sessionStorage.setItem(
                   "toast",
-                  JSON.stringify({ message: data.message, type: "success" })
+                  JSON.stringify({ message: data.message, type: "success" }),
                 );
                 window.location.assign("./login.html");
               } else {
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const transactionsContainer = document.querySelector(
-    ".list-transaction-container"
+    ".list-transaction-container",
   );
   let originalTransaction = null;
 
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const json = await res.json();
-
+      console.log(json);
       // Backend renvoie { data: [...], meta: {...} }
       const transactions = (json.data || []).map((t) => {
         const amountAbs = Math.abs(Number(t.montant));
@@ -319,7 +319,7 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           credentials: "include",
           body: JSON.stringify(payload),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -373,7 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
         user.accounts[i].type.toUpperCase();
 
       const concernedAccount = accounts.find(
-        (account) => account.accountId === user.accounts[i].id
+        (account) => account.accountId === user.accounts[i].id,
       ); /* this is safer code to get the exact balance for each account but i think
      it is fair to think that they will be in the same i position*/
       accountCards[i].querySelector(".account-card-balance").textContent =
@@ -393,6 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const balances = [];
     const promises = [];
     user.accounts.forEach((account) => {
+      console.log(user.accounts);
       promises.push(
         fetch(`${API_URL}/balance?compteId=${account.id}`)
           .then((res) => res.json())
@@ -401,7 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
               accountId: account.id,
               accountBalance: data.finalBalance,
             });
-          })
+          }),
       );
     });
 
@@ -424,7 +425,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((res) => res.json())
       .then((data) => {
         const transactionForm = document.querySelector(
-          "#transaction-form-category"
+          "#transaction-form-category",
         );
         data.forEach((category) => {
           const option = document.createElement("option");

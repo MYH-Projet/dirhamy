@@ -167,7 +167,7 @@ ul {
   border: none;
   border-radius: 50%;
 
-  background-color: var(--secondary-color);
+  background-color: transparent;
 
   color: var(--black-text-color);
 }
@@ -279,7 +279,10 @@ ul {
 
     align-items: center;
 
-    transition: color 0.2s, background-color 0.2s, transform 0.2s;
+    transition:
+      color 0.2s,
+      background-color 0.2s,
+      transform 0.2s;
 
     padding: var(--normal-spacing) var(--normal-spacing);
 
@@ -360,7 +363,10 @@ ul {
   border: 1px var(--redish-color) solid;
   border-radius: var(--border-radius);
 
-  transition: color 0.2s, background-color 0.2s, transform 0.2s;
+  transition:
+    color 0.2s,
+    background-color 0.2s,
+    transform 0.2s;
 
   cursor: pointer;
 }
@@ -478,11 +484,18 @@ table.list-entity-container {
       color: rgb(101, 106, 112);
       cursor: pointer;
 
-      transition: color 0.15s;
+      transition:
+        color 0.2s,
+        transform 0.2s;
     }
 
-    svg:hover {
-      color: rgb(154, 158, 162);
+    .edit-icon:hover {
+      transform: scale(1.1);
+      color: var(--primary-color);
+    }
+    .delete-icon:hover {
+      transform: scale(1.1);
+      color: var(--redish-color);
     }
   }
   thead,

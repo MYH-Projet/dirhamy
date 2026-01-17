@@ -13,11 +13,12 @@
 .balance-container {
   display: flex;
   flex-direction: row;
+  flex-wrap: 1;
   gap: 30px;
 
   margin-bottom: var(--large-spacing);
 
-  div {
+  article {
     flex: 1;
   }
 

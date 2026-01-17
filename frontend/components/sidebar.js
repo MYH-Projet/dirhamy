@@ -157,4 +157,4 @@ export function insertSidebar(container) {
   });
 }
 
-export function disableCurrentSidebarLink() {}
+export function focusCurrentSidebarLink() {}

@@ -3,3 +3,15 @@
 .add-entity-container .form-unit:has(#add-description-field) {
   flex-basis: 300px;
 }
+
+.expense-color {
+  color: var(--redish-color);
+}
+
+.income-color {
+  color: var(--primary-color);
+}
+
+.transfer-color {
+  color: rgb(20, 17, 185);
+}

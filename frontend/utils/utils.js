@@ -1,13 +1,13 @@
 import {
   insertSidebar,
-  disableCurrentSidebarLink,
+  focusCurrentSidebarLink,
 } from "../components/sidebar.js";
 
 export const API_URL = "/api";
 
 function renderInitialStucture(user) {
   return insertSidebar(document.querySelector("body")).then(() => {
-    disableCurrentSidebarLink();
+    focusCurrentSidebarLink();
     document.querySelector(".user-name").textContent =
       user.name + " " + user.surname;
     document.querySelector(".sidebar-profile-icon").textContent =
@@ -37,4 +37,3 @@ export const deleteIcon = `<svg class="delete-icon" xmlns="http://www.w3.org/200
   <line x1="10" y1="11" x2="10" y2="17" stroke-linecap="round" />
   <line x1="14" y1="11" x2="14" y2="17" stroke-linecap="round" />
 </svg>`;
-
