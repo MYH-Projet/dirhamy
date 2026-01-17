@@ -139,3 +139,14 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 backend/generated/prisma
+
+
+
+
+
+
+
+
+#this is related to mouhssine structure
+cdc/
+.vscode/
