@@ -7,6 +7,7 @@ import {
   API_URL,
   submitActionEntity,
   showDeleteEntityModal,
+  toastNotis,
 } from "../../utils/utils.js";
 
 const user = {};
@@ -28,12 +29,13 @@ loadInitialStructure(user).then(() => {
   // write your code here
   getAccountBalances(user);
   fetchAndRenderAddTransactionContainer(user);
-
-  // get transactions
   getTransactions();
+  toastNotis();
 });
 
 // setting up events
+wireTableEvents();
+wireAddContainerEvents();
 
 // Populates the user object with the new balance
 function getAccountBalances(user) {
@@ -207,6 +209,30 @@ function wireTableEvents() {
   });
 }
 
+function wireAddContainerEvents() {
+  document.querySelector("#add-type-field").addEventListener("change", (e) => {
+    const transferToField = document.querySelector("#add-transfer-to-field");
+    if (e.target.value === "TRANSFER") {
+      transferToField.style.display = "block";
+    } else {
+      transferToField.style.display = "none";
+    }
+  });
+
+  document.querySelector("#add-entity-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const fields = {
+      montant: document.querySelector("#add-amount-field").value,
+      type: document.querySelector("#add-type-field").value,
+      description: document.querySelector("#add-description-field").value,
+      compteId: document.querySelector("#add-account-field").value,
+      categoryId: document.querySelector("#add-category-field").value,
+      idDestination: document.querySelector("#add-transfer-to-field").value,
+    };
+    submitActionEntity(API_URL + "/transactions", fields, refreshPage, "POST");
+    e.target.reset();
+  });
+}
 function showEditTransactionModal(transaction) {
   return fetchAndRender(API_URL + "/categories", (categories) => {
     categories.forEach((category) => {

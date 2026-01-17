@@ -78,6 +78,17 @@ export function submitActionEntity(url, newFields, refreshCallback, verb) {
     }),
   );
 }
+export function toastNotis() {
+  const toast = JSON.parse(sessionStorage.getItem("toast"));
+  if (toast) {
+    displayToast(
+      document.querySelector(".toasts-container"),
+      toast.message,
+      toast.type,
+    );
+    sessionStorage.removeItem("toast");
+  }
+}
 
 export function showDeleteEntityModal(modalName, entityId, submitCallback) {
   const modalBackground = document.querySelector(".modal-background");

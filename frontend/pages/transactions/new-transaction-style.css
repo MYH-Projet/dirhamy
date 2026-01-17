@@ -4,6 +4,10 @@
   flex-basis: 300px;
 }
 
+#add-transfer-to-field {
+  display: none;
+}
+
 .expense-color {
   color: var(--redish-color);
 }

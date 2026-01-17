@@ -32,36 +32,17 @@ document.querySelector(".add-entity-form").addEventListener("submit", (e) => {
   e.preventDefault();
 
   const nameFormField = document.querySelector("#name-form-field");
-  fetch(API_URL + "/categories/", {
-    method: "POST",
-    headers: {
-      "Content-type": "application/json",
-    },
-    body: JSON.stringify({
-      nom: nameFormField.value,
-    }),
-  }).then((res) =>
-    res.json().then((data) => {
-      nameFormField.value = "";
-      if (res.ok) {
-        document
-          .querySelector("table.list-entity-container tbody")
-          .appendChild(createCategoryRow(data));
 
-        displayToast(
-          document.querySelector(".toasts-container"),
-          "Adding category was successful",
-          "success",
-        );
-      } else {
-        displayToast(
-          document.querySelector(".toasts-container"),
-          data.error || data.message,
-          "error",
-        );
-      }
-    }),
+  submitActionEntity(
+    API_URL + "/categories",
+    {
+      nom: nameFormField.value,
+    },
+    getCategories,
+    "POST",
   );
+
+  e.target.reset();
 });
 
 function getCategories() {
