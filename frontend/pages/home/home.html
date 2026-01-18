@@ -1,12 +1,508 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home Page</title>
-    <link rel="stylesheet" href="./home-style.css" />
-  </head>
-  <body>
-    <script src="./home-script.js" type="module"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dirhamy - Intelligent Financial Assistant</title>
+  <meta name="description"
+    content="Master your money with Dirhamy. The intelligent financial assistant for students and professionals.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../base.css">
+  <link rel="stylesheet" href="home-style.css?v=6"> <!-- Force Reload -->
+</head>
+
+<body class="home-page">
+
+  <!-- 1. Navbar -->
+  <nav class="home-nav">
+    <div class="container nav-container">
+      <a href="#" class="nav-logo">
+        <img src="../../icons/logo.svg" alt="Dirhamy" class="logo-img">
+      </a>
+
+      <div class="nav-desktop-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#how-it-works" class="nav-link">How it works</a>
+        <a href="#ai" class="nav-link">AI Coach</a>
+      </div>
+
+      <div class="nav-actions">
+        <a href="../login/login.html" class="btn btn-login">Sign in</a>
+        <a href="../register/register.html" class="btn btn-primary">Get Started</a>
+      </div>
+
+      <button class="menu-toggle" aria-label="Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- 2. Hero Section -->
+  <header class="hero-section">
+    <!-- Creative Blobs -->
+    <div class="hero-blob blob-1"></div>
+    <div class="hero-blob blob-2"></div>
+
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="hero-eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>New: AI Budget Insights</span>
+        </div>
+
+        <h1 class="hero-title">
+          Control your money. <br>
+          <span class="text-gradient">Build your future.</span>
+        </h1>
+
+        <p class="hero-sub">
+          Stop guessing where your money went. Track cash, bank accounts, and savings goals in one unified, intelligent
+          dashboard.
+        </p>
+
+        <div class="hero-btns">
+          <a href="../register/register.html" class="btn btn-primary">Start for free</a>
+          <a href="#how-it-works" class="btn btn-white-pill">See how it works</a>
+        </div>
+
+        <div class="hero-trust">
+          <div class="trust-item">
+            <div class="check-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg></div>
+            <span>Privacy-first</span>
+          </div>
+          <div class="trust-item">
+            <div class="check-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg></div>
+            <span>No bank login needed</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="mockup-container">
+          <div class="mock-stat-grid">
+            <div class="mock-card">
+              <div class="mock-label">Total Balance</div>
+              <div class="mock-big-num">12,450 MAD</div>
+            </div>
+            <div class="mock-card" style="background:var(--p-primary-light); color:var(--p-primary-dark);">
+              <div class="mock-label" style="color:var(--p-primary);">Savings</div>
+              <div class="mock-big-num">+15%</div>
+            </div>
+          </div>
+          <!-- Floating Badge -->
+          <div class="float-badge">
+            <div class="float-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+            </div>
+            <div class="float-content">
+              <strong>Under Budget</strong>
+              <span>You saved 300 MAD</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2b. How It Works Section (Flow Design) -->
+  <section class="section-padding" id="how-it-works">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2>How it works</h2>
+        <p class="section-subtitle">Simple steps to take control of your financial life.</p>
+      </div>
+
+      <div class="works-flow-container">
+        <!-- Connecting Line Background -->
+        <svg class="flow-line-svg" viewBox="0 0 1200 400" fill="none" preserveAspectRatio="none">
+          <path d="M200 180 Q 400 50 600 180 T 1000 180" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="6 6"
+            class="flow-path-bg" />
+        </svg>
+
+        <!-- Step 1: Sign Up (Profile Mockup) -->
+        <div class="flow-step" style="top: 100px; left: 10%;">
+          <div class="flow-card active-card">
+            <svg width="140" height="90" viewBox="0 0 140 90" fill="none" class="step-mockup">
+              <!-- Card BG -->
+              <rect x="10" y="10" width="120" height="70" rx="4" fill="#f8fafc" stroke="#e2e8f0" />
+              <!-- Avatar -->
+              <circle cx="35" cy="45" r="12" fill="#e2e8f0" />
+              <!-- Lines -->
+              <rect x="60" y="38" width="50" height="6" rx="3" fill="#cbd5e1" />
+              <rect x="60" y="50" width="30" height="6" rx="3" fill="#e2e8f0" />
+              <!-- Bottom Line -->
+              <rect x="25" y="65" width="90" height="4" rx="2" fill="#e2e8f0" />
+            </svg>
+          </div>
+          <div class="flow-text">
+            <h4><span class="step-num">01</span> Sign up</h4>
+            <p>Create your free account.</p>
+          </div>
+        </div>
+
+        <!-- Step 2: Log (List Mockup) -->
+        <div class="flow-step " style="top: 20px; left: 40%;">
+          <div class="flow-card">
+            <svg width="140" height="90" viewBox="0 0 140 90" fill="none" class="step-mockup">
+              <!-- List Items -->
+              <rect x="20" y="15" width="100" height="16" rx="4" fill="#f8fafc" stroke="#e2e8f0" />
+              <rect x="25" y="20" width="10" height="6" rx="2" fill="#dbeafe" />
+              <rect x="40" y="20" width="40" height="6" rx="2" fill="#cbd5e1" />
+
+              <rect x="20" y="37" width="100" height="16" rx="4" fill="#f8fafc" stroke="#e2e8f0" />
+              <rect x="25" y="42" width="10" height="6" rx="2" fill="#fef3c7" />
+              <rect x="40" y="42" width="50" height="6" rx="2" fill="#cbd5e1" />
+
+              <rect x="20" y="59" width="100" height="16" rx="4" fill="#f8fafc" stroke="#e2e8f0" />
+              <rect x="25" y="64" width="10" height="6" rx="2" fill="#dcfce7" />
+              <rect x="40" y="64" width="30" height="6" rx="2" fill="#cbd5e1" />
+            </svg>
+          </div>
+          <div class="flow-text">
+            <h4><span class="step-num">02</span> Log expenses</h4>
+            <p>Track cash or sync stats.</p>
+          </div>
+        </div>
+
+        <!-- Step 3: Clarity (Chart Mockup) -->
+        <div class="flow-step" style="top: 120px; left: 70%;">
+          <div class="flow-card">
+            <svg width="140" height="90" viewBox="0 0 140 90" fill="none" class="step-mockup">
+              <!-- Chart Card -->
+              <rect x="10" y="10" width="120" height="70" rx="4" fill="#f8fafc" stroke="#e2e8f0" />
+              <!-- Graph Line -->
+              <polyline points="25 60 45 50 65 65 85 40 115 25" fill="none" stroke="#0d9488" stroke-width="3"
+                stroke-linecap="round" stroke-linejoin="round" />
+              <circle cx="115" cy="25" r="4" fill="#0d9488" />
+              <!-- X Axis -->
+              <rect x="25" y="70" width="15" height="4" rx="2" fill="#e2e8f0" />
+              <rect x="50" y="70" width="15" height="4" rx="2" fill="#e2e8f0" />
+              <rect x="75" y="70" width="15" height="4" rx="2" fill="#e2e8f0" />
+            </svg>
+            <!-- Floating Badge -->
+            <div class="flow-float-badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+          </div>
+          <div class="flow-text">
+            <h4><span class="step-num">03</span> Get clarity</h4>
+            <p>Visual reports & tips.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Feature Tiles -->
+  <section class="tiles-wrapper" id="features">
+    <div class="container">
+      <div class="tiles-track">
+
+        <div class="tile-btn active">
+          <div class="tile-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
+          <span class="tile-label">Transactions</span>
+        </div>
+
+        <div class="tile-btn">
+          <div class="tile-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+              <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+            </svg>
+          </div>
+          <span class="tile-label">Budget</span>
+        </div>
+
+        <div class="tile-btn">
+          <div class="tile-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </div>
+          <span class="tile-label">Analytics</span>
+        </div>
+
+        <div class="tile-btn">
+          <div class="tile-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <span class="tile-label">Goals</span>
+        </div>
+
+        <div class="tile-btn">
+          <div class="tile-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+          </div>
+          <span class="tile-label">AI Coach</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Features Grid (Premium) -->
+  <section class="section-padding features-section">
+    <div class="features-bg-blob"></div>
+    <div class="container">
+      <div class="section-header">
+        <div class="header-pill">
+          <span class="pill-dot"></span> Why Dirhamy?
+        </div>
+        <h2>Tools designed for <br>real financial clarity</h2>
+        <p class="section-subtitle">Track spending, set goals, and get smart guidance — without complexity.</p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Card 1 -->
+        <div class="feat-card">
+          <span class="feat-badge">Core</span>
+          <h3>Unified Dashboard</h3>
+          <p class="feat-benefit">See everything at a glance.</p>
+          <p class="feat-desc">Track cash and bank spending in one clean view — always up to date.</p>
+          <div class="feat-proof">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Cash + bank, monthly insights</span>
+          </div>
+          <a href="../register/register.html" class="feat-link">Learn more <span class="arrow">→</span></a>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="feat-card">
+          <span class="feat-badge">Speed</span>
+          <h3>Smart Logging</h3>
+          <p class="feat-benefit">Log expenses in seconds.</p>
+          <p class="feat-desc">Import statements or add transactions quickly with smart categories.</p>
+          <div class="feat-proof">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Fast entry, clean categories</span>
+          </div>
+          <a href="../register/register.html" class="feat-link">Learn more <span class="arrow">→</span></a>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="feat-card">
+          <span class="feat-badge">Growth</span>
+          <h3>Weekly Insights</h3>
+          <p class="feat-benefit">Know what changed, and why.</p>
+          <p class="feat-desc">Get a weekly snapshot of trends, budgets, and small actions to improve.</p>
+          <div class="feat-proof">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Sunday recap, actionable tips</span>
+          </div>
+          <a href="../register/register.html" class="feat-link">Learn more <span class="arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. AI Financial Coach (Premium Interactive Hero) -->
+  <section class="section-padding" id="ai">
+    <div class="container">
+      <div class="ai-hero-card">
+        <!-- Branded Watermark -->
+        <img src="../../icons/logo.svg" class="ai-watermark" alt="" aria-hidden="true">
+
+        <div class="ai-header">
+          <div class="ai-badge">
+            <!-- Inlined Icon Only from logo.svg -->
+            <svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g transform="translate(10, 10) scale(1.2)">
+                <circle cx="15" cy="18" r="11" fill="#2dd4bf" />
+                <rect x="28" y="5" width="22" height="60" rx="11" ry="11" transform="rotate(35 39 35)" fill="#2dd4bf" />
+              </g>
+            </svg>
+            Dirhamy AI Coach
+          </div>
+          <h2>Meet your new Financial Coach</h2>
+          <p>Powered by smart insights to help you make better decisions.</p>
+        </div>
+
+        <div class="chat-interface-glass">
+          <div class="chat-stream" id="chat-stream">
+            <div class="chat-msg bot">
+              Hi! I noticed you spent 20% less on dining out this week. Great job! 🍔
+            </div>
+            <div class="chat-msg user">
+              Thanks! How much did I save?
+            </div>
+            <div class="chat-msg bot">
+              You saved approximately <strong>450 MAD</strong> compared to last week.
+            </div>
+          </div>
+
+          <!-- Prompt Chips -->
+          <div class="chat-chips">
+            <button class="ai-chip" data-msg="Overspending analysis">Why did I overspend?</button>
+            <button class="ai-chip" data-msg="Save 500 MAD">How to save 500 MAD?</button>
+            <button class="ai-chip" data-msg="Budget summary">Weekly Summary</button>
+          </div>
+
+          <!-- Input Area -->
+          <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Ask anything about your money..." aria-label="Ask AI">
+            <button class="chat-send-btn" id="chat-send-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Premium Footer -->
+  <footer class="home-footer">
+    <div class="footer-trust-strip">
+      <div class="container trust-row">
+        <div class="t-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          Privacy-first
+        </div>
+        <div class="t-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+          </svg>
+          MAD-friendly
+        </div>
+        <div class="t-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          Weekly Insights
+        </div>
+      </div>
+    </div>
+
+    <div class="container footer-main">
+      <div class="footer-col brand-col">
+        <a href="#" class="footer-logo">
+          <img src="../../icons/logo.svg" alt="Dirhamy" height="28" loading="lazy">
+        </a>
+        <p class="footer-tagline">Building financial confidence for everyone.</p>
+        <p class="footer-desc">Your intelligent companion for budgeting, tracking, and saving in Morocco.</p>
+
+        <div class="social-row">
+          <a href="#" class="social-btn" aria-label="Twitter">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
+              </path>
+            </svg>
+          </a>
+          <a href="#" class="social-btn" aria-label="LinkedIn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+              <rect x="2" y="9" width="4" height="12" />
+              <circle cx="4" cy="4" r="2" />
+            </svg>
+          </a>
+          <a href="#" class="social-btn" aria-label="GitHub">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+              </path>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-links-group">
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#ai">AI Coach</a>
+          <a href="#">Security</a>
+          <a href="#">Pricing</a>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="#">Help Center</a>
+          <a href="#">Contact</a>
+          <a href="#">Blog</a>
+          <a href="#">Status</a>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Cookie Settings</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container bottom-row">
+        <p>&copy; 2026 Dirhamy. Built for education.</p>
+        <div class="bottom-links">
+          <a href="#">Privacy</a>
+          <span class="dot">•</span>
+          <a href="#">Terms</a>
+          <span class="dot">•</span>
+          <a href="#">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="home-script.js?v=6"></script>
+</body>
+
 </html>
