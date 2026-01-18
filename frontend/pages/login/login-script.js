@@ -5,6 +5,9 @@ const API_URL = "/api";
 
 const toastContainer = document.querySelector(".toasts-container");
 
+document.querySelector(".copyright-year").textContent =
+  new Date().getFullYear();
+
 const loginForm = document.querySelector(".login-form");
 
 const mailInput = document.querySelector("#form-mail-input");
