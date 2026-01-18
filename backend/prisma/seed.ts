@@ -13,11 +13,19 @@ const prisma = new PrismaClient({ adapter })
 async function main() {
   console.log('🌱 Starting seed...');
 
-  // 1. Cleanup: Delete existing data to prevent conflicts (Order matters due to Foreign Keys)
-  // We use deleteMany() instead of truncating to be safe with FK constraints
+  // 1. Cleanup: Delete existing data to prevent conflicts 
+  // Order is critical due to Foreign Key constraints:
+  // Transaction -> depends on Transfer (optional) and Compte
+  // Transfer -> Independent (but Transactions point to it)
+  
   await prisma.balanceSnapshot.deleteMany();
   await prisma.budgetSnapshot.deleteMany();
+  
+  // Delete Transactions first (because they point to Transfers)
   await prisma.transaction.deleteMany();
+  // Now safe to delete Transfers
+  await prisma.transfer.deleteMany();
+  
   await prisma.categorie.deleteMany();
   await prisma.compte.deleteMany();
   await prisma.utilisateur.deleteMany();
@@ -25,14 +33,12 @@ async function main() {
   console.log('🧹 Database cleaned');
 
   // 2. Create a User
-  // In a real app, you would hash this password using bcrypt. 
-  // For seeding, we'll use a dummy hash or plain text depending on your auth setup.
   const user = await prisma.utilisateur.create({
     data: {
       nom: 'Doe',
       prenom: 'John',
       email: 'john.doe@example.com',
-      motDePasse: await bcrypt.hash('password123',10), // Example hash for "password123"
+      motDePasse: await bcrypt.hash('password123', 10), 
     },
   });
 
@@ -67,19 +73,19 @@ async function main() {
 
   // --- Last Month Transactions ---
   
-  // Salary Income
+  // A. Salary Income (Single Entry)
   await prisma.transaction.create({
     data: {
       montant: 3000.0,
       type: TypeTransaction.REVENU,
-      date: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1), // 1st of last month
+      date: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1), 
       description: 'Monthly Salary',
       compteId: bankAccount.id,
       categorieId: catSalary.id,
     },
   });
 
-  // Rent Expense
+  // B. Rent Expense (Single Entry)
   await prisma.transaction.create({
     data: {
       montant: -1200.0,
@@ -91,28 +97,44 @@ async function main() {
     },
   });
 
-  // ATM Withdrawal (Transfer from Bank to Cash)
-  // Note: Transfers need a source (compteId) and destination (idDestination)
-  await prisma.transaction.create({
+  // C. ATM Withdrawal (Transfer from Bank to Cash) - UPDATED!
+  // Uses the new "Transfer" parent model with nested writes
+  await prisma.transfer.create({
     data: {
-      montant: 200.0,
-      type: TypeTransaction.TRANSFER,
-      date: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 5),
-      description: 'ATM Withdrawal',
-      compteId: bankAccount.id, // Source
-      idDestination: cashWallet.id, // Destination
-      categorieId: catTransport.id, // Just tagging it generally, or you might have a "Transfer" category
-    },
+      createdAt: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 5),
+      transactions: {
+        create: [
+          // 1. Withdraw from Bank (Negative)
+          {
+            montant: -200.0,
+            type: TypeTransaction.TRANSFER,
+            date: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 5),
+            description: 'ATM Withdrawal - Out',
+            compteId: bankAccount.id,
+            categorieId: catTransport.id,
+          },
+          // 2. Deposit to Cash (Positive)
+          {
+            montant: 200.0,
+            type: TypeTransaction.TRANSFER,
+            date: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 5),
+            description: 'ATM Withdrawal - In',
+            compteId: cashWallet.id,
+            categorieId: catTransport.id,
+          }
+        ]
+      }
+    }
   });
 
   // --- This Month Transactions ---
 
-  // Grocery Shopping (Cash)
+  // D. Grocery Shopping (Single Entry)
   await prisma.transaction.create({
     data: {
       montant: -85.50,
       type: TypeTransaction.DEPENSE,
-      date: new Date(), // Now
+      date: new Date(), 
       description: 'Supermarket Run',
       compteId: cashWallet.id,
       categorieId: catGroceries.id,
@@ -123,23 +145,22 @@ async function main() {
 
   // 6. Create Snapshots
   
-  // Budget Snapshot (e.g., How much we spent on Groceries last month)
-  // Let's pretend last month we spent 450 out of 500 limit on Groceries
+  // Budget Snapshot
   await prisma.budgetSnapshot.create({
     data: {
-      monthDate: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1), // First day of last month
+      monthDate: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1),
       limit: 500.0,
       spend: 450.0,
       categorieId: catGroceries.id,
     },
   });
 
-  // Balance Snapshot (e.g., Record what the Bank Account balance was 10 days ago)
-  // This is useful for drawing charts of balance history
+  // Balance Snapshot (Bank account balance as of 10 days ago)
+  // Logic: 3000 (salary) - 1200 (rent) - 200 (transfer) = 1600 theoretical balance
   await prisma.balanceSnapshot.create({
     data: {
-      date: new Date(new Date().setDate(today.getDate() - 10)), // 10 days ago
-      solde: 1800.0, // Calculated balance at that time
+      date: new Date(new Date().setDate(today.getDate() - 10)), 
+      solde: 1600.0, 
       compteId: bankAccount.id,
     },
   });

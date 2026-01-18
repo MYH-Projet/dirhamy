@@ -2,6 +2,7 @@ import { prisma } from "../lib/prisma";
 import { AppError } from "../utils/AppError";
 import { TypeTransaction } from "../../generated/prisma/enums";
 import { Transaction } from "../../generated/prisma/browser";
+import { p } from "vitest/dist/chunks/reporters.d.CWXNI2jG";
 
 interface CreateTransactionData {
   montant: number;
@@ -19,7 +20,7 @@ interface UpdateTransactionData {
   categorieId: number;
 }
 
-export const checkAccount = async (compteId: number, userId: number) => {
+export const checkAccount = async (compteId: number,categorieId:number, userId: number) => {
     console.log("i m about giting checked")
   const isHasAccount = await prisma.compte.findFirst({
     where: {
@@ -28,8 +29,18 @@ export const checkAccount = async (compteId: number, userId: number) => {
     }
   });
 
+  const isHasCategory = await prisma.categorie.findFirst({
+    where:{
+        utilisateurId:userId,
+        id:categorieId
+    }
+  })
+
   if (!isHasAccount) {
     throw new AppError("Forbidden: You do not own this source account", 403);
+  }
+  if (!isHasCategory) {
+    throw new AppError("Forbidden: You do not own this category", 403);
   }
 };
 
@@ -42,31 +53,35 @@ export const createTransaction = async (data: CreateTransactionData) => {
     
 
     return await prisma.$transaction(async (tx) => {
-      // 1. Sender (Money leaves -> Negative)
-      const sender = await tx.transaction.create({
-        data: {
-          montant: -montant,
-          type: TypeTransaction.TRANSFER,
-          description: description || `Virement vers compte ${idDestination}`,
-          date: date,
-          compteId: compteId,
-          categorieId: categorieId,
-          idDestination: idDestination
-        }
-      });
-
-      // 2. Receiver (Money arrives -> Positive)
-      const receiver = await tx.transaction.create({
-        data: {
-          montant: montant,
-          type: TypeTransaction.TRANSFER,
-          description: description || `Virement reçu du compte ${compteId}`,
-          date: date,
-          compteId: idDestination!,
-          categorieId: categorieId,
-          idDestination: compteId
-        }
-      });
+        const transfers = await tx.transfer.create({
+            data: {
+                transactions: {
+                    create: [
+                        // Transaction 1: Debit Account A (Negative amount)
+                        {
+                            montant: -montant,
+                            compteId: compteId,
+                            description: description,
+                            type: type, // or however you handle types
+                            date: date,
+                            categorieId: categorieId
+                        },
+                        // Transaction 2: Credit Account B (Positive amount)
+                        {
+                            montant: montant,
+                            compteId: idDestination!,
+                            description: description,
+                            type: type,
+                            date: date,
+                            categorieId: categorieId
+                        }
+                    ]
+                }
+            },
+            include: {
+                transactions: true // Return the created transactions to the frontend
+            }
+        });
 
       // 3. Update Snapshots for Sender (Decrease Balance)
       await tx.balanceSnapshot.updateMany({
@@ -90,7 +105,7 @@ export const createTransaction = async (data: CreateTransactionData) => {
         }
       });
 
-      return { sender, receiver };
+      return transfers;
     });
   }
 
@@ -111,7 +126,7 @@ export const createTransaction = async (data: CreateTransactionData) => {
         date: date,
         compteId: compteId,
         categorieId: categorieId,
-        idDestination: null
+        transferId: null
       }
     });
 
@@ -179,87 +194,108 @@ export const checkExistAndOwnershipTransactionCategory = async(
 
 export const updateTransaction = async (
     transactionId: number,
-    existingTransaction:Transaction, 
+    existingTransaction: Transaction, 
     data: UpdateTransactionData
 ) => {
     const { montant, description, date, categorieId } = data;
     
+    // Check if the date has physically changed (Time Travel)
+    const dateChanged = new Date(date).getTime() !== new Date(existingTransaction.date).getTime();
 
-    // --- SCENARIO A: TRANSFER (Update Both Sides) ---
+    // ==========================================================
+    // SCENARIO A: TRANSFER (Update Both Sides)
+    // ==========================================================
     if (existingTransaction.type === TypeTransaction.TRANSFER) {
         
-        // Find the "Partner" transaction (the other side of the transfer)
-        const partnerTransaction = await prisma.transaction.findFirst({
-            where: {
-                type: TypeTransaction.TRANSFER,
-                compteId: existingTransaction.idDestination!, // The other account
-                idDestination: existingTransaction.compteId, // Points back to us
-                // Logic: Partner amount should be opposite of ours approximately
-                // We use ID check mostly, but if you have concurrent transfers, this might need strictness
-            }
+        // 1. Find the Parent and the Partner Transaction
+        const parentTransfer = await prisma.transfer.findUnique({
+            where: { id: existingTransaction.transferId! },
+            include: { transactions: true }
         });
 
-        if (!partnerTransaction) {
-            throw new AppError(`Critical: Partner transaction missing for transfer ${transactionId}`, 500);
+        if (!parentTransfer || parentTransfer.transactions.length < 2) {
+            throw new Error(`Critical: Broken transfer link for ID ${transactionId}`);
         }
 
-        // Determine who is sender (negative) and receiver (positive)
-        const isSenderSide = existingTransaction.montant < 0;
-        const newAmountForMain = isSenderSide ? -montant : montant;
-        const newAmountForPartner = isSenderSide ? montant : -montant;
+        
+        const partnerTransaction = parentTransfer.transactions.find(
+            (t) => t.id !== existingTransaction.id
+        );
 
-        // Calculate the "Diff" to update snapshots
-        // Example: Old = -100, New = -120. Diff = -20. (Balance goes down by 20 more)
-        const diffMain = newAmountForMain - Number(existingTransaction.montant);
-        const diffPartner = newAmountForPartner - Number(partnerTransaction.montant);
+        if (!partnerTransaction) throw new Error("Partner transaction not found");
+
+        // 2. Calculate New Amounts
+        const isSenderSide = existingTransaction.montant < 0;
+        const cleanAmount = montant
+
+        const newAmountMain = isSenderSide ? -cleanAmount : cleanAmount;
+        const newAmountPartner = isSenderSide ? cleanAmount : -cleanAmount;
 
         return await prisma.$transaction(async (tx) => {
-            // 1. Update Main
+            // Update Records
             const updatedMain = await tx.transaction.update({
                 where: { id: transactionId },
-                data: { description, categorieId, date, montant: newAmountForMain }
+                data: { description, categorieId, date, montant: newAmountMain }
             });
 
-            // 2. Update Partner
-            const updatedPartner = await tx.transaction.update({
+            await tx.transaction.update({
                 where: { id: partnerTransaction.id },
-                data: { description, categorieId, date, montant: newAmountForPartner }
+                data: { description, categorieId, date, montant: newAmountPartner }
             });
 
-            // 3. Update Snapshots for Main Account
-            if (diffMain !== 0) {
+            // 3. Update Snapshots
+            if (dateChanged) {
                 await tx.balanceSnapshot.updateMany({
-                    where: {
-                        compteId: existingTransaction.compteId,
-                        date: { gte: existingTransaction.date } // Update future history
-                    },
-                    data: { solde: { increment: diffMain } }
+                    where: { compteId: existingTransaction.compteId, date: { gte: existingTransaction.date } },
+                    data: { solde: { decrement: existingTransaction.montant } }
                 });
+                // Add New (Main)
+                await tx.balanceSnapshot.updateMany({
+                    where: { compteId: existingTransaction.compteId, date: { gte: date } },
+                    data: { solde: { increment: newAmountMain } }
+                });
+
+                // Remove Old (Partner)
+                await tx.balanceSnapshot.updateMany({
+                    where: { compteId: partnerTransaction.compteId, date: { gte: partnerTransaction.date } },
+                    data: { solde: { decrement: partnerTransaction.montant } }
+                });
+                // Add New (Partner)
+                await tx.balanceSnapshot.updateMany({
+                    where: { compteId: partnerTransaction.compteId, date: { gte: date } },
+                    data: { solde: { increment: newAmountPartner } }
+                });
+
+            } else {
+                const diffMain = newAmountMain - existingTransaction.montant;
+                const diffPartner = newAmountPartner - partnerTransaction.montant;
+
+                if (diffMain !== 0) {
+                    await tx.balanceSnapshot.updateMany({
+                        where: { compteId: existingTransaction.compteId, date: { gte: existingTransaction.date } },
+                        data: { solde: { increment: diffMain } }
+                    });
+                }
+                if (diffPartner !== 0) {
+                    await tx.balanceSnapshot.updateMany({
+                        where: { compteId: partnerTransaction.compteId, date: { gte: partnerTransaction.date } },
+                        data: { solde: { increment: diffPartner } }
+                    });
+                }
             }
 
-            // 4. Update Snapshots for Partner Account
-            if (diffPartner !== 0) {
-                await tx.balanceSnapshot.updateMany({
-                    where: {
-                        compteId: partnerTransaction.compteId,
-                        date: { gte: partnerTransaction.date }
-                    },
-                    data: { solde: { increment: diffPartner } }
-                });
-            }
-
-            return { updatedMain, updatedPartner };
+            return updatedMain;
         });
     }
 
-    // --- SCENARIO B: SIMPLE TRANSACTION (Expense/Revenue) ---
-    // Logic: Expenses are negative, Revenue is positive
+    // ==========================================================
+    // SCENARIO B: SIMPLE TRANSACTION (Expense/Revenue)
+    // ==========================================================
+    
     let finalAmount = montant;
     if (existingTransaction.type === TypeTransaction.DEPENSE) {
         finalAmount = -finalAmount;
     }
-
-    const diff = finalAmount - Number(existingTransaction.montant);
 
     return await prisma.$transaction(async (tx) => {
         const updatedTransaction = await tx.transaction.update({
@@ -267,78 +303,100 @@ export const updateTransaction = async (
             data: { description, categorieId, date, montant: finalAmount }
         });
 
-        if (diff !== 0) {
+        if (dateChanged) {
+            // A. Remove the OLD amount from the OLD date history
             await tx.balanceSnapshot.updateMany({
                 where: {
                     compteId: existingTransaction.compteId,
                     date: { gte: existingTransaction.date }
                 },
-                data: { solde: { increment: diff } }
+                data: { solde: { decrement: existingTransaction.montant } }
             });
+
+            // B. Add the NEW amount to the NEW date history
+            await tx.balanceSnapshot.updateMany({
+                where: {
+                    compteId: existingTransaction.compteId,
+                    date: { gte: date }
+                },
+                data: { solde: { increment: finalAmount } }
+            });
+        } else {
+            // C. Simple Diff (Your preferred logic)
+            const diff = finalAmount - existingTransaction.montant;
+            if (diff !== 0) {
+                await tx.balanceSnapshot.updateMany({
+                    where: {
+                        compteId: existingTransaction.compteId,
+                        date: { gte: existingTransaction.date }
+                    },
+                    data: { solde: { increment: diff } }
+                });
+            }
         }
 
         return updatedTransaction;
     });
 };
 
-
-export const deleteTransactionService = async (transactionId: number,transactionToDelete:Transaction) => {
-    // --- SCENARIO A: TRANSFER (Delete Both Sides) ---
+export const deleteTransactionService = async (
+    transactionId: number,
+    transactionToDelete: Transaction // Ensure this type is imported
+) => {
+    // ==========================================================
+    // SCENARIO A: TRANSFER (Delete the whole group)
+    // ==========================================================
     if (transactionToDelete.type === TypeTransaction.TRANSFER) {
         
-        // Find the partner transaction (the other half of the transfer)
-        const partnerTransaction = await prisma.transaction.findFirst({
-            where: {
-                type: TypeTransaction.TRANSFER,
-                compteId: transactionToDelete.idDestination!, 
-                idDestination: transactionToDelete.compteId,  
-                montant: -transactionToDelete.montant         
-            }
+        // 1. Find the Parent Transfer and ALL related transactions
+        const parentTransfer = await prisma.transfer.findUnique({
+            where: { id: transactionToDelete.transferId! },
+            include: { transactions: true }
         });
 
-        if (!partnerTransaction) {
-            // This is a data integrity issue, but we treat it as a server error
-            throw new AppError("Critical Data Error: Partner transaction missing", 500);
+        if (!parentTransfer || parentTransfer.transactions.length === 0) {
+            throw new Error("Critical Data Error: Transfer parent or transactions missing");
         }
 
-        // Calculate "Reverse" amounts to fix history
-        // e.g. If you sent -100, removing it adds +100 back to history
-        const diffMain = -Number(transactionToDelete.montant);
-        const diffPartner = -Number(partnerTransaction.montant);
+        return await prisma.$transaction(async (tx) => {
+            // 2. Iterate over BOTH transactions to revert their impact
+            for (const t of parentTransfer.transactions) {
+                // Revert logic: If amount was -100, we add +100. If +100, we add -100.
+                const diff = -t.montant; 
 
-        await prisma.$transaction(async (tx) => {
-            // 1. Delete Both Transactions
-            await tx.transaction.delete({ where: { id: transactionId } });
-            await tx.transaction.delete({ where: { id: partnerTransaction.id } });
+                // Update history for this specific account
+                await tx.balanceSnapshot.updateMany({
+                    where: {
+                        compteId: t.compteId,
+                        date: { gte: t.date }
+                    },
+                    data: { solde: { increment: diff } }
+                });
+            }
 
-            // 2. Correct Main Account History
-            await tx.balanceSnapshot.updateMany({
-                where: {
-                    compteId: transactionToDelete.compteId,
-                    date: { gte: transactionToDelete.date }
-                },
-                data: { solde: { increment: diffMain } }
+            // 3. Delete the Transaction entries first (to be safe against FK constraints)
+            await tx.transaction.deleteMany({
+                where: { transferId: parentTransfer.id }
             });
 
-            // 3. Correct Partner Account History
-            await tx.balanceSnapshot.updateMany({
-                where: {
-                    compteId: partnerTransaction.compteId,
-                    date: { gte: partnerTransaction.date }
-                },
-                data: { solde: { increment: diffPartner } }
+            // 4. Delete the Parent Transfer record
+            await tx.transfer.delete({
+                where: { id: parentTransfer.id }
             });
+
+            return { message: "Transfer event completely removed and balances synchronized" };
         });
-
-        return { message: "Transfer deleted and balances synchronized" };
     }
 
-    // --- SCENARIO B: SIMPLE TRANSACTION (Delete Single) ---
+    // ==========================================================
+    // SCENARIO B: SIMPLE TRANSACTION (Expense/Revenue)
+    // ==========================================================
     
-    const diff = -Number(transactionToDelete.montant);
+    // Logic: Just reverse the single amount
+    const diff = -transactionToDelete.montant;
 
-    await prisma.$transaction(async (tx) => {
-        // 1. Delete Transaction
+    return await prisma.$transaction(async (tx) => {
+        // 1. Delete the single Transaction
         await tx.transaction.delete({
             where: { id: transactionId }
         });
@@ -351,8 +409,7 @@ export const deleteTransactionService = async (transactionId: number,transaction
             },
             data: { solde: { increment: diff } }
         });
+
+        return { message: "Transaction deleted and balance synchronized" };
     });
-
-    return { message: "Transaction deleted and balance synchronized" };
 };
-
