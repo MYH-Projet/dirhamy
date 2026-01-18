@@ -431,6 +431,7 @@ ul {
 
   .form-submit-btn {
     flex: 0 0 120px;
+    font-weight: 500;
   }
 }
 
