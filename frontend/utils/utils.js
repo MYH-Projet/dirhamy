@@ -17,66 +17,38 @@ function renderInitialStucture(user) {
 }
 
 export function loadInitialStructure(user) {
-  return fetch(API_URL + "/profile")
-    .then((res) => res.json())
-    .then((data) => {
-      user.id = data.user.id;
-      user.name = data.user.prenom;
-      user.surname = data.user.nom;
-      user.accounts = data.acconts;
-      return renderInitialStucture(user);
-    });
+  return safeApiFetch(API_URL + "/profile").then((data) => {
+    user.id = data.user.id;
+    user.name = data.user.prenom;
+    user.surname = data.user.nom;
+    user.accounts = data.acconts;
+    return renderInitialStucture(user);
+  });
 }
 
 export function fetchAndRender(url, renderCallback) {
-  return fetch(url)
-    .then((res) =>
-      res.json().then((data) => {
-        if (res.ok) {
-          renderCallback(data);
-        } else {
-          throw Error(data.error || data.message);
-        }
-      }),
-    )
-    .catch((err) => {
-      // Add more redirecting logic later
-
-      displayToast(
-        document.querySelector(".toasts-container"),
-        err.message,
-        "error",
-      );
-    });
+  return safeApiFetch(url).then((data) => {
+    renderCallback(data);
+  });
 }
 
 export function submitActionEntity(url, newFields, refreshCallback, verb) {
-  fetch(url, {
+  return safeApiFetch(url, {
     method: verb,
     headers: {
       "Content-type": "application/json",
     },
-    // even if delete its fine since the backend doesn't read the body and you're sending null
+    // even if delete its fine since the backend doesn't read the body and you're sending empty body
     body: JSON.stringify(newFields || { data: "" }),
-  }).then((res) =>
-    res.json().then((data) => {
-      if (res.ok) {
-        return refreshCallback().then(
-          displayToast(
-            document.querySelector(".toasts-container"),
-            data.message || "Success",
-            "success",
-          ),
-        );
-      } else {
-        displayToast(
-          document.querySelector(".toasts-container"),
-          data.message || data.error,
-          "error",
-        );
-      }
-    }),
-  );
+  }).then((data) => {
+    return refreshCallback().then(
+      displayToast(
+        document.querySelector(".toasts-container"),
+        data.message || "Success",
+        "success",
+      ),
+    );
+  });
 }
 export function toastNotis() {
   const toast = JSON.parse(sessionStorage.getItem("toast"));
@@ -112,6 +84,37 @@ export function showDeleteEntityModal(modalName, entityId, submitCallback) {
     deleteModal.parentElement.replaceChild(newModal, deleteModal);
   });
 }
+
+export function safeApiFetch(url, parameterObject) {
+  return fetch(url, parameterObject).then((res) => {
+    return res
+      .json()
+      .then((data) => {
+        if (res.ok) {
+          return data;
+        } else if (res.status === 401) {
+          sessionStorage.setItem(
+            "toast",
+            JSON.stringify({
+              type: "error",
+              message: "Logged out",
+            }),
+          );
+          window.location.replace("../login/login.html");
+        } else {
+          throw Error(data.message || data.error);
+        }
+      })
+      .catch((err) => {
+        displayToast(
+          document.querySelector(".toasts-container"),
+          err.message,
+          "error",
+        );
+      });
+  });
+}
+
 export const editIcon = `<svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke-linecap="round" stroke-linejoin="round" />
   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke-linecap="round" stroke-linejoin="round" />

@@ -106,21 +106,6 @@ function showEditCategoryModal(category) {
   const modalBackground = document.querySelector(".modal-background");
   const editModal = document.querySelector(".edit-category-modal");
 
-  /*
-  This is good if we have a lot of fields i kept it here for future reference but now its just overhead
-  you use fields object if we have a lot to manage
-  const fields = {
-    nom : editIcon.querySelector("#category-name-field"),
-  }
-
-  i wish i could separate the showing of modal from the event wiring but the modal is linked 
-  to a certain category state/value and so i have to know which category to submit and i'll be able 
-  to have only one event listener, 
-  i could use local storage to get the data to change but it will be slow plus i'll have 
-  to hanndle deleting the local storage after leaving the page
-  the other way is global variables which is nice it works and i think its fine to change it but 
-  now is this way better vs global variables? that's to think about later 
-  */
   const nameField = editModal.querySelector("#category-name-field");
 
   nameField.value = category.nom;
