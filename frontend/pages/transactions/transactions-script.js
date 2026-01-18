@@ -7,6 +7,7 @@ import {
   submitActionEntity,
   showDeleteEntityModal,
   toastNotis,
+  safeApiFetch,
 } from "../../utils/utils.js";
 import { displayToast } from "../../components/toast.js";
 
@@ -54,19 +55,9 @@ function getAccountBalances(user) {
 
   user.accounts.forEach((account) => {
     promises.push(
-      fetch(API_URL + "/balance?compteId=" + account.id).then((res) =>
-        res.json().then((data) => {
-          if (res.ok) {
-            account.balance = data.finalBalance;
-          } else {
-            displayToast(
-              document.querySelector(".toasts-container"),
-              data.error || data.message,
-              "error",
-            );
-          }
-        }),
-      ),
+      safeApiFetch(API_URL + "/balance?compteId=" + account.id).then((data) => {
+        account.balance = data.finalBalance;
+      }),
     );
   });
 
@@ -183,42 +174,32 @@ function createTransactionRow(transaction) {
 }
 
 function fetchAndRenderAddTransactionContainer(user) {
-  return fetch(API_URL + "/categories").then((res) =>
-    res.json().then((data) => {
-      if (res.ok) {
-        const selectAccount = document.querySelector("#add-account-field");
-        const selectAccountToField = document.querySelector(
-          "#add-transfer-to-field",
-        );
+  return safeApiFetch(API_URL + "/categories").then((data) => {
+    const selectAccount = document.querySelector("#add-account-field");
+    const selectAccountToField = document.querySelector(
+      "#add-transfer-to-field",
+    );
 
-        const date = trimIsoDateToInput(new Date().toISOString());
+    const date = trimIsoDateToInput(new Date().toISOString());
 
-        document.querySelector("#add-date-field").value = date;
+    document.querySelector("#add-date-field").value = date;
 
-        user.accounts.forEach((account) => {
-          const option = document.createElement("option");
-          option.value = account.id;
-          option.textContent = account.nom;
-          selectAccount.append(option);
-          selectAccountToField.append(option.cloneNode(true));
-        });
+    user.accounts.forEach((account) => {
+      const option = document.createElement("option");
+      option.value = account.id;
+      option.textContent = account.nom;
+      selectAccount.append(option);
+      selectAccountToField.append(option.cloneNode(true));
+    });
 
-        const selectCategory = document.querySelector("#add-category-field");
-        data.forEach((category) => {
-          const option = document.createElement("option");
-          option.value = category.id;
-          option.textContent = category.nom;
-          selectCategory.append(option);
-        });
-      } else {
-        displayToast(
-          document.querySelector(".toasts-container"),
-          data.error || data.message,
-          "error",
-        );
-      }
-    }),
-  );
+    const selectCategory = document.querySelector("#add-category-field");
+    data.forEach((category) => {
+      const option = document.createElement("option");
+      option.value = category.id;
+      option.textContent = category.nom;
+      selectCategory.append(option);
+    });
+  });
 }
 
 function wireTableEvents() {

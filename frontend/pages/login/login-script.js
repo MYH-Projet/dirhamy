@@ -30,7 +30,7 @@ loginForm.addEventListener("submit", (e) => {
         if (res.ok) {
           sessionStorage.setItem(
             "toast",
-            JSON.stringify({ type: "success", message: data.message })
+            JSON.stringify({ type: "success", message: data.message }),
           );
           window.location.replace("../transactions/transactions.html");
         } else {

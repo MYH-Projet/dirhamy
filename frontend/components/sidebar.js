@@ -1,4 +1,4 @@
-import { API_URL } from "../utils/utils.js";
+import { API_URL, safeApiFetch } from "../utils/utils.js";
 
 function createSidebar() {
   const sidebar = document.createElement("div");
@@ -143,19 +143,15 @@ function createSidebar() {
   );
 
   disconnectBtn.addEventListener("click", (e) => {
-    fetch(API_URL + "/auth/logout", {
+    safeApiFetch(API_URL + "/auth/logout", {
       method: "POST",
-    }).then((res) =>
-      res.json().then((data) => {
-        if (res.ok) {
-          sessionStorage.setItem(
-            "toast",
-            JSON.stringify({ type: "success", message: "Logout sucessful" }),
-          );
-          window.location.replace("../login/login.html");
-        }
-      }),
-    );
+    }).then((data) => {
+      sessionStorage.setItem(
+        "toast",
+        JSON.stringify({ type: "success", message: "Logout sucessful" }),
+      );
+      window.location.replace("../login/login.html");
+    });
   });
 
   sidebarFooter.append(sidebarProfile, disconnectBtn);
