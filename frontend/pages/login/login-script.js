@@ -1,4 +1,5 @@
 import { displayToast } from "../../components/toast.js";
+import { toastNotis } from "../../utils/utils.js";
 
 const API_URL = "/api";
 
@@ -9,11 +10,7 @@ const loginForm = document.querySelector(".login-form");
 const mailInput = document.querySelector("#form-mail-input");
 const passInput = document.querySelector("#form-pass-input");
 
-const toast = JSON.parse(sessionStorage.getItem("toast"));
-if (toast) {
-  displayToast(toastContainer, toast.message, toast.type);
-  sessionStorage.removeItem("toast");
-}
+toastNotis();
 
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
