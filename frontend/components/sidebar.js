@@ -1,3 +1,5 @@
+import { API_URL } from "../utils/utils.js";
+
 function createSidebar() {
   const sidebar = document.createElement("div");
   sidebar.classList.add("sidebar");
@@ -22,9 +24,9 @@ function createSidebar() {
             .then((text) => {
               btn.innerHTML = text;
               sidebarHeader.appendChild(btn);
-            })
+            }),
         );
-      })
+      }),
   );
 
   sidebar.append(sidebarHeader);
@@ -47,7 +49,7 @@ function createSidebar() {
         const span = document.createElement("span");
         span.textContent = "Transactions";
         anchorOne.appendChild(span);
-      })
+      }),
   );
   listItemOne.appendChild(anchorOne);
   list.appendChild(listItemOne);
@@ -65,7 +67,7 @@ function createSidebar() {
         const span = document.createElement("span");
         span.textContent = "Categories";
         anchorTwo.appendChild(span);
-      })
+      }),
   );
   listItemTwo.appendChild(anchorTwo);
   list.appendChild(listItemTwo);
@@ -83,7 +85,7 @@ function createSidebar() {
         const span = document.createElement("span");
         span.textContent = "Budget";
         anchorThree.appendChild(span);
-      })
+      }),
   );
   listItemThree.appendChild(anchorThree);
   list.appendChild(listItemThree);
@@ -101,7 +103,7 @@ function createSidebar() {
         const span = document.createElement("span");
         span.textContent = "Chatbot";
         anchorFour.appendChild(span);
-      })
+      }),
   );
   listItemFour.appendChild(anchorFour);
   list.appendChild(listItemFour);
@@ -137,8 +139,25 @@ function createSidebar() {
         const span = document.createElement("span");
         span.textContent = "Disconnect";
         disconnectBtn.appendChild(span);
-      })
+      }),
   );
+
+  disconnectBtn.addEventListener("click", (e) => {
+    fetch(API_URL + "/auth/logout", {
+      method: "POST",
+    }).then((res) =>
+      res.json().then((data) => {
+        if (res.ok) {
+          sessionStorage.setItem(
+            "toast",
+            JSON.stringify({ type: "success", message: "Logout sucessful" }),
+          );
+          window.location.replace("../login/login.html");
+        }
+      }),
+    );
+  });
+
   sidebarFooter.append(sidebarProfile, disconnectBtn);
 
   sidebar.append(sidebarFooter);
