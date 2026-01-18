@@ -10,6 +10,17 @@ import {
 } from "../../utils/utils.js";
 import { displayToast } from "../../components/toast.js";
 
+/*
+  Very important thing for future myself or different collaborator,
+  Backend accepts full iso date, while date local time input only goes to seconds
+  we would be only taking date input from the user up to minutes which would improve usabiliy, 
+  but reduces accuracy
+  this compromise is acceptable for the current app just bear in mind we send to backend full isoString
+  and only show trimmedIsoDate(its a function)
+  (another thing i'm only showing the date (y,m,d) in the table that's why i'm storing the minutes and seconds as 
+  data attribute)
+*/
+
 const user = {};
 
 const getTransactionTypeClass = {
@@ -118,10 +129,16 @@ function renderTransactions(transactions) {
 
   const tableBody = document.querySelector("table.list-entity-container tbody");
   tableBody.innerHTML = "";
-  transactions.forEach((transaction) => {
-    const tableRow = createTransactionRow(transaction);
-    tableBody.append(tableRow);
-  });
+  transactions
+    .toSorted((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return -(dateA.getTime() <= dateB.getTime());
+    })
+    .forEach((transaction) => {
+      const tableRow = createTransactionRow(transaction);
+      tableBody.append(tableRow);
+    });
 }
 
 function createTransactionRow(transaction) {
@@ -129,6 +146,7 @@ function createTransactionRow(transaction) {
   tableRow.dataset.id = transaction.id;
 
   const transactionDate = document.createElement("td");
+  transactionDate.dataset.fullDate = transaction.date;
   transactionDate.textContent = transaction.date.split("T")[0];
 
   const transactionClass = getTransactionTypeClass[transaction.type];
@@ -139,7 +157,7 @@ function createTransactionRow(transaction) {
 
   const transactionCategory = document.createElement("td");
   transactionCategory.textContent = transaction.categorie.nom;
-  transactionCategory.dataset.categoryId = transaction.categoryId;
+  transactionCategory.dataset.categoryId = transaction.categorieId;
 
   const transactionDescription = document.createElement("td");
   transactionDescription.textContent = transaction.description;
@@ -173,9 +191,9 @@ function fetchAndRenderAddTransactionContainer(user) {
           "#add-transfer-to-field",
         );
 
-        const dateArray = new Date().toISOString().split(":");
-        dateArray.pop();
-        document.querySelector("#add-date-field").value = dateArray.join(":");
+        const date = trimIsoDateToInput(new Date().toISOString());
+
+        document.querySelector("#add-date-field").value = date;
 
         user.accounts.forEach((account) => {
           const option = document.createElement("option");
@@ -251,13 +269,14 @@ function wireAddContainerEvents() {
       categorieId: +document.querySelector("#add-category-field").value,
       idDestination: +document.querySelector("#add-transfer-to-field").value,
     };
-    console.log(fields);
     submitActionEntity(API_URL + "/transactions", fields, refreshPage, "POST");
     e.target.reset();
   });
 }
 function showEditTransactionModal(transaction) {
   return fetchAndRender(API_URL + "/categories", (categories) => {
+    // here you should keep a state to not refetch categories each time espicially when its a multi page app
+    document.querySelector("#edit-category-field").innerHTML = "";
     categories.forEach((category) => {
       const option = document.createElement("option");
       option.value = category.id;
@@ -270,7 +289,7 @@ function showEditTransactionModal(transaction) {
     const newModal = editModal.cloneNode(true);
 
     const dateField = editModal.querySelector("#edit-date-field");
-    dateField.value = transaction.date;
+    dateField.value = trimIsoDateToInput(transaction.date);
     const typeField = editModal.querySelector("#edit-type-field");
     typeField.value = transaction.type;
     const categoryField = editModal.querySelector("#edit-category-field");
@@ -288,9 +307,10 @@ function showEditTransactionModal(transaction) {
 
       if (e.submitter.classList.contains("action-btn")) {
         const newFields = {
-          montant: amountField.value,
+          montant: +amountField.value,
           description: descriptionField.value,
-          categoryId: categoryField.value,
+          date: new Date(dateField.value).toISOString(),
+          categorieId: +categoryField.value,
         };
         submitEditTransaction(transaction.id, newFields);
       } else if (e.submitter.classList.contains("cancel-btn")) {
@@ -362,7 +382,7 @@ function getNeededTransactionData(tableRow) {
 
   let currentTd = tableRow.firstChild;
   transactionData.id = tableRow.dataset.id;
-  transactionData.date = currentTd.textContent;
+  transactionData.date = currentTd.dataset.fullDate;
 
   currentTd = currentTd.nextSibling;
   transactionData.type = getKeyByValue(
@@ -375,6 +395,9 @@ function getNeededTransactionData(tableRow) {
   transactionData.categoryId = currentTd.dataset.categoryId;
 
   currentTd = currentTd.nextSibling;
+  transactionData.description = currentTd.textContent;
+
+  currentTd = currentTd.nextSibling;
   transactionData.amount = Math.abs(+currentTd.textContent);
 
   return transactionData;
@@ -382,4 +405,10 @@ function getNeededTransactionData(tableRow) {
 
 function getKeyByValue(object, value) {
   return Object.keys(object).find((key) => object[key] === value);
+}
+
+function trimIsoDateToInput(dateString) {
+  const array = dateString.split(":");
+  array.pop();
+  return array.join(":");
 }

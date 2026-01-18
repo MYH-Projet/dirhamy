@@ -118,33 +118,49 @@
     <form action="" class="modal action-modal edit-transaction-modal">
       <h2 class="modal-header">Edit this transaction</h2>
       <div class="form-unit first-unit">
-        <label for="edit-date-field" class="form-field">Date</label>
+        <label for="edit-date-field" class="form-label">Date</label>
         <input
           type="datetime-local"
           name="date"
           id="edit-date-field"
-          disabled
+          class="form-field"
         />
       </div>
       <div class="form-unit">
-        <label for="edit-type-field">Type</label>
-        <select name="type" id="edit-type-field" disabled>
+        <label for="edit-type-field" class="form-label">Type</label>
+        <select name="type" id="edit-type-field" class="form-field" disabled>
           <option value="DEPENSE">Expense</option>
           <option value="REVENU">Income</option>
           <option value="TRANSFER">Transfer</option>
         </select>
       </div>
       <div class="form-unit">
-        <label for="edit-category-field">Category</label>
-        <select name="category" id="edit-category-field"></select>
+        <label for="edit-category-field" class="form-label">Category</label>
+        <select
+          name="category"
+          id="edit-category-field"
+          class="form-field"
+        ></select>
       </div>
       <div class="form-unit">
-        <label for="edit-description-field">Description</label>
-        <input type="text" name="description" id="edit-description-field" />
+        <label for="edit-description-field" class="form-label"
+          >Description</label
+        >
+        <input
+          type="text"
+          name="description"
+          id="edit-description-field"
+          class="form-field"
+        />
       </div>
       <div class="form-unit last-unit">
-        <label for="edit-amount-field">Amount (DH)</label>
-        <input type="text" name="amount" id="edit-amount-field" />
+        <label for="edit-amount-field" class="form-label">Amount (DH)</label>
+        <input
+          type="text"
+          name="amount"
+          id="edit-amount-field"
+          class="form-field"
+        />
       </div>
 
       <div class="action-btns modal-footer">

@@ -412,7 +412,7 @@ ul {
     }
 
     select:hover {
-      background-color: #f3f3f3;
+      background-color: #f4f4f4;
     }
   }
   .form-label {
@@ -524,7 +524,7 @@ table.list-entity-container {
   background-color: var(--secondary-color);
 
   position: fixed;
-  top: 45%;
+  top: 50%;
   left: 50%;
 
   display: flex;
@@ -563,7 +563,11 @@ table.list-entity-container {
     }
 
     select:hover {
-      background-color: #e6e6e6;
+      background-color: #f4f4f4;
+    }
+
+    select:disabled:hover {
+      background-color: #e5e5e5;
     }
   }
 
@@ -576,10 +580,10 @@ table.list-entity-container {
   .form-label {
     color: rgb(82, 88, 95);
 
-    font-size: 15px;
+    font-size: 13px;
   }
   .form-field {
-    font-size: 16px;
+    font-size: 14px;
     background-color: var(--secondary-color);
   }
 

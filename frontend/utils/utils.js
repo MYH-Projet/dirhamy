@@ -57,14 +57,14 @@ export function submitActionEntity(url, newFields, refreshCallback, verb) {
       "Content-type": "application/json",
     },
     // even if delete its fine since the backend doesn't read the body and you're sending null
-    body: JSON.stringify(newFields),
+    body: JSON.stringify(newFields || { data: "" }),
   }).then((res) =>
     res.json().then((data) => {
       if (res.ok) {
         return refreshCallback().then(
           displayToast(
             document.querySelector(".toasts-container"),
-            data.message,
+            data.message || "Success",
             "success",
           ),
         );
