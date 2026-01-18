@@ -1,7 +1,7 @@
 import {generateResponse} from '../services/aiService';
 import {Request, Response} from 'express';
 import {dataAggregator} from '../services/dataAggregator';
-import {AuthRequest,JwtPayload} from '../Middleware/authMiddleware'
+import {AuthRequest,JwtPayload} from '../Middleware/authMiddleware';
 
 export const chat = async(req : AuthRequest, res : Response) =>{
 
@@ -28,7 +28,7 @@ export const chat = async(req : AuthRequest, res : Response) =>{
   const userMessage = req.body.message;
   let reply: string;
   try {
-    reply = await generateResponse(userMessage, userData);
+    reply = await generateResponse(userMessage, userData, "chat");
   } catch (e) {
     console.error("❌ Gemini API error:", e);
     return res.status(500).json({ error: "AI service failed" });

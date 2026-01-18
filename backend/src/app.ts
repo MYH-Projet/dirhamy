@@ -14,7 +14,7 @@ import transactionRoutes from './routers/transactionRouter';
 import balanceRouters from './routers/balanceRouter'
 import categorieRoutes from './routers/categorieRoutes';
 import budgetRouter from './routers/budgetRoutes';
-import chatRouter from './routers/chatRouter';
+import aiRouter from './routers/aiRouter';
 
 import {authenticateToken , AuthRequest} from './Middleware/authMiddleware'
 
@@ -53,7 +53,7 @@ app.use('/transactions', transactionRoutes);
 app.use('/balance',balanceRouters);
 app.use('/categories', categorieRoutes);
 app.use('/budget',budgetRouter);
-app.use('/chat', chatRouter)
+app.use('/chat', aiRouter)
 app.get('/profile', authenticateToken,async (req: AuthRequest, res) => {
   
   res.json({ 

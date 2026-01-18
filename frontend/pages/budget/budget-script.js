@@ -327,6 +327,8 @@ function submitDeleteLimit(categoryId) {
   );
 }
 
+
+
 function budgetPercentages(percentage) {
   const suffixProgress = "progress-used";
   const suffixMessage = "budget-status";
