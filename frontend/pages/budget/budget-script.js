@@ -327,7 +327,14 @@ function submitDeleteLimit(categoryId) {
   );
 }
 
-
+const message = async()=>{
+  const response = await fetch(API_URL + "/budget/insight", {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+    },
+  });
+}
 
 function budgetPercentages(percentage) {
   const suffixProgress = "progress-used";
@@ -337,28 +344,28 @@ function budgetPercentages(percentage) {
       progressUsedClass: "good-" + suffixProgress,
       cardMessageClass: "good-" + suffixMessage,
       cardIcon: goodIcon,
-      cardMessage: `Doing great`,
+      cardMessage: message,
     };
   } else if (percentage < 81) {
     return {
       progressUsedClass: "on-track-" + suffixProgress,
       cardMessageClass: "on-track-" + suffixMessage,
       cardIcon: onTrackIcon,
-      cardMessage: `On track`,
+      cardMessage: message,
     };
   } else if (percentage <= 100) {
     return {
       progressUsedClass: "warning-" + suffixProgress,
       cardMessageClass: "warning-" + suffixMessage,
       cardIcon: warningIcon,
-      cardMessage: `Warning`,
+      cardMessage: message,
     };
   } else {
     return {
       progressUsedClass: "over-" + suffixProgress,
       cardMessageClass: "over-" + suffixMessage,
       cardIcon: overIcon,
-      cardMessage: `Over budget`,
+      cardMessage: message,
     };
   }
 }

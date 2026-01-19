@@ -8,6 +8,6 @@ const router = Router();
 
 
 router.post('/',authenticateToken, chat);
-router.post('/goal',authenticateToken, budgetInsight);
+router.post('/budget/insight',authenticateToken, budgetInsight);
 
 export default router;

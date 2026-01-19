@@ -27,7 +27,7 @@ export async function dataAggregator(userId: number): Promise<string> {
     orderBy: { date: "desc" },
     distinct: ["compteId"], // keep only the most recent snapshot per account
     select: {
-      compteId: true,   // useful to match balances and  accounts
+      compteId: true, // useful to match balances and  accounts
       date: true,
       solde: true, 
     },

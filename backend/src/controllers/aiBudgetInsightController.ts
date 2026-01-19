@@ -26,10 +26,9 @@ export const budgetInsight = async(req : AuthRequest, res : Response) =>{
 
     // getting the user's request and getting the ai response
 
-    const userMessage = req.body.message;
     let reply: string;
     try {
-        reply = await generateResponse(userMessage, userData, "budgetInsight");
+        reply = await generateInsight(userData);
     } catch (e) {
         console.error("❌ Gemini API error:", e);
         return res.status(500).json({ error: "AI service failed" });
