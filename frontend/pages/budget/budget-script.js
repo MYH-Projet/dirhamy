@@ -178,8 +178,8 @@ function showEditLimitModal(budgetStatus) {
   const newCleanModal = editModal.cloneNode(true);
   newCleanModal.reset();
 
-  modalBackground.style.display = "block";
-  editModal.style.display = "block";
+  modalBackground.classList.add("switch-on-modal");
+  editModal.classList.add("switch-on-modal");
 
   const limitField = editModal.querySelector("#edit-category-limit-field");
   limitField.value = budgetStatus.limit;
@@ -200,8 +200,8 @@ function showEditLimitModal(budgetStatus) {
 
     editModal.parentElement.replaceChild(newCleanModal, editModal);
 
-    modalBackground.style.display = "none";
-    newCleanModal.style.display = "none";
+    modalBackground.classList.remove("switch-on-modal");
+    newCleanModal.classList.remove("switch-on-modal");
   });
 }
 
@@ -221,8 +221,8 @@ function showSetLimitModal(categories) {
     selectElement.append(option);
   });
 
-  modalBackground.style.display = "block";
-  setLimitModal.style.display = "block";
+  modalBackground.classList.add("switch-on-modal");
+  setLimitModal.classList.add("switch-on-modal");
 
   setLimitModal.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -238,8 +238,9 @@ function showSetLimitModal(categories) {
       // remove event listener
       setLimitModal.parentElement.replaceChild(newCleanModal, setLimitModal);
     }
-    modalBackground.style.display = "none";
-    setLimitModal.style.display = "none";
+
+    modalBackground.classList.remove("switch-on-modal");
+    newCleanModal.classList.remove("switch-on-modal");
   });
 }
 function showDeleteLimitModal(budgetStatus) {

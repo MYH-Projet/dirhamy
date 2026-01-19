@@ -67,8 +67,8 @@ export function showDeleteEntityModal(modalName, entityId, submitCallback) {
   const deleteModal = document.querySelector(`.delete-${modalName}-modal`);
   const newModal = deleteModal.cloneNode(true);
 
-  modalBackground.style.display = "block";
-  deleteModal.style.display = "block";
+  modalBackground.classList.add("switch-on-modal");
+  deleteModal.classList.add("switch-on-modal");
 
   deleteModal.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -78,8 +78,8 @@ export function showDeleteEntityModal(modalName, entityId, submitCallback) {
     } else if (e.submitter.classList.contains("cancel-btn")) {
     }
 
-    modalBackground.style.display = "none";
-    deleteModal.style.display = "none";
+    modalBackground.classList.remove("switch-on-modal");
+    deleteModal.classList.remove("switch-on-modal");
 
     deleteModal.parentElement.replaceChild(newModal, deleteModal);
   });

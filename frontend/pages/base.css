@@ -532,8 +532,6 @@ table.list-entity-container {
   flex-direction: column;
   gap: var(--normal-spacing);
 
-  transform: translateY(-50%) translateX(-50%);
-
   border: none;
   border-radius: var(--border-radius);
 
@@ -659,5 +657,25 @@ table.list-entity-container {
   p {
     font-size: 15px;
     color: rgb(69, 73, 78);
+  }
+}
+
+.switch-on-modal {
+  display: block !important;
+}
+.switch-on-modal.modal {
+  animation-name: modalTransition;
+  animation-duration: 0.15s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes modalTransition {
+  from {
+    transform: translateY(-50%) translateX(-50%);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateY(-52%) translateX(-50%);
+    opacity: 1;
   }
 }

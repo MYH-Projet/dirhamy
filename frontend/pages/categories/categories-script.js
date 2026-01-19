@@ -110,14 +110,14 @@ function showEditCategoryModal(category) {
 
   nameField.value = category.nom;
 
-  modalBackground.style.display = "block";
-  editModal.style.display = "block";
+  modalBackground.classList.add("switch-on-modal");
+  editModal.classList.add("switch-on-modal");
 
   editModal.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    modalBackground.style.display = "none";
-    editModal.style.display = "none";
+    modalBackground.classList.remove("switch-on-modal");
+    editModal.classList.remove("switch-on-modal");
 
     if (e.submitter.classList.contains("action-btn")) {
       const newCategoryFields = {

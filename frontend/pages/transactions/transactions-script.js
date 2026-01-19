@@ -280,8 +280,8 @@ function showEditTransactionModal(transaction) {
     const amountField = editModal.querySelector("#edit-amount-field");
     amountField.value = transaction.amount;
 
-    modalBackground.style.display = "block";
-    editModal.style.display = "block";
+    modalBackground.classList.add("switch-on-modal");
+    editModal.classList.add("switch-on-modal");
 
     editModal.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -297,8 +297,8 @@ function showEditTransactionModal(transaction) {
       } else if (e.submitter.classList.contains("cancel-btn")) {
       }
 
-      modalBackground.style.display = "none";
-      editModal.style.display = "none";
+      modalBackground.classList.remove("switch-on-modal");
+      editModal.classList.remove("switch-on-modal");
 
       editModal.parentElement.replaceChild(newModal, editModal);
     });
