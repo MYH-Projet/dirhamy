@@ -16,6 +16,9 @@ import {
   fetchAndRender,
   showDeleteEntityModal,
   submitActionEntity,
+  switchToProcess,
+  removeStopOverlay,
+  closeModalsAndRemoveEvents,
 } from "../../utils/utils.js";
 
 const user = {};
@@ -30,7 +33,7 @@ wireTableEvents();
 
 document.querySelector(".add-entity-form").addEventListener("submit", (e) => {
   e.preventDefault();
-
+  switchToProcess(e.submitter);
   const nameFormField = document.querySelector("#name-form-field");
 
   submitActionEntity(
@@ -40,9 +43,10 @@ document.querySelector(".add-entity-form").addEventListener("submit", (e) => {
     },
     getCategories,
     "POST",
-  );
-
-  e.target.reset();
+  ).finally(() => {
+    removeStopOverlay(e.submitter, "Add");
+    e.target.reset();
+  });
 });
 
 function getCategories() {
@@ -105,6 +109,7 @@ function createCategoryRow(category) {
 function showEditCategoryModal(category) {
   const modalBackground = document.querySelector(".modal-background");
   const editModal = document.querySelector(".edit-category-modal");
+  const newModal = editModal.cloneNode(true);
 
   const nameField = editModal.querySelector("#category-name-field");
 
@@ -119,7 +124,7 @@ function showEditCategoryModal(category) {
     const actionBtn = editModal.querySelector(".action-btn");
 
     if (!actionBtn.disabled) {
-      editModal.removeEventListener(enableSumbitFn);
+      editModal.removeEventListener("input", enableSumbitFn);
     } else {
       actionBtn.disabled = false;
     }
@@ -129,24 +134,26 @@ function showEditCategoryModal(category) {
   editModal.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    modalBackground.classList.remove("switch-on-modal");
-    editModal.classList.remove("switch-on-modal");
+    switchToProcess(e.submitter);
 
     if (e.submitter.classList.contains("action-btn")) {
       const newCategoryFields = {
         nom: nameField.value,
       };
-      submitEditCategory(category, newCategoryFields);
-
-      editModal.parentElement.replaceChild(
-        editModal.cloneNode(true),
-        editModal,
-      );
+      submitEditCategory(category, newCategoryFields).finally(() => {
+        closeModalsAndRemoveEvents(
+          editModal,
+          modalBackground,
+          newModal,
+          e.submitter,
+        );
+      });
     } else if (e.submitter.classList.contains("cancel-btn")) {
-      // remove the event listener, to try using removeEventListener later
-      editModal.parentElement.replaceChild(
-        editModal.cloneNode(true),
+      closeModalsAndRemoveEvents(
         editModal,
+        modalBackground,
+        newModal,
+        e.submitter,
       );
     }
   });
@@ -167,7 +174,7 @@ function showDeleteCategoryModal(category) {
 
 function submitDeleteCategory(categoryId) {
   return submitActionEntity(
-    API_URL + "/categories" + categoryId,
+    API_URL + "/categories/" + categoryId,
     null,
     getCategories,
     "DELETE",

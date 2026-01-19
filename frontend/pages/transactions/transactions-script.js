@@ -8,6 +8,10 @@ import {
   showDeleteEntityModal,
   toastNotis,
   safeApiFetch,
+  removeStopOverlay,
+  switchToProcess,
+  closeModal,
+  closeModalsAndRemoveEvents,
 } from "../../utils/utils.js";
 import { displayToast } from "../../components/toast.js";
 
@@ -199,6 +203,16 @@ function fetchAndRenderAddTransactionContainer(user) {
       option.textContent = category.nom;
       selectCategory.append(option);
     });
+
+    // Verify that if value is on transfer on load show the transfer field
+    const transferToUnit = document.querySelector(
+      ".add-entity-container .form-unit:has(#add-transfer-to-field)",
+    );
+    if (document.querySelector("#add-type-field").value === "TRANSFER") {
+      transferToUnit.style.display = "block";
+    } else {
+      transferToUnit.style.display = "none";
+    }
   });
 }
 
@@ -239,6 +253,7 @@ function wireAddContainerEvents() {
 
   document.querySelector(".add-entity-form").addEventListener("submit", (e) => {
     e.preventDefault();
+    switchToProcess(e.submitter);
     const fields = {
       montant: +document.querySelector("#add-amount-field").value,
       date: new Date(
@@ -250,8 +265,15 @@ function wireAddContainerEvents() {
       categorieId: +document.querySelector("#add-category-field").value,
       idDestination: +document.querySelector("#add-transfer-to-field").value,
     };
-    submitActionEntity(API_URL + "/transactions", fields, refreshPage, "POST");
-    e.target.reset();
+    submitActionEntity(
+      API_URL + "/transactions",
+      fields,
+      refreshPage,
+      "POST",
+    ).finally(() => {
+      removeStopOverlay(e.submitter, "Add");
+      e.target.reset();
+    });
   });
 }
 function showEditTransactionModal(transaction) {
@@ -289,7 +311,7 @@ function showEditTransactionModal(transaction) {
       const actionBtn = editModal.querySelector(".action-btn");
 
       if (!actionBtn.disabled) {
-        editModal.removeEventListener(enableSumbitFn);
+        editModal.removeEventListener("input", enableSumbitFn);
       } else {
         actionBtn.disabled = false;
       }
@@ -298,6 +320,7 @@ function showEditTransactionModal(transaction) {
 
     editModal.addEventListener("submit", (e) => {
       e.preventDefault();
+      switchToProcess(e.submitter);
 
       if (e.submitter.classList.contains("action-btn")) {
         const newFields = {
@@ -306,14 +329,22 @@ function showEditTransactionModal(transaction) {
           date: new Date(dateField.value).toISOString(),
           categorieId: +categoryField.value,
         };
-        submitEditTransaction(transaction.id, newFields);
+        submitEditTransaction(transaction.id, newFields).finally(() => {
+          closeModalsAndRemoveEvents(
+            editModal,
+            modalBackground,
+            newModal,
+            e.submitter,
+          );
+        });
       } else if (e.submitter.classList.contains("cancel-btn")) {
+        closeModalsAndRemoveEvents(
+          editModal,
+          modalBackground,
+          newModal,
+          e.submitter,
+        );
       }
-
-      modalBackground.classList.remove("switch-on-modal");
-      editModal.classList.remove("switch-on-modal");
-
-      editModal.parentElement.replaceChild(newModal, editModal);
     });
   });
 }

@@ -72,16 +72,25 @@ export function showDeleteEntityModal(modalName, entityId, submitCallback) {
 
   deleteModal.addEventListener("submit", (e) => {
     e.preventDefault();
+    switchToProcess(e.submitter);
 
     if (e.submitter.classList.contains("delete-btn")) {
-      submitCallback(entityId);
+      submitCallback(entityId).finally(() => {
+        closeModalsAndRemoveEvents(
+          deleteModal,
+          modalBackground,
+          newModal,
+          e.submitter,
+        );
+      });
     } else if (e.submitter.classList.contains("cancel-btn")) {
+      closeModalsAndRemoveEvents(
+        deleteModal,
+        modalBackground,
+        newModal,
+        e.submitter,
+      );
     }
-
-    modalBackground.classList.remove("switch-on-modal");
-    deleteModal.classList.remove("switch-on-modal");
-
-    deleteModal.parentElement.replaceChild(newModal, deleteModal);
   });
 }
 
@@ -113,6 +122,43 @@ export function safeApiFetch(url, parameterObject) {
         );
       });
   });
+}
+
+export function switchToProcess(btn) {
+  btn.textContent = "Processing...";
+  btn.disabled = true;
+  const stopOverlay = document.createElement("div");
+  stopOverlay.classList.add("pause-page-overlay");
+  document.querySelector("body").append(stopOverlay);
+}
+export function removeStopOverlay(btn, btnOriginalText) {
+  btn.textContent = btnOriginalText;
+  btn.disabled = false;
+  document.querySelector(".pause-page-overlay").remove();
+}
+
+export function closeModal(modal, modalBackground, actionBtn) {
+  let originalText = "";
+  if (actionBtn.classList.contains("cancel-btn")) {
+    originalText = "Cancel";
+  } else if (actionBtn.classList.contains("action-btn")) {
+    originalText = "Save";
+  } else if (actionBtn.classList.contains("delete-btn")) {
+    originalText = "Delete";
+  }
+  removeStopOverlay(actionBtn, originalText);
+  modal.classList.remove("switch-on-modal");
+  modalBackground.classList.remove("switch-on-modal");
+}
+
+export function closeModalsAndRemoveEvents(
+  modal,
+  modalBackground,
+  newModal,
+  btn,
+) {
+  modal.parentElement.replaceChild(newModal, modal);
+  closeModal(newModal, modalBackground, btn);
 }
 
 export const editIcon = `<svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

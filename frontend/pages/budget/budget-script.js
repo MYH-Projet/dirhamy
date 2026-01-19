@@ -6,6 +6,8 @@ import {
   fetchAndRender,
   submitActionEntity,
   showDeleteEntityModal,
+  switchToProcess,
+  closeModalsAndRemoveEvents,
 } from "../../utils/utils.js";
 import { displayToast } from "../../components/toast.js";
 
@@ -192,7 +194,7 @@ function showEditLimitModal(budgetStatus) {
     const actionBtn = editModal.querySelector(".action-btn");
 
     if (!actionBtn.disabled) {
-      editModal.removeEventListener(enableSumbitFn);
+      editModal.removeEventListener("input", enableSumbitFn);
     } else {
       actionBtn.disabled = false;
     }
@@ -202,19 +204,28 @@ function showEditLimitModal(budgetStatus) {
   editModal.addEventListener("submit", (e) => {
     e.preventDefault();
 
+    switchToProcess(e.submitter);
     if (e.submitter.classList.contains("cancel-btn")) {
+      closeModalsAndRemoveEvents(
+        editModal,
+        modalBackground,
+        newCleanModal,
+        e.submitter,
+      );
     } else if (e.submitter.classList.contains("action-btn")) {
       const fields = {
         categoryId: budgetStatus.categoryId,
         limit: limitField.value,
       };
-      submitSetLimit(fields);
+      submitSetLimit(fields).finally(() => {
+        closeModalsAndRemoveEvents(
+          editModal,
+          modalBackground,
+          newCleanModal,
+          e.submitter,
+        );
+      });
     }
-
-    editModal.parentElement.replaceChild(newCleanModal, editModal);
-
-    modalBackground.classList.remove("switch-on-modal");
-    newCleanModal.classList.remove("switch-on-modal");
   });
 }
 
@@ -240,20 +251,28 @@ function showSetLimitModal(categories) {
   setLimitModal.addEventListener("submit", (e) => {
     e.preventDefault();
 
+    switchToProcess(e.submitter);
     if (e.submitter.classList.contains("action-btn")) {
       const fields = {
         categoryId: selectElement.value,
         limit: setLimitModal.querySelector("#add-category-limit-field").value,
       };
-      submitSetLimit(fields);
-      setLimitModal.parentElement.replaceChild(newCleanModal, setLimitModal);
+      submitSetLimit(fields).finally(() => {
+        closeModalsAndRemoveEvents(
+          setLimitModal,
+          modalBackground,
+          newCleanModal,
+          e.submitter,
+        );
+      });
     } else if (e.submitter.classList.contains("cancel-btn")) {
-      // remove event listener
-      setLimitModal.parentElement.replaceChild(newCleanModal, setLimitModal);
+      closeModalsAndRemoveEvents(
+        setLimitModal,
+        modalBackground,
+        newCleanModal,
+        e.submitter,
+      );
     }
-
-    modalBackground.classList.remove("switch-on-modal");
-    newCleanModal.classList.remove("switch-on-modal");
   });
 }
 function showDeleteLimitModal(budgetStatus) {

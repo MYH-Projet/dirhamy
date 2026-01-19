@@ -683,3 +683,25 @@ table.list-entity-container {
     opacity: 1;
   }
 }
+
+.modal .action-btn:disabled,
+.sign-in-btn:disabled,
+.add-entity-form .form-submit-btn:disabled {
+  background-color: #0d948887 !important;
+}
+
+.modal .delete-btn:disabled {
+  background-color: #e027279c !important;
+}
+
+.pause-page-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  z-index: 1000;
+
+  background-color: transparent;
+}
