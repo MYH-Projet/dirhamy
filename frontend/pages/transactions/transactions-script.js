@@ -10,8 +10,8 @@ import {
   safeApiFetch,
   removeStopOverlay,
   switchToProcess,
-  closeModal,
   closeModalsAndRemoveEvents,
+  removeSpinner,
 } from "../../utils/utils.js";
 import { displayToast } from "../../components/toast.js";
 
@@ -43,10 +43,14 @@ const getTransactionTypeName = {
 // Create Initial Structure and populate the user object
 loadInitialStructure(user).then(() => {
   // write your code here
-  getAccountBalances(user);
-  fetchAndRenderAddTransactionContainer(user);
-  getTransactions();
-  toastNotis();
+  Promise.all([
+    getAccountBalances(user),
+    fetchAndRenderAddTransactionContainer(user),
+    getTransactions(),
+  ]).then(() => {
+    removeSpinner();
+    toastNotis();
+  });
 });
 
 // setting up events
@@ -273,6 +277,9 @@ function wireAddContainerEvents() {
     ).finally(() => {
       removeStopOverlay(e.submitter, "Add");
       e.target.reset();
+      const date = trimIsoDateToInput(new Date().toISOString());
+
+      document.querySelector("#add-date-field").value = date;
     });
   });
 }

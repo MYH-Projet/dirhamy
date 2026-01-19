@@ -111,15 +111,17 @@ export function safeApiFetch(url, parameterObject) {
           );
           window.location.replace("../login/login.html");
         } else {
-          throw Error(data.message || data.error);
+          throw Error(JSON.stringify(data.errors));
         }
       })
       .catch((err) => {
-        displayToast(
-          document.querySelector(".toasts-container"),
-          err.message,
-          "error",
-        );
+        JSON.parse(err.message).forEach((error) => {
+          displayToast(
+            document.querySelector(".toasts-container"),
+            error.message,
+            "error",
+          );
+        });
       });
   });
 }
@@ -159,6 +161,14 @@ export function closeModalsAndRemoveEvents(
 ) {
   modal.parentElement.replaceChild(newModal, modal);
   closeModal(newModal, modalBackground, btn);
+}
+
+export function removeSpinner() {
+  const overlay = document.querySelector(".loading-overlay");
+  overlay.classList.add("no-opacity");
+  setTimeout(() => {
+    overlay.remove();
+  }, 100);
 }
 
 export const editIcon = `<svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

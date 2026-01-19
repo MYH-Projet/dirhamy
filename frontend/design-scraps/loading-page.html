@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .loading-overlay {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        z-index: 1000;
+
+        background-color: #f9fafb;
+      }
+
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        opacity: 1;
+        border: 4px solid black;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+      }
+      @keyframes rotation {
+        from {
+          transform: rotateZ(0);
+        }
+        to {
+          transform: rotateZ(360deg);
+        }
+      }
+      @keyframes loadingSpinner {
+        0% {
+          border-bottom: none;
+          border-right: none;
+          border-top: gray 3px solid;
+          border-left: gray 3px solid;
+        }
+        25% {
+          border-bottom: none;
+          border-right: gray 3px solid;
+          border-top: gray 3px solid;
+          border-left: none;
+        }
+        50% {
+          border-bottom: gray 3px solid;
+          border-right: gray 3px solid;
+          border-top: none;
+          border-left: none;
+        }
+        75% {
+          border-bottom: gray 3px solid;
+          border-right: none;
+          border-top: none;
+          border-left: gray 3px solid;
+        }
+        100% {
+          border-bottom: none;
+          border-right: none;
+          border-top: gray 3px solid;
+          border-left: gray 3px solid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading data needed...</p>
+    </div>
+    <script></script>
+  </body>
+</html>

@@ -19,6 +19,8 @@ import {
   switchToProcess,
   removeStopOverlay,
   closeModalsAndRemoveEvents,
+  toastNotis,
+  removeSpinner,
 } from "../../utils/utils.js";
 
 const user = {};
@@ -26,7 +28,10 @@ const user = {};
 // Create Initial Structure and populate the user object
 loadInitialStructure(user).then(() => {
   // write your code here
-  getCategories();
+  getCategories().then(() => {
+    removeSpinner();
+    toastNotis();
+  });
 });
 
 wireTableEvents();

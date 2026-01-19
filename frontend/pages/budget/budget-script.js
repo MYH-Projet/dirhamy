@@ -8,6 +8,8 @@ import {
   showDeleteEntityModal,
   switchToProcess,
   closeModalsAndRemoveEvents,
+  toastNotis,
+  removeSpinner,
 } from "../../utils/utils.js";
 import { displayToast } from "../../components/toast.js";
 
@@ -44,7 +46,10 @@ const months = [
 // Create Initial Structure and populate the user object
 loadInitialStructure(user).then(() => {
   // write your code here
-  getBudgetStatuses();
+  getBudgetStatuses().then(() => {
+    removeSpinner();
+    toastNotis();
+  });
 });
 
 const currentDate = new Date();
