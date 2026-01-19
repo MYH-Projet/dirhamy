@@ -614,6 +614,10 @@ table.list-entity-container {
   .action-btn:hover {
     background-color: #10b7a9;
   }
+  .action-btn:disabled {
+    background-color: #a1a1a1;
+    cursor: auto;
+  }
   .delete-btn {
     background-color: #e02727;
     color: var(--secondary-color);

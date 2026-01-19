@@ -186,6 +186,19 @@ function showEditLimitModal(budgetStatus) {
   const nameField = editModal.querySelector("#category-name-field");
   nameField.value = budgetStatus.categoryName;
 
+  // THIS USES EDITMODAL AS A MORE GLOBAL SCOPE VAR BE CAREFUL
+  const enableSumbitFn = (e) => {
+    e.preventDefault();
+    const actionBtn = editModal.querySelector(".action-btn");
+
+    if (!actionBtn.disabled) {
+      editModal.removeEventListener(enableSumbitFn);
+    } else {
+      actionBtn.disabled = false;
+    }
+  };
+  editModal.addEventListener("input", enableSumbitFn);
+
   editModal.addEventListener("submit", (e) => {
     e.preventDefault();
 
