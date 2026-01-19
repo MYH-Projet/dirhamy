@@ -1,3 +1,4 @@
+import { expect } from "vitest";
 import { generateResponse } from "../src/services/aiService";
  
 //this uses the real GEMINI API key, be careful not to waste the whole shit ⛔😅

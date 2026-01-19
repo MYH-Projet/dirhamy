@@ -60,7 +60,6 @@ input:disabled {
   color: white;
   background-color: var(--primary-color);
 
-  font-weight: bold;
   font-size: 17px;
 
   text-align: center;
@@ -168,7 +167,7 @@ ul {
   border: none;
   border-radius: 50%;
 
-  background-color: var(--secondary-color);
+  background-color: transparent;
 
   color: var(--black-text-color);
 }
@@ -280,7 +279,10 @@ ul {
 
     align-items: center;
 
-    transition: color 0.2s, background-color 0.2s, transform 0.2s;
+    transition:
+      color 0.2s,
+      background-color 0.2s,
+      transform 0.2s;
 
     padding: var(--normal-spacing) var(--normal-spacing);
 
@@ -361,7 +363,10 @@ ul {
   border: 1px var(--redish-color) solid;
   border-radius: var(--border-radius);
 
-  transition: color 0.2s, background-color 0.2s, transform 0.2s;
+  transition:
+    color 0.2s,
+    background-color 0.2s,
+    transform 0.2s;
 
   cursor: pointer;
 }
@@ -397,35 +402,36 @@ ul {
   flex-wrap: wrap;
   gap: 15px;
   justify-content: center;
+  align-items: flex-end;
 
   .form-unit {
-    flex: 1 0 120px;
+    flex: 1 0 150px;
 
     select {
       transition: background-color 0.1s;
     }
 
     select:hover {
-      background-color: #e6e6e6;
+      background-color: #f4f4f4;
     }
   }
   .form-label {
     color: var(--gray-color);
 
     margin-left: var(--xs-spacing);
-    margin-bottom: 3px;
-
     font-size: 13px;
     font-weight: 450;
   }
   .form-field {
+    margin-top: 2px;
     width: 100%;
     font-size: 14px;
     background-color: var(--lightest-gray-color);
   }
 
   .form-submit-btn {
-    flex-basis: 90px;
+    flex: 0 0 120px;
+    font-weight: 500;
   }
 }
 
@@ -467,6 +473,7 @@ table.list-entity-container {
     text-align: left;
     font-size: 15px;
   }
+
   .action-btns {
     flex: 2 0;
 
@@ -479,11 +486,18 @@ table.list-entity-container {
       color: rgb(101, 106, 112);
       cursor: pointer;
 
-      transition: color 0.15s;
+      transition:
+        color 0.2s,
+        transform 0.2s;
     }
 
-    svg:hover {
-      color: rgb(154, 158, 162);
+    .edit-icon:hover {
+      transform: scale(1.1);
+      color: var(--primary-color);
+    }
+    .delete-icon:hover {
+      transform: scale(1.1);
+      color: var(--redish-color);
     }
   }
   thead,
@@ -511,7 +525,7 @@ table.list-entity-container {
   background-color: var(--secondary-color);
 
   position: fixed;
-  top: 45%;
+  top: 50%;
   left: 50%;
 
   display: flex;
@@ -550,7 +564,11 @@ table.list-entity-container {
     }
 
     select:hover {
-      background-color: #e6e6e6;
+      background-color: #f4f4f4;
+    }
+
+    select:disabled:hover {
+      background-color: #e5e5e5;
     }
   }
 
@@ -563,10 +581,10 @@ table.list-entity-container {
   .form-label {
     color: rgb(82, 88, 95);
 
-    font-size: 15px;
+    font-size: 13px;
   }
   .form-field {
-    font-size: 16px;
+    font-size: 14px;
     background-color: var(--secondary-color);
   }
 

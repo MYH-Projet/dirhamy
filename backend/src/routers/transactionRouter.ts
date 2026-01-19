@@ -5,7 +5,13 @@ import {
     updateTransaction, 
     removeTransaction 
 } from '../controllers/transactionControler'; // Adjust path to your controller
-
+import { validation } from '../Middleware/validateResource';
+import { 
+    createTransactionSchema,
+    updateTransactionSchema,
+    removeTransactionSchema,
+    getTransactionSchema
+} from '../schemas/transactionSchema';
 import {authenticateToken , AuthRequest} from '../Middleware/authMiddleware'
 
 
@@ -16,7 +22,7 @@ const router = Router();
 // ==========================================
 // Route: GET /api/transactions/user/:id?cursor=123
 // Params: :id = User ID
-router.get('/user',authenticateToken, getTransaction);
+router.get('/user',authenticateToken,validation(getTransactionSchema), getTransaction);
 
 
 // ==========================================
@@ -24,7 +30,13 @@ router.get('/user',authenticateToken, getTransaction);
 // ==========================================
 // Route: POST /api/transactions
 // Body: { montant, type, description, compteId, ... }
-router.post('/',authenticateToken, createTransaction);
+router.post('/',authenticateToken,(req,res,next)=>{
+    console.log("what the f********");
+    next(); 
+},validation(createTransactionSchema),(req,res,next)=>{
+    console.log("what i pass the validate");
+    next(); 
+}, createTransaction);
 
 
 // ==========================================
@@ -32,7 +44,7 @@ router.post('/',authenticateToken, createTransaction);
 // ==========================================
 // Route: PUT /api/transactions/:id
 // Params: :id = Transaction ID
-router.put('/:id',authenticateToken, updateTransaction);
+router.put('/:id',authenticateToken,validation(updateTransactionSchema), updateTransaction);
 
 
 // ==========================================
@@ -40,6 +52,6 @@ router.put('/:id',authenticateToken, updateTransaction);
 // ==========================================
 // Route: DELETE /api/transactions/:id
 // Params: :id = Transaction ID
-router.delete('/:id', authenticateToken, removeTransaction);
+router.delete('/:id', authenticateToken,validation(removeTransactionSchema), removeTransaction);
 
 export default router;

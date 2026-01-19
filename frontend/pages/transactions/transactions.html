@@ -1,194 +1,174 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Transactions</title>
     <link rel="stylesheet" href="transactions-style.css" />
-    <script type="module" src="./transactions-script.js"></script>
   </head>
-
-  <body class="invisible-unit">
-    <div class="main-container">
-      <div class="balance-container">
-        <div class="card primary-card account-card">
-          <p class="card-label account-card-label">
-            <span class="account-card-name"></span>
-            <span class="account-card-type"></span>
-          </p>
-          <p class="card-balance account-card-balance"></p>
-        </div>
-        <div class="card primary-card account-card">
-          <p class="card-label account-card-label">
-            <span class="account-card-name"></span>
-            <span class="account-card-type"></span>
-          </p>
-          <p class="card-balance account-card-balance"></p>
-        </div>
-        <div class="card secondary-card total-card">
+  <body>
+    <main class="main-container">
+      <section class="balance-container">
+        <article class="card secondary-card total-card">
           <p class="card-label total-card-label">TOTAL WEALTH</p>
           <p class="card-balance total-card-balance"></p>
-        </div>
-      </div>
-
-      <div class="card primary-card add-transaction-container">
-        <h2>ADD NEW ENTRY</h2>
-        <form action="" class="add-transaction-form">
-          <div class="add-transaction-form-unit">
-            <label for="transaction-form-type" class="transaction-unit-label"
-              >Type</label
-            >
-            <select name="transaction-type" id="transaction-form-type">
+        </article>
+      </section>
+      <section class="card primary-card add-entity-container">
+        <h2 class="add-entity-title">ADD NEW TRANSACTION</h2>
+        <form action="" class="add-entity-form">
+          <div class="form-unit">
+            <label for="add-type-field" class="form-label">Type</label>
+            <select name="type" id="add-type-field" class="form-field">
               <option value="DEPENSE">Expense</option>
               <option value="REVENU">Income</option>
               <option value="TRANSFER">Transfer</option>
             </select>
           </div>
-          <div class="add-transaction-form-unit">
-            <label
-              for="transaction-form-from-account"
-              class="transaction-unit-label"
-              >Account</label
-            >
+          <div class="form-unit">
+            <label for="add-type-field" class="form-label">Account</label>
             <select
-              name="transaction-account"
-              id="transaction-form-from-account"
-              class="transaction-form-account"
+              name="type"
+              id="add-account-field"
+              class="form-field"
             ></select>
           </div>
-          <div
-            class="add-transaction-form-unit invisible-unit"
-            id="form-unit-transfer"
-          >
-            <label
-              for="transaction-form-to-account"
-              class="transaction-unit-label"
-              >Transfer to:</label
-            >
+
+          <div class="form-unit">
+            <label for="add-type-field" class="form-label">Transfer to</label>
             <select
-              name="transaction-account"
-              id="transaction-form-to-account"
-              class="transaction-form-account"
+              name="type"
+              id="add-transfer-to-field"
+              class="form-field"
             ></select>
           </div>
-          <div class="add-transaction-form-unit">
-            <label for="transaction-form-date" class="transaction-unit-label"
-              >Date</label
-            >
-            <input type="date" id="transaction-form-date" reqiured />
-          </div>
-          <div class="add-transaction-form-unit">
-            <label
-              for="transaction-form-category"
-              class="transaction-unit-label"
-              >Category</label
-            >
-            <select
-              type="text"
-              placeholder="e.g. Food"
-              id="transaction-form-category"
-            ></select>
-          </div>
-          <div class="add-transaction-form-unit">
-            <label for="transaction-form-amount" class="transaction-unit-label"
-              >Amount</label
-            >
+
+          <div class="form-unit">
+            <label for="add-date-field" class="form-label">Date</label>
             <input
-              type="text"
-              placeholder="e.g. 0.00"
-              id="transaction-form-amount"
-              required
+              type="datetime-local"
+              name="date"
+              id="add-date-field"
+              class="form-field"
             />
           </div>
-          <div class="add-transaction-form-unit">
-            <label
-              for="transaction-form-description"
-              class="transaction-unit-label"
+
+          <div class="form-unit">
+            <label for="add-category-field" class="form-label">Category</label>
+            <select
+              name="category"
+              id="add-category-field"
+              class="form-field"
+            ></select>
+          </div>
+
+          <div class="form-unit unit">
+            <label for="add-amount-field" class="form-label">Amount (DH)</label>
+            <input
+              type="text"
+              name="amount"
+              id="add-amount-field"
+              class="form-field"
+            />
+          </div>
+          <div class="form-unit">
+            <label for="add-description-field" class="form-label"
               >Description</label
             >
             <input
               type="text"
-              placeholder="e.g. Weekly Groceries"
-              id="transaction-form-description"
-              required
+              name="description"
+              id="add-description-field"
+              class="form-field"
             />
           </div>
-          <div class="add-transaction-form-unit">
-            <button class="btn" id="transaction-form-submit" type="submit">
-              &#65291;
-            </button>
-          </div>
+
+          <button type="submit" class="form-submit-btn btn">Add</button>
         </form>
+      </section>
+
+      <table class="list-entity-container card primary-card">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th class="amount-column">Amount (DH)</th>
+            <th class="action-btns">Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </main>
+
+    <div class="modal-background"></div>
+
+    <form action="" class="modal delete-modal delete-transaction-modal">
+      <h2>Delete this transaction</h2>
+
+      <p>This action is irreversible. Do you want to continue?</p>
+
+      <div class="action-btns">
+        <button type="submit" class="cancel-btn">Cancel</button>
+        <button type="submit" class="delete-btn">Delete</button>
+      </div>
+    </form>
+
+    <form action="" class="modal action-modal edit-transaction-modal">
+      <h2 class="modal-header">Edit this transaction</h2>
+      <div class="form-unit first-unit">
+        <label for="edit-date-field" class="form-label">Date</label>
+        <input
+          type="datetime-local"
+          name="date"
+          id="edit-date-field"
+          class="form-field"
+        />
+      </div>
+      <div class="form-unit">
+        <label for="edit-type-field" class="form-label">Type</label>
+        <select name="type" id="edit-type-field" class="form-field" disabled>
+          <option value="DEPENSE">Expense</option>
+          <option value="REVENU">Income</option>
+          <option value="TRANSFER">Transfer</option>
+        </select>
+      </div>
+      <div class="form-unit">
+        <label for="edit-category-field" class="form-label">Category</label>
+        <select
+          name="category"
+          id="edit-category-field"
+          class="form-field"
+        ></select>
+      </div>
+      <div class="form-unit">
+        <label for="edit-description-field" class="form-label"
+          >Description</label
+        >
+        <input
+          type="text"
+          name="description"
+          id="edit-description-field"
+          class="form-field"
+        />
+      </div>
+      <div class="form-unit last-unit">
+        <label for="edit-amount-field" class="form-label">Amount (DH)</label>
+        <input
+          type="text"
+          name="amount"
+          id="edit-amount-field"
+          class="form-field"
+        />
       </div>
 
-      <div class="card primary-card list-transaction-container"></div>
-    </div>
-    <!-- Transaction Modal Overlay -->
-    <div
-      id="transaction-modal-overlay"
-      class="modal-overlay hidden"
-      aria-hidden="true"
-    >
-      <div class="modal-card">
-        <!-- Header -->
-        <div class="modal-header">
-          <h3>Edit Transaction</h3>
-          <button id="modal-close-btn" class="modal-close-btn">&times;</button>
-        </div>
-
-        <!-- Body -->
-        <div class="modal-body">
-          <div class="modal-group">
-            <label>Date</label>
-            <input type="date" id="modal-date" />
-          </div>
-
-          <div class="modal-group">
-            <label>Type</label>
-            <select id="modal-type">
-              <option value="income">Income</option>
-              <option value="expense">Expense</option>
-            </select>
-          </div>
-
-          <div class="modal-group">
-            <label>Category</label>
-            <input type="text" id="modal-category" />
-          </div>
-
-          <div class="modal-group">
-            <label>Description</label>
-            <input type="text" id="modal-description" />
-          </div>
-
-          <div class="modal-group">
-            <label>Amount (DH)</label>
-            <input type="number" id="modal-amount" />
-          </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="modal-footer">
-          <div class="modal-actions-right">
-            <button id="modal-cancel-btn" class="btn-secondary">Cancel</button>
-            <button id="modal-save-btn" class="btn-primary">Save</button>
-          </div>
-        </div>
+      <div class="action-btns modal-footer">
+        <button type="submit" class="cancel-btn">Cancel</button>
+        <button type="submit" class="action-btn">Save</button>
       </div>
-    </div>
-    <!-- Confirm Delete Modal -->
-    <div id="confirm-modal-overlay" class="modal-overlay hidden">
-      <div class="modal-box">
-        <h3>Supprimer la transaction</h3>
-        <p>Cette action est irréversible. Voulez-vous continuer ?</p>
-
-        <div class="modal-actions">
-          <button id="confirm-cancel-btn" class="btn-secondary">Annuler</button>
-          <button id="confirm-delete-btn" class="btn-danger">Supprimer</button>
-        </div>
-      </div>
-    </div>
-
+    </form>
     <div class="toasts-container"></div>
+    <script src="./transactions-script.js" type="module"></script>
   </body>
 </html>

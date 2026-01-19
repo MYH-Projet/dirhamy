@@ -1,13 +1,14 @@
 import {
   insertSidebar,
-  disableCurrentSidebarLink,
+  focusCurrentSidebarLink,
 } from "../components/sidebar.js";
+import { displayToast } from "../components/toast.js";
 
 export const API_URL = "/api";
 
 function renderInitialStucture(user) {
   return insertSidebar(document.querySelector("body")).then(() => {
-    disableCurrentSidebarLink();
+    focusCurrentSidebarLink();
     document.querySelector(".user-name").textContent =
       user.name + " " + user.surname;
     document.querySelector(".sidebar-profile-icon").textContent =
@@ -16,15 +17,102 @@ function renderInitialStucture(user) {
 }
 
 export function loadInitialStructure(user) {
-  return fetch(API_URL + "/profile")
-    .then((res) => res.json())
-    .then((data) => {
-      user.id = data.user.id;
-      user.name = data.user.prenom;
-      user.surname = data.user.nom;
-      user.accounts = data.acconts;
-      return renderInitialStucture(user);
-    });
+  return safeApiFetch(API_URL + "/profile").then((data) => {
+    user.id = data.user.id;
+    user.name = data.user.prenom;
+    user.surname = data.user.nom;
+    user.accounts = data.acconts;
+    return renderInitialStucture(user);
+  });
+}
+
+export function fetchAndRender(url, renderCallback) {
+  return safeApiFetch(url).then((data) => {
+    renderCallback(data);
+  });
+}
+
+export function submitActionEntity(url, newFields, refreshCallback, verb) {
+  return safeApiFetch(url, {
+    method: verb,
+    headers: {
+      "Content-type": "application/json",
+    },
+    // even if delete its fine since the backend doesn't read the body and you're sending empty body
+    body: JSON.stringify(newFields || { data: "" }),
+  }).then((data) => {
+    return refreshCallback().then(
+      displayToast(
+        document.querySelector(".toasts-container"),
+        data.message || "Success",
+        "success",
+      ),
+    );
+  });
+}
+export function toastNotis() {
+  const toast = JSON.parse(sessionStorage.getItem("toast"));
+  if (toast) {
+    displayToast(
+      document.querySelector(".toasts-container"),
+      toast.message,
+      toast.type,
+    );
+    sessionStorage.removeItem("toast");
+  }
+}
+
+export function showDeleteEntityModal(modalName, entityId, submitCallback) {
+  const modalBackground = document.querySelector(".modal-background");
+  const deleteModal = document.querySelector(`.delete-${modalName}-modal`);
+  const newModal = deleteModal.cloneNode(true);
+
+  modalBackground.style.display = "block";
+  deleteModal.style.display = "block";
+
+  deleteModal.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    if (e.submitter.classList.contains("delete-btn")) {
+      submitCallback(entityId);
+    } else if (e.submitter.classList.contains("cancel-btn")) {
+    }
+
+    modalBackground.style.display = "none";
+    deleteModal.style.display = "none";
+
+    deleteModal.parentElement.replaceChild(newModal, deleteModal);
+  });
+}
+
+export function safeApiFetch(url, parameterObject) {
+  return fetch(url, parameterObject).then((res) => {
+    return res
+      .json()
+      .then((data) => {
+        if (res.ok) {
+          return data;
+        } else if (res.status === 401) {
+          sessionStorage.setItem(
+            "toast",
+            JSON.stringify({
+              type: "error",
+              message: "Logged out",
+            }),
+          );
+          window.location.replace("../login/login.html");
+        } else {
+          throw Error(data.message || data.error);
+        }
+      })
+      .catch((err) => {
+        displayToast(
+          document.querySelector(".toasts-container"),
+          err.message,
+          "error",
+        );
+      });
+  });
 }
 
 export const editIcon = `<svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -37,4 +125,3 @@ export const deleteIcon = `<svg class="delete-icon" xmlns="http://www.w3.org/200
   <line x1="10" y1="11" x2="10" y2="17" stroke-linecap="round" />
   <line x1="14" y1="11" x2="14" y2="17" stroke-linecap="round" />
 </svg>`;
-
