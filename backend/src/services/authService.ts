@@ -4,6 +4,10 @@ import {prisma} from '../lib/prisma';
 import {UtilisateurModel} from '../../generated/prisma/models/Utilisateur';
 import { AppError } from '../utils/AppError';
 import dotenv from 'dotenv';
+import crypto from 'crypto';
+import redisClient from '../lib/redis';
+import { sendMail } from '../lib/nodemailer';
+import { userInfo } from 'os';
 dotenv.config();
 
 const SECRET_KEY = process.env.JWT_SECRET as string;
@@ -24,20 +28,26 @@ const generateToken=(user:UtilisateurModel)=>{
     return { token, refreshToken };
 }
 
+export const generateForgetPToken = (mail:string)=>{
+    return jwt.sign({
+        mail
+    },SECRET_KEY,{expiresIn:'15m'})
+}
 
-
-export const checkUserCredentials = async (mail:string , password:string)=>{
+export const checkUserCredentials = async (mail:string)=>{
     const user = await prisma.utilisateur.findUnique({
         where:{email:mail}
     });
     if(!user){
         throw new AppError("Invalid credentials",401)
     }
+    return user;    
+}
+export const checkPassword = async (user:UtilisateurModel,password:string)=>{
     const isPasswordValid = await bcrypt.compare(password, user.motDePasse);
     if(!isPasswordValid){
         throw new AppError("Invalid credentials",401);
     }
-    return user;    
 }
 
 
@@ -87,4 +97,38 @@ export const createUser = async (mail:string, password:string, nom:string,prenom
         },
     });
     return user;
+}
+
+export const forgetpasswordMail = async (mail:string)=>{
+    const code:string = crypto.randomInt(100000, 1000000).toString();
+    const key = `reset:${mail}`;
+    const hash = crypto.createHash('sha512').update(key).digest('hex');
+    await redisClient.set(hash,code,{
+        EX:15*60
+    })
+    await sendMail(mail,code);
+}
+
+export const validateCode = async (mail:string,code:string)=>{
+    const key = `reset:${mail}`;
+    const hash = crypto.createHash('sha512').update(key).digest('hex');
+    const storedCode = await redisClient.get(hash);
+    if(!storedCode || storedCode !== code){
+        throw new AppError('the code not valid',401);
+    }
+    await redisClient.del(hash);
+}
+
+
+export const resetPassword = async (mail:string,password:string)=>{
+
+    const hashedPassword = await bcrypt.hash(password,10);
+    await prisma.utilisateur.update({
+        where:{
+            email:mail,
+        },
+        data:{
+            motDePasse:hashedPassword
+        }
+    })
 }
