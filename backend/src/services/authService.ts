@@ -28,9 +28,9 @@ const generateToken=(user:UtilisateurModel)=>{
     return { token, refreshToken };
 }
 
-export const generateForgetPToken = (mail:string)=>{
+export const generateForgetPToken = (email:string)=>{
     return jwt.sign({
-        mail
+        email
     },SECRET_KEY,{expiresIn:'15m'})
 }
 
