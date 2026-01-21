@@ -3,7 +3,7 @@
 .balance-container {
   display: flex;
   flex-direction: row;
-  flex-wrap: 1;
+  flex-wrap: wrap;
   gap: 30px;
 
   margin-bottom: var(--large-spacing);
