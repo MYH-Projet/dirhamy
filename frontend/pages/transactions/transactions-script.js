@@ -9,6 +9,7 @@ import {
   removeSpinnerPage,
   cancelSwitchToProcess,
   trimIsoDateToInput,
+  adaptTime,
 } from "../../helpers/utils.js";
 import {
   showEditEntityModal,
@@ -150,9 +151,7 @@ function wireAddContainerEvents() {
     switchToProcess(e.submitter);
     const fields = {
       montant: +document.querySelector("#add-amount-field").value,
-      date: new Date(
-        document.querySelector("#add-date-field").value,
-      ).toISOString(),
+      date: adaptTime(document.querySelector("#add-date-field").value),
       type: document.querySelector("#add-type-field").value,
       description: document.querySelector("#add-description-field").value,
       compteId: +document.querySelector("#add-account-field").value,
@@ -203,10 +202,16 @@ function showEditTransactionModal(transaction) {
         this.fields.amount.value = this.entity.amount;
       },
       getApiFields: function () {
+        let trueDate;
+        if (trimIsoDateToInput(this.entity.date) === this.fields.date.value) {
+          trueDate = this.entity.date;
+        } else {
+          trueDate = adaptTime(this.fields.date.value);
+        }
         return {
           montant: +this.fields.amount.value,
           description: this.fields.description.value,
-          date: new Date(this.fields.date.value).toISOString(),
+          date: trueDate,
           categorieId: +this.fields.category.value,
         };
       },

@@ -117,7 +117,17 @@ export function getKeyByValue(object, value) {
 }
 
 export function trimIsoDateToInput(dateString) {
-  const array = dateString.split(":");
-  array.pop();
-  return array.join(":");
+  const array = dateString.split("T");
+  return array[0];
+}
+
+function getTimeToday() {
+  const todayFirstDate = new Date(trimIsoDateToInput(new Date().toISOString()));
+  return Date.now() - todayFirstDate.getTime();
+}
+
+export function adaptTime(inputDate) {
+  const inputTime = new Date(inputDate).getTime();
+  const todayTime = getTimeToday();
+  return new Date(inputTime + todayTime).toISOString();
 }
