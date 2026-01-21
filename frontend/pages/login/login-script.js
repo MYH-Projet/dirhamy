@@ -1,19 +1,19 @@
-import { displayToast } from "./components/toast.js";
+import { displayToast } from "../../components/toast.js";
+import { toastNotis } from "../../utils/utils.js";
 
 const API_URL = "/api";
 
 const toastContainer = document.querySelector(".toasts-container");
+
+document.querySelector(".copyright-year").textContent =
+  new Date().getFullYear();
 
 const loginForm = document.querySelector(".login-form");
 
 const mailInput = document.querySelector("#form-mail-input");
 const passInput = document.querySelector("#form-pass-input");
 
-const toast = JSON.parse(sessionStorage.getItem("toast"));
-if (toast) {
-  displayToast(toastContainer, toast.message, toast.type);
-  sessionStorage.removeItem("toast");
-}
+toastNotis();
 
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -33,11 +33,11 @@ loginForm.addEventListener("submit", (e) => {
         if (res.ok) {
           sessionStorage.setItem(
             "toast",
-            JSON.stringify({ type: "success", message: data.message })
+            JSON.stringify({ type: "success", message: data.message }),
           );
-          window.location.replace("./transactions.html");
+          window.location.replace("../transactions/transactions.html");
         } else {
-          throw Error(data.error);
+          throw Error(data.error || data.message);
         }
       });
     })
