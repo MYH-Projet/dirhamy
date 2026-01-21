@@ -19,7 +19,7 @@
         <form action="" class="add-entity-form">
           <div class="form-unit">
             <label for="add-type-field" class="form-label">Type</label>
-            <select name="type" id="add-type-field" class="form-field">
+            <select name="type" id="add-type-field" class="form-field" required>
               <option value="DEPENSE">Expense</option>
               <option value="REVENU">Income</option>
               <option value="TRANSFER">Transfer</option>
@@ -31,6 +31,7 @@
               name="type"
               id="add-account-field"
               class="form-field"
+              required
             ></select>
           </div>
 
@@ -40,16 +41,18 @@
               name="type"
               id="add-transfer-to-field"
               class="form-field"
+              required
             ></select>
           </div>
 
           <div class="form-unit">
             <label for="add-date-field" class="form-label">Date</label>
             <input
-              type="datetime-local"
+              type="date"
               name="date"
               id="add-date-field"
               class="form-field"
+              required
             />
           </div>
 
@@ -59,16 +62,19 @@
               name="category"
               id="add-category-field"
               class="form-field"
+              required
             ></select>
           </div>
 
           <div class="form-unit unit">
             <label for="add-amount-field" class="form-label">Amount (DH)</label>
             <input
-              type="text"
+              type="number"
               name="amount"
               id="add-amount-field"
               class="form-field"
+              placeholder="0.00"
+              required
             />
           </div>
           <div class="form-unit">
@@ -80,6 +86,8 @@
               name="description"
               id="add-description-field"
               class="form-field"
+              placeholder="e.g. Weekly Groceries"
+              required
             />
           </div>
 
@@ -156,20 +164,24 @@
           name="description"
           id="edit-description-field"
           class="form-field"
+          placeholder="e.g. Weekly Groceries"
+          required
         />
       </div>
       <div class="form-unit last-unit">
         <label for="edit-amount-field" class="form-label">Amount (DH)</label>
         <input
-          type="text"
+          type="number"
           name="amount"
           id="edit-amount-field"
           class="form-field"
+          placeholder="0.00"
+          required
         />
       </div>
 
       <div class="action-btns modal-footer">
-        <button type="submit" class="cancel-btn">Cancel</button>
+        <button type="submit" class="cancel-btn" formnovalidate>Cancel</button>
         <button type="submit" class="action-btn" disabled>Save</button>
       </div>
     </form>

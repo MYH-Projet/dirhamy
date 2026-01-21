@@ -52,16 +52,17 @@
           >Monthly Limit (DH)</label
         >
         <input
-          type="text"
+          type="number"
           name="category-name"
           id="edit-category-limit-field"
           class="form-field"
           placeholder="e.g. 2000"
+          required
         />
       </div>
 
       <div class="action-btns modal-footer">
-        <button type="submit" class="cancel-btn">Cancel</button>
+        <button type="submit" class="cancel-btn" formnovalidate>Cancel</button>
         <button type="submit" class="action-btn" disabled>Save</button>
       </div>
     </form>
@@ -73,6 +74,7 @@
           name="category-choice"
           id="category-choices"
           class="form-field"
+          required
         ></select>
       </div>
       <div class="form-unit last-unit">
@@ -80,15 +82,16 @@
           >Monthly Limit (DH)</label
         >
         <input
-          type="text"
+          type="number"
           name="category-limit"
           id="add-category-limit-field"
           class="form-field"
           placeholder="e.g. 2000"
+          required
         />
       </div>
       <div class="action-btns modal-footer">
-        <button type="submit" class="cancel-btn">Cancel</button>
+        <button type="submit" class="cancel-btn" formnovalidate>Cancel</button>
         <button type="submit" class="action-btn">Set Limit</button>
       </div>
     </form>
