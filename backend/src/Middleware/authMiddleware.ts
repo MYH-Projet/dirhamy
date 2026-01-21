@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import {prisma} from '../lib/prisma';
 import {UtilisateurModel} from '../../generated/prisma/models/Utilisateur'
 import dotenv from 'dotenv';
+import { error } from 'console';
 dotenv.config();
 const SECRET_KEY = process.env.JWT_SECRET as string;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET as string;
@@ -101,6 +102,6 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
         res.clearCookie('jwt');
         res.clearCookie('refreshToken');
         const message = e||'Session expired';
-        return res.status(403).json({ message: message });
+        return res.status(403).json({ error: message });
     }
 };

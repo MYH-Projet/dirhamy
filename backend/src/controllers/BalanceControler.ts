@@ -17,7 +17,7 @@ export const getBalance = async (req: AuthRequest, res: Response) => {
         });
 
         if (!compte) {
-            return res.status(404).json({ message: "Account not found or access denied" });
+            return res.status(404).json({ error: "Account not found or access denied" });
         }
 
         // 2. Get the most recent snapshot (Save Point)
@@ -54,6 +54,6 @@ export const getBalance = async (req: AuthRequest, res: Response) => {
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error calculating balance" });
+        return res.status(500).json({ error: "Error calculating balance" });
     }
 }
