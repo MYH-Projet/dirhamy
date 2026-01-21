@@ -94,6 +94,54 @@ export function showDeleteEntityModal(modalName, entityId, submitCallback) {
   });
 }
 
+export function showEditEntityModal(editModal) {
+  const modalBackground = document.querySelector(".modal-background");
+
+  const newCleanModal = editModal.modal.cloneNode(true);
+  newCleanModal.reset();
+
+  modalBackground.classList.add("switch-on-modal");
+  editModal.modal.classList.add("switch-on-modal");
+
+  editModal.fillFields();
+
+  // THIS USES Modal AS A MORE GLOBAL SCOPE VAR BE CAREFUL
+  const enableSumbitFn = (e) => {
+    e.preventDefault();
+    const actionBtn = editModal.modal.querySelector(".action-btn");
+
+    if (!actionBtn.disabled) {
+      editModal.modal.removeEventListener("input", enableSumbitFn);
+    } else {
+      actionBtn.disabled = false;
+    }
+  };
+  editModal.modal.addEventListener("input", enableSumbitFn);
+
+  editModal.modal.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    switchToProcess(e.submitter);
+    if (e.submitter.classList.contains("cancel-btn")) {
+      // i could use a promise.resolve to only write this once but this is simple enough to be fine
+      closeModalsAndRemoveEvents(
+        editModal.modal,
+        modalBackground,
+        newCleanModal,
+        e.submitter,
+      );
+    } else if (e.submitter.classList.contains("action-btn")) {
+      editModal.submitModal().finally(() => {
+        closeModalsAndRemoveEvents(
+          editModal.modal,
+          modalBackground,
+          newCleanModal,
+          e.submitter,
+        );
+      });
+    }
+  });
+}
 export function safeApiFetch(url, parameterObject) {
   return fetch(url, parameterObject).then((res) => {
     return res
@@ -101,7 +149,7 @@ export function safeApiFetch(url, parameterObject) {
       .then((data) => {
         if (res.ok) {
           return data;
-        } else if (res.status === 401) {
+        } else if (res.status === 401 || res.status === 403) {
           sessionStorage.setItem(
             "toast",
             JSON.stringify({

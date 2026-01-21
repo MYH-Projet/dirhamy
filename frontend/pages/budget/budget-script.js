@@ -10,6 +10,7 @@ import {
   closeModalsAndRemoveEvents,
   toastNotis,
   removeSpinner,
+  showEditEntityModal,
 } from "../../utils/utils.js";
 import { displayToast } from "../../components/toast.js";
 
@@ -179,59 +180,28 @@ function createBudgetCard(budgetStatus) {
 }
 
 function showEditLimitModal(budgetStatus) {
-  const modalBackground = document.querySelector(".modal-background");
-  const editModal = document.querySelector(".edit-budget-modal");
-
-  const newCleanModal = editModal.cloneNode(true);
-  newCleanModal.reset();
-
-  modalBackground.classList.add("switch-on-modal");
-  editModal.classList.add("switch-on-modal");
-
-  const limitField = editModal.querySelector("#edit-category-limit-field");
-  limitField.value = budgetStatus.limit;
-  const nameField = editModal.querySelector("#category-name-field");
-  nameField.value = budgetStatus.categoryName;
-
-  // THIS USES EDITMODAL AS A MORE GLOBAL SCOPE VAR BE CAREFUL
-  const enableSumbitFn = (e) => {
-    e.preventDefault();
-    const actionBtn = editModal.querySelector(".action-btn");
-
-    if (!actionBtn.disabled) {
-      editModal.removeEventListener("input", enableSumbitFn);
-    } else {
-      actionBtn.disabled = false;
-    }
-  };
-  editModal.addEventListener("input", enableSumbitFn);
-
-  editModal.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    switchToProcess(e.submitter);
-    if (e.submitter.classList.contains("cancel-btn")) {
-      closeModalsAndRemoveEvents(
-        editModal,
-        modalBackground,
-        newCleanModal,
-        e.submitter,
-      );
-    } else if (e.submitter.classList.contains("action-btn")) {
-      const fields = {
-        categoryId: budgetStatus.categoryId,
-        limit: limitField.value,
+  const editLimitModalBehavior = {
+    entity: budgetStatus,
+    modal: document.querySelector(".edit-budget-modal"),
+    fields: {
+      limit: document.querySelector("#edit-category-limit-field"),
+      categoryName: document.querySelector("#category-name-field"),
+    },
+    fillFields: function () {
+      this.fields.limit.value = this.entity.limit;
+      this.fields.categoryName.value = this.entity.categoryName;
+    },
+    getApiFields: function () {
+      return {
+        categoryId: this.entity.categoryId,
+        limit: this.fields.limit.value,
       };
-      submitSetLimit(fields).finally(() => {
-        closeModalsAndRemoveEvents(
-          editModal,
-          modalBackground,
-          newCleanModal,
-          e.submitter,
-        );
-      });
-    }
-  });
+    },
+    submitModal: function () {
+      return submitSetLimit(this.getApiFields());
+    },
+  };
+  showEditEntityModal(editLimitModalBehavior);
 }
 
 function showSetLimitModal(categories) {

@@ -21,6 +21,7 @@ import {
   closeModalsAndRemoveEvents,
   toastNotis,
   removeSpinner,
+  showEditEntityModal,
 } from "../../utils/utils.js";
 
 const user = {};
@@ -112,61 +113,30 @@ function createCategoryRow(category) {
 }
 
 function showEditCategoryModal(category) {
-  const modalBackground = document.querySelector(".modal-background");
-  const editModal = document.querySelector(".edit-category-modal");
-  const newModal = editModal.cloneNode(true);
-
-  const nameField = editModal.querySelector("#category-name-field");
-
-  nameField.value = category.nom;
-
-  modalBackground.classList.add("switch-on-modal");
-  editModal.classList.add("switch-on-modal");
-
-  // THIS USES EDITMODAL AS A MORE GLOBAL SCOPE VAR BE CAREFUL
-  const enableSumbitFn = (e) => {
-    e.preventDefault();
-    const actionBtn = editModal.querySelector(".action-btn");
-
-    if (!actionBtn.disabled) {
-      editModal.removeEventListener("input", enableSumbitFn);
-    } else {
-      actionBtn.disabled = false;
-    }
-  };
-  editModal.addEventListener("input", enableSumbitFn);
-
-  editModal.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    switchToProcess(e.submitter);
-
-    if (e.submitter.classList.contains("action-btn")) {
-      const newCategoryFields = {
-        nom: nameField.value,
+  const editCategoryModalBehavior = {
+    entity: category,
+    modal: document.querySelector(".edit-category-modal"),
+    fields: {
+      name: document.querySelector("#category-name-field"),
+    },
+    fillFields: function () {
+      this.fields.name.value = this.entity.nom;
+    },
+    getApiFields: function () {
+      return {
+        nom: this.fields.name.value,
       };
-      submitEditCategory(category, newCategoryFields).finally(() => {
-        closeModalsAndRemoveEvents(
-          editModal,
-          modalBackground,
-          newModal,
-          e.submitter,
-        );
-      });
-    } else if (e.submitter.classList.contains("cancel-btn")) {
-      closeModalsAndRemoveEvents(
-        editModal,
-        modalBackground,
-        newModal,
-        e.submitter,
-      );
-    }
-  });
+    },
+    submitModal: function () {
+      return submitEditCategory(this.entity.id, this.getApiFields());
+    },
+  };
+  showEditEntityModal(editCategoryModalBehavior);
 }
 
-function submitEditCategory(category, newCategoryFields) {
+function submitEditCategory(categoryId, newCategoryFields) {
   return submitActionEntity(
-    API_URL + "/categories/" + category.id,
+    API_URL + "/categories/" + categoryId,
     newCategoryFields,
     getCategories,
     "PUT",

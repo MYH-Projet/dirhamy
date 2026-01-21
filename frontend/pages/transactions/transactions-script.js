@@ -12,6 +12,7 @@ import {
   switchToProcess,
   closeModalsAndRemoveEvents,
   removeSpinner,
+  showEditEntityModal,
 } from "../../utils/utils.js";
 import { displayToast } from "../../components/toast.js";
 
@@ -283,6 +284,7 @@ function wireAddContainerEvents() {
     });
   });
 }
+
 function showEditTransactionModal(transaction) {
   return fetchAndRender(API_URL + "/categories", (categories) => {
     // here you should keep a state to not refetch categories each time espicially when its a multi page app
@@ -294,65 +296,36 @@ function showEditTransactionModal(transaction) {
       document.querySelector("#edit-category-field").append(option);
     });
   }).then(() => {
-    const modalBackground = document.querySelector(".modal-background");
-    const editModal = document.querySelector(".edit-transaction-modal");
-    const newModal = editModal.cloneNode(true);
-
-    const dateField = editModal.querySelector("#edit-date-field");
-    dateField.value = trimIsoDateToInput(transaction.date);
-    const typeField = editModal.querySelector("#edit-type-field");
-    typeField.value = transaction.type;
-    const categoryField = editModal.querySelector("#edit-category-field");
-    categoryField.value = transaction.categoryId;
-    const descriptionField = editModal.querySelector("#edit-description-field");
-    descriptionField.value = transaction.description;
-    const amountField = editModal.querySelector("#edit-amount-field");
-    amountField.value = transaction.amount;
-
-    modalBackground.classList.add("switch-on-modal");
-    editModal.classList.add("switch-on-modal");
-
-    // THIS USES EDITMODAL AS A MORE GLOBAL SCOPE VAR BE CAREFUL
-    const enableSumbitFn = (e) => {
-      e.preventDefault();
-      const actionBtn = editModal.querySelector(".action-btn");
-
-      if (!actionBtn.disabled) {
-        editModal.removeEventListener("input", enableSumbitFn);
-      } else {
-        actionBtn.disabled = false;
-      }
-    };
-    editModal.addEventListener("input", enableSumbitFn);
-
-    editModal.addEventListener("submit", (e) => {
-      e.preventDefault();
-      switchToProcess(e.submitter);
-
-      if (e.submitter.classList.contains("action-btn")) {
-        const newFields = {
-          montant: +amountField.value,
-          description: descriptionField.value,
-          date: new Date(dateField.value).toISOString(),
-          categorieId: +categoryField.value,
+    const editTransactionBehaviour = {
+      entity: transaction,
+      modal: document.querySelector(".edit-transaction-modal"),
+      fields: {
+        date: document.querySelector("#edit-date-field"),
+        type: document.querySelector("#edit-type-field"),
+        category: document.querySelector("#edit-category-field"),
+        description: document.querySelector("#edit-description-field"),
+        amount: document.querySelector("#edit-amount-field"),
+      },
+      fillFields: function () {
+        this.fields.date.value = trimIsoDateToInput(this.entity.date);
+        this.fields.type.value = this.entity.type;
+        this.fields.category.value = this.entity.categoryId;
+        this.fields.description.value = this.entity.description;
+        this.fields.amount.value = this.entity.amount;
+      },
+      getApiFields: function () {
+        return {
+          montant: +this.fields.amount.value,
+          description: this.fields.description.value,
+          date: new Date(this.fields.date.value).toISOString(),
+          categorieId: +this.fields.category.value,
         };
-        submitEditTransaction(transaction.id, newFields).finally(() => {
-          closeModalsAndRemoveEvents(
-            editModal,
-            modalBackground,
-            newModal,
-            e.submitter,
-          );
-        });
-      } else if (e.submitter.classList.contains("cancel-btn")) {
-        closeModalsAndRemoveEvents(
-          editModal,
-          modalBackground,
-          newModal,
-          e.submitter,
-        );
-      }
-    });
+      },
+      submitModal: function () {
+        return submitEditTransaction(this.entity.id, this.getApiFields());
+      },
+    };
+    showEditEntityModal(editTransactionBehaviour);
   });
 }
 
