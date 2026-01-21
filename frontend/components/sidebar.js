@@ -1,4 +1,4 @@
-import { API_URL, safeApiFetch } from "../utils/utils.js";
+import { API_URL, safeApiFetch } from "../helpers/utils.js";
 
 const hamburgerIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><line x1="0" y1="3" x2="32" y2="3" stroke="#18212c" stroke-width="3" stroke-linecap="round"/><line x1="0" y1="12" x2="32" y2="12" stroke="#18212c" stroke-width="3" stroke-linecap="round"/><line x1="0" y1="21" x2="32" y2="21" stroke="#18212c" stroke-width="3" stroke-linecap="round"/></svg>`;
 

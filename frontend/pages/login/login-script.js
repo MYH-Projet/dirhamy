@@ -2,8 +2,8 @@ import { displayToast } from "../../components/toast.js";
 import {
   toastNotis,
   switchToProcess,
-  removeStopOverlay,
-} from "../../utils/utils.js";
+  cancelSwitchToProcess,
+} from "../../helpers/utils.js";
 
 const API_URL = "/api";
 
@@ -51,6 +51,6 @@ loginForm.addEventListener("submit", (e) => {
       displayToast(toastContainer, err.message, "error");
     })
     .finally(() => {
-      removeStopOverlay(e.submitter, "Sign in");
+      cancelSwitchToProcess(e.submitter, "Sign in");
     });
 });
