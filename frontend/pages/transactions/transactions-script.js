@@ -135,10 +135,13 @@ function wireTableEvents() {
 }
 
 function wireAddContainerEvents() {
-  document.querySelector("#add-type-field").addEventListener("change", (e) => {
-    const transferToUnit = document.querySelector(
-      ".add-entity-container .form-unit:has(#add-transfer-to-field)",
-    );
+  const addTransactionForm = document.querySelector(".add-entity-form");
+  const addTypeField = addTransactionForm.querySelector("#add-type-field");
+  const transferToUnit = document.querySelector(
+    ".add-entity-container .form-unit:has(#add-transfer-to-field)",
+  );
+
+  addTypeField.addEventListener("change", (e) => {
     if (e.target.value === "TRANSFER") {
       transferToUnit.style.display = "block";
     } else {
@@ -146,17 +149,25 @@ function wireAddContainerEvents() {
     }
   });
 
-  document.querySelector(".add-entity-form").addEventListener("submit", (e) => {
+  addTransactionForm.addEventListener("reset", (e) => {
+    e.preventDefault();
+    document.querySelector("#add-amount-field").value = "";
+    document.querySelector("#add-description-field").value = "";
+    addTypeField.value = "DEPENSE";
+    transferToUnit.style.display = "none";
+  });
+  addTransactionForm.addEventListener("submit", (e) => {
     e.preventDefault();
     switchToProcess(e.submitter);
     const fields = {
       montant: +document.querySelector("#add-amount-field").value,
       date: adaptTime(document.querySelector("#add-date-field").value),
-      type: document.querySelector("#add-type-field").value,
+      type: addTypeField.value,
       description: document.querySelector("#add-description-field").value,
       compteId: +document.querySelector("#add-account-field").value,
       categorieId: +document.querySelector("#add-category-field").value,
-      idDestination: +document.querySelector("#add-transfer-to-field").value,
+      idDestination: +transferToUnit.querySelector("#add-transfer-to-field")
+        .value,
     };
     submitActionEntity(
       API_URL + "/transactions",
@@ -165,10 +176,8 @@ function wireAddContainerEvents() {
       "POST",
     ).finally(() => {
       cancelSwitchToProcess(e.submitter, "Add");
-      e.target.reset();
-      const date = trimIsoDateToInput(new Date().toISOString());
 
-      document.querySelector("#add-date-field").value = date;
+      e.target.reset();
     });
   });
 }
