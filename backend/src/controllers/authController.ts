@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import * as authService from "../services/authService";
 import { AppError } from '../utils/AppError';
-import { checkAccount } from '../services/transactionServices';
 import { resetPasswordRequest } from '../Middleware/authMiddleware';
 
 const setcookies=(res:Response,token:any,refreshToken:any)=>{
@@ -108,11 +107,11 @@ export const checkCode = async (req:Request,res:Response)=>{
 
 
 export const resetPassword=async (req:resetPasswordRequest,res:Response)=>{
-    const mail = req.mail
+    const email = req.email
     const password = req.body.password;
     try{
-        console.log("im in the controller and the mail and password is ",mail,password)
-        await authService.resetPassword(mail!,password);
+        console.log("im in the controller and the mail and password is ",email,password)
+        await authService.resetPassword(email!,password);
         res.clearCookie('restpassword');
         res.status(201).json({ message: 'password reset' })
     }catch(e){
