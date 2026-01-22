@@ -16,6 +16,8 @@ import categorieRoutes from './routers/categorieRoutes';
 import budgetRouter from './routers/budgetRoutes'
 
 import {authenticateToken , AuthRequest} from './Middleware/authMiddleware'
+import { limitApiTraffic } from './Middleware/ratelimiterMiddleware';
+
 
 
 
@@ -35,6 +37,8 @@ cron.schedule("0 0 */15 * *", () => {
     .catch(e => console.error("Job Failed:", e));
 });
 
+
+
 app.get('/', async (req:Request, res:Response) => {
     try {
     // This runs a simple "1+1" query on the database to check connection
@@ -48,6 +52,7 @@ app.get('/', async (req:Request, res:Response) => {
 
 
 app.use("/auth",authRoutes);
+app.use(limitApiTraffic);
 app.use('/transactions', transactionRoutes);
 app.use('/balance',balanceRouters);
 app.use('/categories', categorieRoutes);

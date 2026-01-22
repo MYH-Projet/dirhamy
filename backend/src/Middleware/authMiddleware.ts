@@ -107,11 +107,11 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
 };
 
 export interface resetPasswordRequest extends Request{
-    mail?:string
+    email?:string
 }
 
 type resetPasswordpayload = {
-    mail:string
+    email:string
 }
 
 export const authenticateResetpasswordToken = async (req: resetPasswordRequest, res: Response, next: NextFunction)=>{
@@ -123,10 +123,10 @@ export const authenticateResetpasswordToken = async (req: resetPasswordRequest, 
         }
         
         const decoded = jwt.verify(token,SECRET_KEY) as resetPasswordpayload;
-        if (!decoded.mail) {
+        if (!decoded.email) {
             throw new Error("Invalid token structure");
         }
-        req.mail= decoded.mail;
+        req.email= decoded.email;
         console.log('i will call next()')
         next();
     }catch(e){
