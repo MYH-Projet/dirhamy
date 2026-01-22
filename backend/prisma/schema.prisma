@@ -47,9 +47,9 @@ model Compte {
   utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
 
   // Relationships
-  transactionsSent Transaction[] @relation("SourceAccount")
-
-  snapshots BalanceSnapshot[]
+  transactionsSent     Transaction[]     @relation("SourceAccount")
+  transactionsReceived Transaction[]     @relation("DestinationAccount")
+  snapshots            BalanceSnapshot[]
 }
 
 model Categorie {
@@ -79,13 +79,6 @@ model BudgetSnapshot {
   @@unique([categorieId, monthDate])
 }
 
-model Transfer {
-  id           Int           @id @default(autoincrement())
-  createdAt    DateTime      @default(now())
-  // This relation links to the transactions
-  transactions Transaction[]
-}
-
 model Transaction {
   id          Int             @id @default(autoincrement())
   montant     Float
@@ -97,8 +90,8 @@ model Transaction {
   compteId Int
   compte   Compte @relation("SourceAccount", fields: [compteId], references: [id])
 
-  transferId Int?
-  transfer   Transfer? @relation(fields: [transferId], references: [id])
+  idDestination Int?
+  destination   Compte? @relation("DestinationAccount", fields: [idDestination], references: [id])
 
   categorieId Int
   categorie   Categorie @relation(fields: [categorieId], references: [id])

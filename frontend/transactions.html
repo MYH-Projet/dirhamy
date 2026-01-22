@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transactions</title>
+    <link rel="stylesheet" href="transactions-style.css" />
+    <script type="module" src="./transactions-script.js"></script>
+  </head>
+
+  <body class="invisible-unit">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <img src="icons/logo.svg" width="120" alt="" />
+        <button class="sidebar-resize-btn">
+          <img
+            src="icons/sidebar-icons/hamburger-icon.svg"
+            width="16"
+            height="16"
+            alt=""
+          />
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="sidebar-link">
+            <a href="dashboard.html">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+              >
+                <rect
+                  x="3"
+                  y="3"
+                  width="8"
+                  height="8"
+                  rx="1"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <rect
+                  x="13"
+                  y="3"
+                  width="8"
+                  height="5"
+                  rx="1"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <rect
+                  x="13"
+                  y="10"
+                  width="8"
+                  height="11"
+                  rx="1"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <rect
+                  x="3"
+                  y="13"
+                  width="8"
+                  height="8"
+                  rx="1"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+              </svg>
+
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="sidebar-link">
+            <a href="dashboard.html">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+              >
+                <polyline
+                  points="4,7 14,7 11,4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <line
+                  x1="14"
+                  y1="7"
+                  x2="14"
+                  y2="7"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+
+                <polyline
+                  points="20,17 10,17 13,20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <span>Transactions</span>
+            </a>
+          </li>
+          <li class="sidebar-link">
+            <a href="dashboard.html">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M3 12V3h9l9 9-9 9-9-9z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+              </svg>
+              <span>Categories</span>
+            </a>
+          </li>
+          <li class="sidebar-link">
+            <a href="dashboard.html">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="3"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <path
+                  d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1l2.1-2.1M17 7l2.1-2.1"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-profile">
+          <div class="sidebar-profile-icon">JD</div>
+          <p class="user-name"></p>
+        </div>
+        <button class="sidebar-disconnect">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+          >
+            <!-- Door -->
+            <path
+              d="M4 3h8v18H4z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linejoin="round"
+            />
+
+            <!-- Arrow out -->
+            <polyline
+              points="14,12 20,12 17,9"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <line
+              x1="20"
+              y1="12"
+              x2="17"
+              y2="15"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+
+          <span>Disconnect</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="main-container">
+      <div class="balance-container">
+        <div class="card primary-card account-card">
+          <p class="card-label account-card-label">
+            <span class="account-card-name"></span>
+            <span class="account-card-type"></span>
+          </p>
+          <p class="card-balance account-card-balance"></p>
+        </div>
+        <div class="card primary-card account-card">
+          <p class="card-label account-card-label">
+            <span class="account-card-name"></span>
+            <span class="account-card-type"></span>
+          </p>
+          <p class="card-balance account-card-balance"></p>
+        </div>
+        <div class="card secondary-card total-card">
+          <p class="card-label total-card-label">TOTAL WEALTH</p>
+          <p class="card-balance total-card-balance"></p>
+        </div>
+      </div>
+
+      <div class="card primary-card add-transaction-container">
+        <h2>ADD NEW ENTRY</h2>
+        <form action="" class="add-transaction-form">
+          <div class="add-transaction-form-unit">
+            <label for="transaction-form-type" class="transaction-unit-label"
+              >Type</label
+            >
+            <select name="transaction-type" id="transaction-form-type">
+              <option value="DEPENSE">Expense</option>
+              <option value="REVENU">Income</option>
+              <option value="TRANSFER">Transfer</option>
+            </select>
+          </div>
+          <div class="add-transaction-form-unit">
+            <label
+              for="transaction-form-from-account"
+              class="transaction-unit-label"
+              >Account</label
+            >
+            <select
+              name="transaction-account"
+              id="transaction-form-from-account"
+              class="transaction-form-account"
+            ></select>
+          </div>
+          <div
+            class="add-transaction-form-unit invisible-unit"
+            id="form-unit-transfer"
+          >
+            <label
+              for="transaction-form-to-account"
+              class="transaction-unit-label"
+              >Transfer to:</label
+            >
+            <select
+              name="transaction-account"
+              id="transaction-form-to-account"
+              class="transaction-form-account"
+            ></select>
+          </div>
+          <div class="add-transaction-form-unit">
+            <label for="transaction-form-date" class="transaction-unit-label"
+              >Date</label
+            >
+            <input type="date" id="transaction-form-date" reqiured />
+          </div>
+          <div class="add-transaction-form-unit">
+            <label
+              for="transaction-form-category"
+              class="transaction-unit-label"
+              >Category</label
+            >
+            <select
+              type="text"
+              placeholder="e.g. Food"
+              id="transaction-form-category"
+            ></select>
+          </div>
+          <div class="add-transaction-form-unit">
+            <label for="transaction-form-amount" class="transaction-unit-label"
+              >Amount</label
+            >
+            <input
+              type="text"
+              placeholder="e.g. 0.00"
+              id="transaction-form-amount"
+              required
+            />
+          </div>
+          <div class="add-transaction-form-unit">
+            <label
+              for="transaction-form-description"
+              class="transaction-unit-label"
+              >Description</label
+            >
+            <input
+              type="text"
+              placeholder="e.g. Weekly Groceries"
+              id="transaction-form-description"
+              required
+            />
+          </div>
+          <div class="add-transaction-form-unit">
+            <button class="btn" id="transaction-form-submit" type="submit">
+              &#65291;
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card primary-card list-transaction-container"></div>
+    </div>
+    <!-- Transaction Modal Overlay -->
+    <div
+      id="transaction-modal-overlay"
+      class="modal-overlay hidden"
+      aria-hidden="true"
+    >
+      <div class="modal-card">
+        <!-- Header -->
+        <div class="modal-header">
+          <h3>Edit Transaction</h3>
+          <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <div class="modal-group">
+            <label>Date</label>
+            <input type="date" id="modal-date" />
+          </div>
+
+          <div class="modal-group">
+            <label>Type</label>
+            <select id="modal-type">
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
+
+          <div class="modal-group">
+            <label>Category</label>
+            <input type="text" id="modal-category" />
+          </div>
+
+          <div class="modal-group">
+            <label>Description</label>
+            <input type="text" id="modal-description" />
+          </div>
+
+          <div class="modal-group">
+            <label>Amount (DH)</label>
+            <input type="number" id="modal-amount" />
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+          <div class="modal-actions-right">
+            <button id="modal-cancel-btn" class="btn-secondary">Cancel</button>
+            <button id="modal-save-btn" class="btn-primary">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Confirm Delete Modal -->
+    <div id="confirm-modal-overlay" class="modal-overlay hidden">
+      <div class="modal-box">
+        <h3>Supprimer la transaction</h3>
+        <p>Cette action est irréversible. Voulez-vous continuer ?</p>
+
+        <div class="modal-actions">
+          <button id="confirm-cancel-btn" class="btn-secondary">Annuler</button>
+          <button id="confirm-delete-btn" class="btn-danger">Supprimer</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toasts-container"></div>
+  </body>
+</html>
