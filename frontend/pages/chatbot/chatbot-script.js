@@ -1,4 +1,4 @@
-import { loadInitialStructure } from "../../utils/utils.js";
+import { loadInitialStructure } from "../../helpers/utils.js";
 
 const user = {};
 
