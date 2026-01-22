@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import {prisma} from '../lib/prisma';
 import {UtilisateurModel} from '../../generated/prisma/models/Utilisateur'
 import dotenv from 'dotenv';
+import { error } from 'console';
 dotenv.config();
 const SECRET_KEY = process.env.JWT_SECRET as string;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET as string;
@@ -101,6 +102,37 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
         res.clearCookie('jwt');
         res.clearCookie('refreshToken');
         const message = e||'Session expired';
-        return res.status(403).json({ message: message });
+        return res.status(403).json({ error: message });
     }
 };
+
+export interface resetPasswordRequest extends Request{
+    email?:string
+}
+
+type resetPasswordpayload = {
+    email:string
+}
+
+export const authenticateResetpasswordToken = async (req: resetPasswordRequest, res: Response, next: NextFunction)=>{
+    try{
+        const token = req.cookies.restpassword;
+        console.log('im in the middleware i get the token')
+        if (!token) {
+            throw new Error("Token not found");
+        }
+        
+        const decoded = jwt.verify(token,SECRET_KEY) as resetPasswordpayload;
+        if (!decoded.email) {
+            throw new Error("Invalid token structure");
+        }
+        req.email= decoded.email;
+        console.log('i will call next()')
+        next();
+    }catch(e){
+        res.clearCookie('restpassword');
+        const message = e||'Session expired';
+        return res.status(403).json({ error: message });
+    }
+    
+}

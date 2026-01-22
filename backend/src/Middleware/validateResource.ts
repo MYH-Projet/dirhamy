@@ -20,6 +20,6 @@ export const validation = (schema:ZodSchema)=>(req:Request, res:Response, next:N
         }))
       });
     }
-    return res.status(500).send('Internal Server Error');
+    return res.status(500).json({error:'Internal Server Error'});
   }
 };
