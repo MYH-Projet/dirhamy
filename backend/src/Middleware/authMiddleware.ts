@@ -105,3 +105,34 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
         return res.status(403).json({ error: message });
     }
 };
+
+export interface resetPasswordRequest extends Request{
+    mail?:string
+}
+
+type resetPasswordpayload = {
+    mail:string
+}
+
+export const authenticateResetpasswordToken = async (req: resetPasswordRequest, res: Response, next: NextFunction)=>{
+    try{
+        const token = req.cookies.restpassword;
+        console.log('im in the middleware i get the token')
+        if (!token) {
+            throw new Error("Token not found");
+        }
+        
+        const decoded = jwt.verify(token,SECRET_KEY) as resetPasswordpayload;
+        if (!decoded.mail) {
+            throw new Error("Invalid token structure");
+        }
+        req.mail= decoded.mail;
+        console.log('i will call next()')
+        next();
+    }catch(e){
+        res.clearCookie('restpassword');
+        const message = e||'Session expired';
+        return res.status(403).json({ error: message });
+    }
+    
+}
