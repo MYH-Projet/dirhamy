@@ -53,7 +53,7 @@ app.use('/transactions', transactionRoutes);
 app.use('/balance',balanceRouters);
 app.use('/categories', categorieRoutes);
 app.use('/budget',budgetRouter);
-app.use('/chat', aiRouter)
+app.use('/ai', aiRouter);
 app.get('/profile', authenticateToken,async (req: AuthRequest, res) => {
   
   res.json({ 

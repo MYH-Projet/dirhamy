@@ -1,4 +1,4 @@
-import {generateResponse} from '../services/aiService';
+import {generateInsight} from '../services/aiService';
 import {Request, Response} from 'express';
 import {dataAggregator} from '../services/dataAggregator';
 import {AuthRequest,JwtPayload} from '../Middleware/authMiddleware'

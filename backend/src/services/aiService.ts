@@ -9,7 +9,7 @@ const genAi = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 export async function generateResponse(userMessage: string, userData: string){
     try {
         const model = genAi.getGenerativeModel({model:"gemini-2.5-flash"});
-       
+            console.log("model created")
           const prompt=`
                 you are a financial advisor for an app called Dirhamy.\n
                 your job is to help the user manage their money,educate them and help them acheinve financial literacy and freedom\n
@@ -22,11 +22,11 @@ export async function generateResponse(userMessage: string, userData: string){
                 user message : ${userMessage}`;  
 
         const result = await model.generateContent(prompt);
-
+        console.log("chat response generated :", result)
         return result.response.text();
         
     } catch (error) {
-        console.log(error);
+        console.log("chat ai error:" + error);
         return "Something went wrong";
     }
 

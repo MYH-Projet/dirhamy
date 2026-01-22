@@ -29,6 +29,7 @@ export const chat = async(req : AuthRequest, res : Response) =>{
   let reply: string;
   try {
     reply = await generateResponse(userMessage, userData);
+    console.log("reply of chat ai")
   } catch (e) {
     console.error("❌ Gemini API error:", e);
     return res.status(500).json({ error: "AI service failed" });

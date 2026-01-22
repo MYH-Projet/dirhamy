@@ -25,7 +25,7 @@ loadInitialStructure(user).then(() => {
     addMessage("…", "ai");
     try {
       console.log("Sending message to server");
-      const response = await fetch("/api/chat", {
+      const response = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMsg })
