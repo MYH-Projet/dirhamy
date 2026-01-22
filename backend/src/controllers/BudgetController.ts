@@ -68,7 +68,7 @@ export const getBudgetStatus = async (req: AuthRequest, res: Response) => {
                     }
                 });
 
-                const totalSpent = -(aggregation._sum.montant || 0);
+                const totalSpent = aggregation._sum.montant || 0;
 
                 // D. Return the calculated object
                 return {

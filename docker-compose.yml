@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: dirhamy
     ports:
-      - "5431:5432"
+      - "5432:5432"
     volumes:
       - dirhamy-pgdata:/var/lib/postgresql/data
 
@@ -25,7 +25,6 @@ services:
       PORT: "3000"
       JWT_SECRET: anas
       REFRESH_TOKEN_SECRET: anas
-      GEMINI_API_KEY: AIzaSyB1hmBH-Q3lQeUsYBCHFrU89DGeRAkyf88
     depends_on:
       - db
     ports:
@@ -43,7 +42,6 @@ services:
         echo 'Postgres is ready' &&
         npx prisma migrate deploy &&
         npx prisma generate &&
-        npx prisma db seed &&
         npm run dev
       "
 

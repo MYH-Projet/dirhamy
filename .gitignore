@@ -124,9 +124,6 @@ dist
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
-.vscode
-
-docker-data
 
 # yarn v3
 .pnp.*
@@ -142,14 +139,3 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 backend/generated/prisma
-
-
-
-
-
-
-
-
-#this is related to mouhssine structure
-cdc/
-.vscode/
