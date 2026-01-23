@@ -445,6 +445,7 @@ table.list-entity-container {
   tr {
     display: flex;
     flex-direction: row;
+    align-items: center;
   }
 
   tbody tr {

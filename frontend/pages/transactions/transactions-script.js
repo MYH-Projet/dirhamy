@@ -257,3 +257,58 @@ function submitDeleteTransaction(transactionId) {
 function refreshPage() {
   return Promise.all([getAccountBalances(user), getTransactions()]);
 }
+
+const transferIdTreated = [];
+function adaptTransactions(transactions) {
+  const allInfoNeeded = {
+    array: [],
+    transactionsNeedTransferEquivalent: [],
+  };
+  let found = false;
+  for (let i = 0; i < transactions.length; i++) {
+    if (transactions[i].type === "TRANSFER" && transactions[i].isTreated) {
+      continue;
+    } else if (transactions[i].type === "TRANSFER") {
+      for (let j = i + 1; i < transactions.length; i++) {
+        if (transactions[i].transferId === transactions[j].transferId) {
+          transactions[i].account2 = transactions[j].compte;
+          transactions[j].isTreated = true;
+          found = true;
+        }
+      }
+      if (found == false) {
+        transactionsNeedTransferEquivalent.push(transactions[i]);
+        continue;
+      }
+    }
+    allInfoNeeded.array.push(transactions[i]);
+  }
+  return allInfoNeeded;
+}
+
+function getTransactionsTest(
+  finalArray = [],
+  cursor = null,
+  firstCall = true,
+  needsMoreCalls = false,
+) {
+  while (
+    (finalArray.length < 10 && (!cursor === null || firstCall)) ||
+    needsMoreCalls
+  ) {
+    let url = cursor
+      ? API_URL + "/transactions/user?cursor=" + cursor
+      : API_URL + "/transactions/user";
+
+    return safeApiFetch(url).then((data) => {
+      const infoNeeded = adaptTransactions(data.data);
+      finalArray = [...finalArray, ...infoNeeded.array];
+
+      cursor = data.meta.nextCursor;
+      return getTransactionsTest(finalArray, cursor, false);
+    });
+  }
+  return { transactions: finalArray, cursor: cursor };
+}
+
+getTransactionsTest().then((data) => console.log(data));
