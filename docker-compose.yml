@@ -22,9 +22,6 @@ services:
         DATABASE_URL: postgresql://postgres:postgres@db:5432/dirhamy
     container_name: dirhamy-backend
     restart: always
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/dirhamy
-      PORT: "3000"
 
     depends_on:
       - db

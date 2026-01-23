@@ -1,4 +1,16 @@
-import { API_URL, safeApiFetch } from "../utils/utils.js";
+import { API_URL, safeApiFetch } from "../helpers/utils.js";
+
+const hamburgerIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><line x1="0" y1="3" x2="32" y2="3" stroke="#18212c" stroke-width="3" stroke-linecap="round"/><line x1="0" y1="12" x2="32" y2="12" stroke="#18212c" stroke-width="3" stroke-linecap="round"/><line x1="0" y1="21" x2="32" y2="21" stroke="#18212c" stroke-width="3" stroke-linecap="round"/></svg>`;
+
+const transactionIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><polyline points="4,7 14,7 11,4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="14" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="2"/><polyline points="20,17 10,17 13,20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+const categoryIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9-9-9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/></svg>`;
+
+const budgetIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" stroke-linejoin="round"/><path d="M16 3v4M8 3v4M2 11h20" stroke-linecap="round"/></svg>`;
+
+const chatbotIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke-linejoin="round"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/><path d="M9 14s1 1 3 1 3-1 3-1" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+const disconnectIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 3h8v18H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><polyline points="14,12 20,12 17,9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="12" x2="17" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
 
 function createSidebar() {
   const sidebar = document.createElement("div");
@@ -18,14 +30,8 @@ function createSidebar() {
         sidebarHeader.innerHTML = text;
         const btn = document.createElement("button");
         btn.classList.add("sidebar-resize-btn");
-        promises.push(
-          fetch("../../icons/sidebar-icons/hamburger-icon.svg")
-            .then((res) => res.text())
-            .then((text) => {
-              btn.innerHTML = text;
-              sidebarHeader.appendChild(btn);
-            }),
-        );
+        btn.innerHTML = hamburgerIcon;
+        sidebarHeader.appendChild(btn);
       }),
   );
 
@@ -41,16 +47,10 @@ function createSidebar() {
   const anchorOne = document.createElement("a");
   anchorOne.href = "../transactions/transactions.html";
 
-  promises.push(
-    fetch("../../icons/sidebar-icons/transactions-icon.svg")
-      .then((res) => res.text())
-      .then((text) => {
-        anchorOne.innerHTML = text;
-        const span = document.createElement("span");
-        span.textContent = "Transactions";
-        anchorOne.appendChild(span);
-      }),
-  );
+  anchorOne.innerHTML = transactionIcon;
+  const spanOne = document.createElement("span");
+  spanOne.textContent = "Transactions";
+  anchorOne.appendChild(spanOne);
   listItemOne.appendChild(anchorOne);
   list.appendChild(listItemOne);
 
@@ -59,16 +59,11 @@ function createSidebar() {
   const anchorTwo = document.createElement("a");
   anchorTwo.href = "../categories/categories.html";
 
-  promises.push(
-    fetch("../../icons/sidebar-icons/categories-icon.svg")
-      .then((res) => res.text())
-      .then((text) => {
-        anchorTwo.innerHTML = text;
-        const span = document.createElement("span");
-        span.textContent = "Categories";
-        anchorTwo.appendChild(span);
-      }),
-  );
+  anchorTwo.innerHTML = categoryIcon;
+  const spanTwo = document.createElement("span");
+  spanTwo.textContent = "Categories";
+  anchorTwo.appendChild(spanTwo);
+
   listItemTwo.appendChild(anchorTwo);
   list.appendChild(listItemTwo);
 
@@ -77,16 +72,11 @@ function createSidebar() {
   const anchorThree = document.createElement("a");
   anchorThree.href = "../budget/budget.html";
 
-  promises.push(
-    fetch("../../icons/sidebar-icons/budget-icon.svg")
-      .then((res) => res.text())
-      .then((text) => {
-        anchorThree.innerHTML = text;
-        const span = document.createElement("span");
-        span.textContent = "Budget";
-        anchorThree.appendChild(span);
-      }),
-  );
+  anchorThree.innerHTML = budgetIcon;
+  const spanThree = document.createElement("span");
+  spanThree.textContent = "Budget";
+  anchorThree.appendChild(spanThree);
+
   listItemThree.appendChild(anchorThree);
   list.appendChild(listItemThree);
 
@@ -95,16 +85,11 @@ function createSidebar() {
   const anchorFour = document.createElement("a");
   anchorFour.href = "../chatbot/chatbot.html";
 
-  promises.push(
-    fetch("../../icons/sidebar-icons/chatbot-icon.svg")
-      .then((res) => res.text())
-      .then((text) => {
-        anchorFour.innerHTML = text;
-        const span = document.createElement("span");
-        span.textContent = "Chatbot";
-        anchorFour.appendChild(span);
-      }),
-  );
+  anchorFour.innerHTML = chatbotIcon;
+  const spanFour = document.createElement("span");
+  spanFour.textContent = "Chatbot";
+  anchorFour.appendChild(spanFour);
+
   listItemFour.appendChild(anchorFour);
   list.appendChild(listItemFour);
 
@@ -131,16 +116,10 @@ function createSidebar() {
   const disconnectBtn = document.createElement("button");
   disconnectBtn.classList.add("sidebar-disconnect");
 
-  promises.push(
-    fetch("../../icons/sidebar-icons/disconnect-icon.svg")
-      .then((res) => res.text())
-      .then((text) => {
-        disconnectBtn.innerHTML = text;
-        const span = document.createElement("span");
-        span.textContent = "Disconnect";
-        disconnectBtn.appendChild(span);
-      }),
-  );
+  disconnectBtn.innerHTML = disconnectIcon;
+  const disconectSpan = document.createElement("span");
+  disconectSpan.textContent = "Disconnect";
+  disconnectBtn.appendChild(disconectSpan);
 
   disconnectBtn.addEventListener("click", (e) => {
     safeApiFetch(API_URL + "/auth/logout", {

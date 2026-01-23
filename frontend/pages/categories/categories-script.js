@@ -1,36 +1,35 @@
-/*
-  VERY IMPORTANT TODOS
-    add rerendering logic on fail fetching user if its not done already
-
-    refactor this 'res.ok -> toast' logic in a function if possible
-
-    maybe refactor the removeeventlistener logic its too much repetition
-*/
-
-import { displayToast } from "../../components/toast.js";
 import {
   loadInitialStructure,
-  deleteIcon,
-  editIcon,
-  API_URL,
   fetchAndRender,
-  showDeleteEntityModal,
+  API_URL,
   submitActionEntity,
-} from "../../utils/utils.js";
+  toastNotis,
+  switchToProcess,
+  removeSpinnerPage,
+  cancelSwitchToProcess,
+} from "../../helpers/utils.js";
+import {
+  showEditEntityModal,
+  showDeleteEntityModal,
+} from "../../helpers/modals.js";
+import { renderCategories } from "../../ui/category-ui.js";
 
 const user = {};
 
 // Create Initial Structure and populate the user object
 loadInitialStructure(user).then(() => {
   // write your code here
-  getCategories();
+  getCategories().then(() => {
+    removeSpinnerPage();
+    toastNotis();
+  });
 });
 
 wireTableEvents();
 
 document.querySelector(".add-entity-form").addEventListener("submit", (e) => {
   e.preventDefault();
-
+  switchToProcess(e.submitter);
   const nameFormField = document.querySelector("#name-form-field");
 
   submitActionEntity(
@@ -40,26 +39,15 @@ document.querySelector(".add-entity-form").addEventListener("submit", (e) => {
     },
     getCategories,
     "POST",
-  );
-
-  e.target.reset();
+  ).finally(() => {
+    cancelSwitchToProcess(e.submitter, "Add");
+    e.target.reset();
+  });
 });
 
 function getCategories() {
   return fetchAndRender(API_URL + "/categories", renderCategories);
 }
-
-function renderCategories(categories) {
-  const tableBody = document.querySelector("table.list-entity-container tbody");
-
-  tableBody.innerHTML = "";
-
-  categories.forEach((category) => {
-    const tableRow = createCategoryRow(category);
-    tableBody.appendChild(tableRow);
-  });
-}
-
 function wireTableEvents() {
   const tableBody = document.querySelector("table.list-entity-container tbody");
   tableBody.addEventListener("click", (e) => {
@@ -87,61 +75,32 @@ function wireTableEvents() {
     }
   });
 }
-function createCategoryRow(category) {
-  const tableRow = document.createElement("tr");
-  const categoryName = document.createElement("td");
-  categoryName.textContent = category.nom;
-
-  const actionBtnsRow = document.createElement("td");
-  actionBtnsRow.classList.add("action-btns");
-  actionBtnsRow.dataset.id = category.id;
-
-  actionBtnsRow.innerHTML = editIcon + deleteIcon;
-
-  tableRow.append(categoryName, actionBtnsRow);
-  return tableRow;
-}
 
 function showEditCategoryModal(category) {
-  const modalBackground = document.querySelector(".modal-background");
-  const editModal = document.querySelector(".edit-category-modal");
-
-  const nameField = editModal.querySelector("#category-name-field");
-
-  nameField.value = category.nom;
-
-  modalBackground.style.display = "block";
-  editModal.style.display = "block";
-
-  editModal.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    modalBackground.style.display = "none";
-    editModal.style.display = "none";
-
-    if (e.submitter.classList.contains("action-btn")) {
-      const newCategoryFields = {
-        nom: nameField.value,
+  const editCategoryModalBehavior = {
+    entity: category,
+    modal: document.querySelector(".edit-category-modal"),
+    fields: {
+      name: document.querySelector("#category-name-field"),
+    },
+    fillFields: function () {
+      this.fields.name.value = this.entity.nom;
+    },
+    getApiFields: function () {
+      return {
+        nom: this.fields.name.value,
       };
-      submitEditCategory(category, newCategoryFields);
-
-      editModal.parentElement.replaceChild(
-        editModal.cloneNode(true),
-        editModal,
-      );
-    } else if (e.submitter.classList.contains("cancel-btn")) {
-      // remove the event listener, to try using removeEventListener later
-      editModal.parentElement.replaceChild(
-        editModal.cloneNode(true),
-        editModal,
-      );
-    }
-  });
+    },
+    submitModal: function () {
+      return submitEditCategory(this.entity.id, this.getApiFields());
+    },
+  };
+  showEditEntityModal(editCategoryModalBehavior);
 }
 
-function submitEditCategory(category, newCategoryFields) {
+function submitEditCategory(categoryId, newCategoryFields) {
   return submitActionEntity(
-    API_URL + "/categories/" + category.id,
+    API_URL + "/categories/" + categoryId,
     newCategoryFields,
     getCategories,
     "PUT",
@@ -154,7 +113,7 @@ function showDeleteCategoryModal(category) {
 
 function submitDeleteCategory(categoryId) {
   return submitActionEntity(
-    API_URL + "/categories" + categoryId,
+    API_URL + "/categories/" + categoryId,
     null,
     getCategories,
     "DELETE",

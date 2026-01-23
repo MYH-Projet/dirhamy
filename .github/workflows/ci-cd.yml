@@ -2,7 +2,7 @@ name: Dirhamy CI/CD
 
 on:
   push:
-    branches: ["develop", "main"]
+    branches: ["develop", "master"]
   pull_request:
     branches: ["develop"]
 
@@ -70,7 +70,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     needs: tests
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master')
 
     steps:
       - uses: actions/checkout@v4
@@ -115,7 +115,7 @@ jobs:
   deploy-prod:
     runs-on: ubuntu-latest
     needs: tests
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
 
     steps:
       - name: Configure SSH agent

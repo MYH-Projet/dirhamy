@@ -103,7 +103,7 @@ model Transaction {
   categorieId Int
   categorie   Categorie @relation(fields: [categorieId], references: [id])
 
-  @@index([compteId, date, montant])
+  @@index([compteId, date, id, montant])
 }
 
 model BalanceSnapshot {

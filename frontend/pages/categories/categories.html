@@ -55,16 +55,22 @@
           name="category-name"
           id="category-name-field"
           class="form-field"
+          placeholder="New Category Name"
+          required
         />
       </div>
 
       <div class="action-btns modal-footer">
-        <button type="submit" class="cancel-btn">Cancel</button>
-        <button type="submit" class="action-btn">Save</button>
+        <button type="submit" class="cancel-btn" formnovalidate>Cancel</button>
+        <button type="submit" class="action-btn" disabled>Save</button>
       </div>
     </form>
     <div class="toasts-container"></div>
 
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading data needed...</p>
+    </div>
     <script src="./categories-script.js" type="module"></script>
   </body>
 </html>

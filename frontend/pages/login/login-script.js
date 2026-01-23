@@ -1,5 +1,9 @@
 import { displayToast } from "../../components/toast.js";
-import { toastNotis } from "../../utils/utils.js";
+import {
+  toastNotis,
+  switchToProcess,
+  cancelSwitchToProcess,
+} from "../../helpers/utils.js";
 
 const API_URL = "/api";
 
@@ -17,6 +21,8 @@ toastNotis();
 
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
+
+  switchToProcess(e.submitter);
 
   fetch(API_URL + "/auth/login", {
     method: "POST",
@@ -43,5 +49,8 @@ loginForm.addEventListener("submit", (e) => {
     })
     .catch((err) => {
       displayToast(toastContainer, err.message, "error");
+    })
+    .finally(() => {
+      cancelSwitchToProcess(e.submitter, "Sign in");
     });
 });
