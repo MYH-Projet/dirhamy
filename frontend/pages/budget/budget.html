@@ -48,21 +48,22 @@
         />
       </div>
       <div class="form-unit last-unit">
-        <label for="category-name-field" class="form-label"
+        <label for="edit-category-limit-field" class="form-label"
           >Monthly Limit (DH)</label
         >
         <input
-          type="text"
+          type="number"
           name="category-name"
           id="edit-category-limit-field"
           class="form-field"
           placeholder="e.g. 2000"
+          required
         />
       </div>
 
       <div class="action-btns modal-footer">
-        <button type="submit" class="cancel-btn">Cancel</button>
-        <button type="submit" class="action-btn">Save</button>
+        <button type="submit" class="cancel-btn" formnovalidate>Cancel</button>
+        <button type="submit" class="action-btn" disabled>Save</button>
       </div>
     </form>
     <form action="" class="modal action-modal add-budget-modal">
@@ -73,6 +74,7 @@
           name="category-choice"
           id="category-choices"
           class="form-field"
+          required
         ></select>
       </div>
       <div class="form-unit last-unit">
@@ -80,18 +82,23 @@
           >Monthly Limit (DH)</label
         >
         <input
-          type="text"
+          type="number"
           name="category-limit"
           id="add-category-limit-field"
           class="form-field"
           placeholder="e.g. 2000"
+          required
         />
       </div>
       <div class="action-btns modal-footer">
-        <button type="submit" class="cancel-btn">Cancel</button>
+        <button type="submit" class="cancel-btn" formnovalidate>Cancel</button>
         <button type="submit" class="action-btn">Set Limit</button>
       </div>
     </form>
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading data needed...</p>
+    </div>
     <div class="toasts-container"></div>
     <script src="./budget-script.js" type="module"></script>
   </body>

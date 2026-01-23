@@ -445,6 +445,7 @@ table.list-entity-container {
   tr {
     display: flex;
     flex-direction: row;
+    align-items: center;
   }
 
   tbody tr {
@@ -532,8 +533,6 @@ table.list-entity-container {
   flex-direction: column;
   gap: var(--normal-spacing);
 
-  transform: translateY(-50%) translateX(-50%);
-
   border: none;
   border-radius: var(--border-radius);
 
@@ -616,6 +615,10 @@ table.list-entity-container {
   .action-btn:hover {
     background-color: #10b7a9;
   }
+  .action-btn:disabled {
+    background-color: #a1a1a1;
+    cursor: auto;
+  }
   .delete-btn {
     background-color: #e02727;
     color: var(--secondary-color);
@@ -659,5 +662,101 @@ table.list-entity-container {
   p {
     font-size: 15px;
     color: rgb(69, 73, 78);
+  }
+}
+
+.switch-on-modal {
+  display: block !important;
+}
+.switch-on-modal.modal {
+  animation-name: modalTransition;
+  animation-duration: 0.15s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes modalTransition {
+  from {
+    transform: translateY(-50%) translateX(-50%);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateY(-52%) translateX(-50%);
+    opacity: 1;
+  }
+}
+
+.modal .action-btn:disabled,
+.sign-in-btn:disabled,
+.add-entity-form .form-submit-btn:disabled {
+  background-color: #0d948887 !important;
+}
+
+.modal .delete-btn:disabled {
+  background-color: #e027279c !important;
+}
+
+.pause-page-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  z-index: 1000;
+
+  background-color: transparent;
+}
+
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  z-index: 1000;
+
+  background-color: var(--lightest-gray-color);
+
+  transition: opacity 0.1s;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  opacity: 1;
+  border: 4px solid var(--black-text-color);
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+.loading-text {
+  color: var(--black-text-color);
+
+  font-weight: 500;
+}
+.no-opacity {
+  opacity: 0 !important;
+}
+
+.no-display {
+  display: none !important;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotateZ(0);
+  }
+  to {
+    transform: rotateZ(360deg);
   }
 }
