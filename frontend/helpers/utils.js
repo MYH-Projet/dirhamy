@@ -31,13 +31,13 @@ export function submitActionEntity(url, newFields, refreshCallback, verb) {
     // even if delete its fine since the backend doesn't read the body and you're sending empty body
     body: JSON.stringify(newFields || { data: "" }),
   }).then((data) => {
-    return refreshCallback().then(
+    return refreshCallback().then(() => {
       displayToast(
         document.querySelector(".toasts-container"),
         data.message || "Success",
         "success",
-      ),
-    );
+      );
+    });
   });
 }
 
