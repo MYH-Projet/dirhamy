@@ -56,9 +56,10 @@ services:
       - "8080:80"
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/usr/share/nginx/html:Z
-  
+    # Volume mount disabled due to file corruption on Windows
+    # volumes:
+    #   - ./frontend:/usr/share/nginx/html:Z
+
   redis:
     image: redis:7.4-alpine
     container_name: dirhamy-cache
