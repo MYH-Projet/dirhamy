@@ -114,7 +114,7 @@ jobs:
   # ----------------------------
   deploy-prod:
     runs-on: ubuntu-latest
-    needs: tests
+    needs: [tests, build-and-push]
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
 
     steps:
