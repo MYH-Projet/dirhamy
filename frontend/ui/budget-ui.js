@@ -107,6 +107,18 @@ function createBudgetCard(budgetStatus) {
   return budgetCard;
 }
 
+const message = async () => {
+  const response = await fetch("/api/ai/insight", {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+    },
+  });
+  console.log("insights", response);
+  if (!response.ok) throw new Error("Network error");
+  const data = await response.json();
+};
+
 function budgetPercentages(percentage) {
   const suffixProgress = "progress-used";
   const suffixMessage = "budget-status";
@@ -115,28 +127,28 @@ function budgetPercentages(percentage) {
       progressUsedClass: "good-" + suffixProgress,
       cardMessageClass: "good-" + suffixMessage,
       cardIcon: goodIcon,
-      cardMessage: `Doing great`,
+      cardMessage: "hi " + message(),
     };
   } else if (percentage < 81) {
     return {
       progressUsedClass: "on-track-" + suffixProgress,
       cardMessageClass: "on-track-" + suffixMessage,
       cardIcon: onTrackIcon,
-      cardMessage: `On track`,
+      cardMessage: message(),
     };
   } else if (percentage <= 100) {
     return {
       progressUsedClass: "warning-" + suffixProgress,
       cardMessageClass: "warning-" + suffixMessage,
       cardIcon: warningIcon,
-      cardMessage: `Warning`,
+      cardMessage: message(),
     };
   } else {
     return {
       progressUsedClass: "over-" + suffixProgress,
       cardMessageClass: "over-" + suffixMessage,
       cardIcon: overIcon,
-      cardMessage: `Over budget`,
+      cardMessage: message(),
     };
   }
 }
