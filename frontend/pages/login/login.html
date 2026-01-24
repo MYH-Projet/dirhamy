@@ -7,15 +7,140 @@
     <link rel="stylesheet" href="./login-style.css" />
   </head>
   <body>
-    <div class="card primary-card login-box">
+    <div class="card primary-card box login-box">
       <img
         src="../../icons/logo.svg"
         width="180"
         alt="Dirhamy Logo"
         class="logo-icon"
       />
-      <p class="login-box-text">Please enter your details to sign in.</p>
+      <p class="box-text">Please enter your details to sign in.</p>
+      <form action="" class="box-form">
+        <label for="login-mail-input" class="form-label">Email Address</label>
+        <input
+          type="email"
+          name="mail"
+          id="login-mail-input"
+          placeholder="example@example.com"
+          required
+        />
+        <label for="login-pass-input" class="form-label">
+          <p>Password</p>
+          <a href="" class="form-forgot-password">Forgot password?</a>
+        </label>
+        <input
+          type="password"
+          name="password"
+          id="login-pass-input"
+          placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
+          minlength="8"
+          required
+        />
+        <button type="submit" class="btn box-submit-btn">Sign in</button>
+      </form>
+      <p class="box-text">
+        Don't have an account? <a href="../register/register.html">Sign up</a>
+      </p>
+    </div>
+    <div class="card primary-card forgot-pass-box">
+      <img
+        src="../../icons/logo.svg"
+        width="180"
+        alt="Dirhamy Logo"
+        class="logo-icon"
+      />
+      <p class="forgot-pass-box-text">Please enter your email.</p>
+      <form action="" class="forgot-pass-form">
+        <label for="form-mail-input" class="form-label">Email Address</label>
+        <input
+          type="email"
+          name="mail"
+          id="form-mail-input"
+          placeholder="example@example.com"
+          required
+        />
+        <button type="submit" class="btn forgot-pass-btn">Send</button>
+      </form>
+      <p class="login-box-text">
+        Don't have an account? <a href="../register/register.html">Sign up</a>
+      </p>
+    </div>
+    <div class="card primary-card box verify-code-box">
+      <img
+        src="../../icons/logo.svg"
+        width="180"
+        alt="Dirhamy Logo"
+        class="logo-icon"
+      />
+      <p class="verify-code-box-text">Please enter verification code.</p>
+      <form action="" class="verify-code-form">
+        <label for="form-mail-input" class="form-label"
+          >Verification Code</label
+        >
+        <input
+          type="email"
+          name="mail"
+          id="form-mail-input"
+          placeholder="example@example.com"
+          required
+        />
+        <button type="submit" class="btn verify-code-btn">Send</button>
+      </form>
+      <p class="login-box-text">
+        Don't have an account? <a href="../register/register.html">Sign up</a>
+      </p>
+    </div>
+    <div class="card primary-card reset-pass-box">
+      <img
+        src="../../icons/logo.svg"
+        width="180"
+        alt="Dirhamy Logo"
+        class="logo-icon"
+      />
+      <p class="reset-pass-box-text">Please enter verification code.</p>
+      <form action="" class="reset-pass-form">
+        <label for="form-mail-input" class="form-label"
+          >Verification Code</label
+        >
+        <input
+          type="email"
+          name="mail"
+          id="form-mail-input"
+          placeholder="example@example.com"
+          required
+        />
+        <button type="submit" class="btn reset-pass-btn">Send</button>
+      </form>
+      <p class="login-box-text">
+        Don't have an account? <a href="../register/register.html">Sign up</a>
+      </p>
+    </div>
+
+    <div class="card primary-card box register-box">
+      <img
+        src="../../icons/logo.svg"
+        width="180"
+        alt="Dirhamy Logo"
+        class="logo-icon"
+      />
+      <p class="login-box-text">Please enter your details to sign up.</p>
       <form action="" class="login-form">
+        <label for="form-first-name-input" class="form-label">First Name</label>
+        <input
+          type="text"
+          name="first-name"
+          id="form-first-name-input"
+          placeholder="e.g. John"
+          required
+        />
+        <label for="form-last-name-input" class="form-label">Last Name</label>
+        <input
+          type="text"
+          name="last-name"
+          id="form-last-name-input"
+          placeholder="e.g. Doe"
+          required
+        />
         <label for="form-mail-input" class="form-label">Email Address</label>
         <input
           type="email"
@@ -26,9 +151,6 @@
         />
         <label for="form-pass-input" class="form-label">
           <p>Password</p>
-          <a href="./index.html" class="form-forgot-password"
-            >Forgot password?</a
-          >
         </label>
         <input
           type="password"
@@ -38,10 +160,21 @@
           minlength="8"
           required
         />
-        <button type="submit" class="btn sign-in-btn">Sign in</button>
+        <label for="form-confirm-pass-input" class="form-label">
+          <p>Confirm Password</p>
+        </label>
+        <input
+          type="password"
+          name="password"
+          id="form-confirm-pass-input"
+          placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
+          minlength="8"
+          required
+        />
+        <button type="submit" class="btn sign-in-btn">Sign up</button>
       </form>
       <p class="login-box-text">
-        Don't have an account? <a href="../register/register.html">Sign up</a>
+        Already have an account? <a href="../login/login.html">Sign in</a>
       </p>
     </div>
 

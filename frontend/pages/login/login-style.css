@@ -6,7 +6,7 @@ body {
   background-color: var(--lightest-gray-color);
 }
 
-.login-box {
+.box {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -24,7 +24,7 @@ body {
     margin-bottom: var(--s-spacing);
   }
 
-  .login-box-header {
+  .box-header {
     color: var(--black-text-color);
     margin-bottom: var(--s-spacing);
 
@@ -32,7 +32,7 @@ body {
     font-weight: bold;
   }
 
-  .login-form {
+  .box-form {
     display: flex;
     flex-direction: column;
 
@@ -65,7 +65,7 @@ body {
       color: var(--primary-color);
     }
 
-    .sign-in-btn {
+    .box-submit-btn {
       font-weight: bold;
 
       margin-top: var(--s-spacing);
@@ -73,7 +73,7 @@ body {
     }
   }
 
-  .login-box-text {
+  .box-text {
     color: var(--gray-color);
     margin-bottom: 24px;
     font-size: 14px;
@@ -83,6 +83,10 @@ body {
       color: var(--primary-color);
     }
   }
+}
+
+.register-box {
+  margin-top: 10vh;
 }
 
 .copyright-text {

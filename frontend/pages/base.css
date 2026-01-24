@@ -741,7 +741,7 @@ table.list-entity-container {
 }
 
 .modal .action-btn:disabled,
-.sign-in-btn:disabled,
+.submit-btn:disabled,
 .add-entity-form .form-submit-btn:disabled {
   background-color: #0d948887 !important;
 }
