@@ -116,6 +116,7 @@ async function main() {
             description: 'ATM Withdrawal - Out',
             compteId: bankAccount.id,
             categorieId: catTransport.id,
+            idDestination:cashWallet.id
           },
           // 2. Money entering Cash (Positive)
           {
@@ -125,6 +126,7 @@ async function main() {
             description: 'ATM Withdrawal - In',
             compteId: cashWallet.id,
             categorieId: catTransport.id,
+            idDestination:bankAccount.id
           }
         ]
       }
