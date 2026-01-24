@@ -83,6 +83,11 @@ body {
       color: var(--primary-color);
     }
   }
+  form .box-text {
+    align-self: center;
+    margin-top: var(--large-spacing);
+    margin-bottom: 0;
+  }
 }
 
 .register-box {
