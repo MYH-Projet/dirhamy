@@ -20,9 +20,9 @@ interface UpdateTransactionData {
   categorieId: number;
 }
 
-export const checkAccount = async (compteId: number,categorieId:number, userId: number) => {
+export const checkAccount = async (compteId: number,idDestination:number,categorieId:number, userId: number) => {
     console.log("i m about giting checked")
-  const isHasAccount = await prisma.compte.findFirst({
+  const isHasAccount = await prisma.compte.findUnique({
     where: {
       id: compteId,
       utilisateurId: userId
@@ -36,11 +36,21 @@ export const checkAccount = async (compteId: number,categorieId:number, userId: 
     }
   })
 
+  const isHasDestinationAccount = await prisma.compte.findUnique({
+    where: {
+      id: idDestination,
+      utilisateurId: userId
+    }
+  })
+
   if (!isHasAccount) {
     throw new AppError("Forbidden: You do not own this source account", 403);
   }
   if (!isHasCategory) {
     throw new AppError("Forbidden: You do not own this category", 403);
+  }
+  if (!isHasDestinationAccount) {
+    throw new AppError("Forbidden: You do not own destination account", 403);
   }
 };
 
