@@ -32,6 +32,20 @@ function createSidebar() {
         btn.classList.add("sidebar-resize-btn");
         btn.innerHTML = hamburgerIcon;
         sidebarHeader.appendChild(btn);
+        btn.addEventListener("click", (e) => {
+          sidebar.classList.toggle("sidebar-collapsed");
+          document
+            .querySelector(".main-container")
+            .classList.toggle("main-container-expanded");
+
+          const timeout = sidebar.classList.contains("sidebar-collapsed")
+            ? 140
+            : 60;
+
+          setTimeout(() => {
+            sidebar.classList.toggle("sidebar-collapsed-later");
+          }, timeout);
+        });
       }),
   );
 
@@ -45,6 +59,7 @@ function createSidebar() {
   const listItemOne = document.createElement("li");
   listItemOne.classList.add("sidebar-link");
   const anchorOne = document.createElement("a");
+  anchorOne.id = "transactions-link";
   anchorOne.href = "../transactions/transactions.html";
 
   anchorOne.innerHTML = transactionIcon;
@@ -58,6 +73,7 @@ function createSidebar() {
   listItemTwo.classList.add("sidebar-link");
   const anchorTwo = document.createElement("a");
   anchorTwo.href = "../categories/categories.html";
+  anchorTwo.id = "categories-link";
 
   anchorTwo.innerHTML = categoryIcon;
   const spanTwo = document.createElement("span");
@@ -71,6 +87,7 @@ function createSidebar() {
   listItemThree.classList.add("sidebar-link");
   const anchorThree = document.createElement("a");
   anchorThree.href = "../budget/budget.html";
+  anchorThree.id = "budget-link";
 
   anchorThree.innerHTML = budgetIcon;
   const spanThree = document.createElement("span");
@@ -84,6 +101,7 @@ function createSidebar() {
   listItemFour.classList.add("sidebar-link");
   const anchorFour = document.createElement("a");
   anchorFour.href = "../chatbot/chatbot.html";
+  anchorFour.id = "chatbot-link";
 
   anchorFour.innerHTML = chatbotIcon;
   const spanFour = document.createElement("span");
@@ -151,4 +169,11 @@ export function insertSidebar(container) {
   });
 }
 
-export function focusCurrentSidebarLink() {}
+export function focusCurrentSidebarLink() {
+  const currentPage = window.location.pathname
+    .split("/")[3]
+    .replace(".html", "");
+  const anchorLink = document.querySelector("#" + currentPage + "-link");
+
+  anchorLink.classList.add("current-link");
+}
