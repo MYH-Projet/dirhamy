@@ -75,6 +75,7 @@ export function safeApiFetch(url, parameterObject) {
             "error",
           );
         });
+        return Promise.reject();
       });
   });
 }
