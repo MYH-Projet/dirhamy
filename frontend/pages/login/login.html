@@ -39,9 +39,78 @@
         <button type="submit" class="btn box-submit-btn">Sign in</button>
       </form>
       <p class="box-text">
-        Don't have an account? <a href="../register/register.html">Sign up</a>
+        Don't have an account? <a href="" class="register-link">Sign up</a>
       </p>
     </div>
+
+    <div class="card primary-card box register-box">
+      <img
+        src="../../icons/logo.svg"
+        width="180"
+        alt="Dirhamy Logo"
+        class="logo-icon"
+      />
+      <p class="box-text">Please enter your details to sign up.</p>
+      <form action="" class="box-form">
+        <label for="register-first-name-input" class="form-label"
+          >First Name</label
+        >
+        <input
+          type="text"
+          name="first-name"
+          id="register-first-name-input"
+          placeholder="e.g. John"
+          required
+        />
+        <label for="register-last-name-input" class="form-label"
+          >Last Name</label
+        >
+        <input
+          type="text"
+          name="last-name"
+          id="register-last-name-input"
+          placeholder="e.g. Doe"
+          required
+        />
+        <label for="register-mail-input" class="form-label"
+          >Email Address</label
+        >
+        <input
+          type="email"
+          name="mail"
+          id="register-mail-input"
+          placeholder="example@example.com"
+          required
+        />
+        <label for="register-pass-input" class="form-label">
+          <p>Password</p>
+        </label>
+        <input
+          type="password"
+          name="password"
+          id="register-pass-input"
+          placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
+          minlength="8"
+          required
+        />
+        <label for="register-confirm-pass-input" class="form-label">
+          <p>Confirm Password</p>
+        </label>
+        <input
+          type="password"
+          name="password"
+          id="register-confirm-pass-input"
+          placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
+          minlength="8"
+          required
+        />
+        <button type="submit" class="btn box-submit-btn">Sign up</button>
+      </form>
+      <p class="box-text">
+        Already have an account? <a class="login-link" href="">Sign in</a>
+      </p>
+    </div>
+
     <div class="card primary-card forgot-pass-box">
       <img
         src="../../icons/logo.svg"
@@ -113,68 +182,6 @@
       </form>
       <p class="login-box-text">
         Don't have an account? <a href="../register/register.html">Sign up</a>
-      </p>
-    </div>
-
-    <div class="card primary-card box register-box">
-      <img
-        src="../../icons/logo.svg"
-        width="180"
-        alt="Dirhamy Logo"
-        class="logo-icon"
-      />
-      <p class="login-box-text">Please enter your details to sign up.</p>
-      <form action="" class="login-form">
-        <label for="form-first-name-input" class="form-label">First Name</label>
-        <input
-          type="text"
-          name="first-name"
-          id="form-first-name-input"
-          placeholder="e.g. John"
-          required
-        />
-        <label for="form-last-name-input" class="form-label">Last Name</label>
-        <input
-          type="text"
-          name="last-name"
-          id="form-last-name-input"
-          placeholder="e.g. Doe"
-          required
-        />
-        <label for="form-mail-input" class="form-label">Email Address</label>
-        <input
-          type="email"
-          name="mail"
-          id="form-mail-input"
-          placeholder="example@example.com"
-          required
-        />
-        <label for="form-pass-input" class="form-label">
-          <p>Password</p>
-        </label>
-        <input
-          type="password"
-          name="password"
-          id="form-pass-input"
-          placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
-          minlength="8"
-          required
-        />
-        <label for="form-confirm-pass-input" class="form-label">
-          <p>Confirm Password</p>
-        </label>
-        <input
-          type="password"
-          name="password"
-          id="form-confirm-pass-input"
-          placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
-          minlength="8"
-          required
-        />
-        <button type="submit" class="btn sign-in-btn">Sign up</button>
-      </form>
-      <p class="login-box-text">
-        Already have an account? <a href="../login/login.html">Sign in</a>
       </p>
     </div>
 

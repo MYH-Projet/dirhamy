@@ -32,6 +32,8 @@ document.querySelector(".copyright-year").textContent =
 
 toastNotis();
 
+wirePageTransitionEvents();
+
 function changePageTitle(page) {
   const title = pageNameToTitle[page];
 }
@@ -48,7 +50,23 @@ function showPage(page) {
   boxes[page].style.display = "flex";
 }
 
-function wirePageTransitionEvents() {}
+function wirePageTransitionEvents() {
+  document
+    .querySelector(".login-box .register-link")
+    .addEventListener("click", (e) => {
+      e.preventDefault();
+      showPage("register");
+      document.querySelector(".login-box .box-form").reset();
+    });
+
+  document
+    .querySelector(".register-box .login-link")
+    .addEventListener("click", (e) => {
+      e.preventDefault();
+      showPage("login");
+      document.querySelector(".register-box .box-form").reset();
+    });
+}
 
 document
   .querySelector(".login-box .box-form")
@@ -66,16 +84,17 @@ document
         mail: document.querySelector("#login-mail-input").value,
         password: document.querySelector("#login-pass-input").value,
       }),
-    }).then((data) => {
-      sessionStorage.setItem(
-        "toast",
-        JSON.stringify({ type: "success", message: data.message }),
-      );
-      window.location.replace("../transactions/transactions.html");
-    });
-  })
-  .finally(() => {
-    cancelSwitchToProcess(e.submitter, "Sign in");
+    })
+      .then((data) => {
+        sessionStorage.setItem(
+          "toast",
+          JSON.stringify({ type: "success", message: data.message }),
+        );
+        window.location.replace("../transactions/transactions.html");
+      })
+      .finally(() => {
+        cancelSwitchToProcess(e.submitter, "Sign in");
+      });
   });
 
 document
@@ -104,8 +123,8 @@ document
         })
         .finally(() => {
           cancelSwitchToProcess(e.submitter, "Sign up");
+          e.target.reset();
         });
-      e.target.reset();
     } else {
       displayToast(toastContainer, "Passwords don't match", "error");
     }
@@ -113,7 +132,7 @@ document
 
 function validatePasswordMatching() {
   return (
-    document.querySelector("#form-pass-input").value ===
-    document.querySelector("#form-confirm-pass-input").value
+    document.querySelector("#register-pass-input").value ===
+    document.querySelector("#register-confirm-pass-input").value
   );
 }
