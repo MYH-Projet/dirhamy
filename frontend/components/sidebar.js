@@ -32,6 +32,20 @@ function createSidebar() {
         btn.classList.add("sidebar-resize-btn");
         btn.innerHTML = hamburgerIcon;
         sidebarHeader.appendChild(btn);
+        btn.addEventListener("click", (e) => {
+          sidebar.classList.toggle("sidebar-collapsed");
+          document
+            .querySelector(".main-container")
+            .classList.toggle("main-container-expanded");
+
+          const timeout = sidebar.classList.contains("sidebar-collapsed")
+            ? 140
+            : 60;
+
+          setTimeout(() => {
+            sidebar.classList.toggle("sidebar-collapsed-later");
+          }, timeout);
+        });
       }),
   );
 
@@ -151,4 +165,12 @@ export function insertSidebar(container) {
   });
 }
 
-export function focusCurrentSidebarLink() {}
+export function focusCurrentSidebarLink() {
+  const currentPage = window.location.pathname
+    .split("/")[3]
+    .replace(".html", "");
+  switch(currentPage) {
+    case "transactions":
+      break;
+  };
+}
