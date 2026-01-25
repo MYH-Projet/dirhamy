@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/MYH-Projet/dirhamy#readme",
   "devDependencies": {
+    "@testcontainers/postgresql": "^11.11.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
@@ -35,6 +36,7 @@
     "experss": "^0.0.1-security",
     "prisma": "^7.3.0",
     "supertest": "^7.1.4",
+    "testcontainers": "^11.11.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.17",
