@@ -1,5 +1,5 @@
-import { renderInitialStucture } from "../ui/common-ui.js";
-import { displayToast } from "../components/toast.js";
+import { renderInitialStucture } from "/ui/common-ui.js";
+import { displayToast } from "/components/toast.js";
 
 export const API_URL = "/api";
 
@@ -46,6 +46,7 @@ export function safeApiFetch(url, parameterObject) {
     return res
       .json()
       .then((data) => {
+        console.log(res);
         if (res.ok) {
           return data;
         } else if (res.status === 401 || res.status === 403) {
@@ -56,7 +57,8 @@ export function safeApiFetch(url, parameterObject) {
               message: data.error || data.message || "Logged out",
             }),
           );
-          window.location.replace("../login/login.html");
+          window.location.replace("/login");
+          return Promise.reject();
         } else {
           let errorToSend = [{ message: "Some type of error" }];
           if (data.error) {

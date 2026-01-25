@@ -1,6 +1,6 @@
 /* style.css */
 
-@import url("../base.css");
+@import url("/base.css");
 
 body {
   background-color: var(--lightest-gray-color);

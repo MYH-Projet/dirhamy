@@ -1,11 +1,11 @@
-import { displayToast } from "../../components/toast.js";
+import { displayToast } from "/components/toast.js";
 import {
   API_URL,
   toastNotis,
   switchToProcess,
   cancelSwitchToProcess,
   safeApiFetch,
-} from "../../helpers/utils.js";
+} from "/helpers/utils.js";
 
 const boxes = {
   login: document.querySelector(".login-box"),
@@ -105,7 +105,7 @@ document
           "toast",
           JSON.stringify({ type: "success", message: data.message }),
         );
-        window.location.replace("../transactions/transactions.html");
+        window.location.replace("/transactions");
       })
       .finally(() => {
         cancelSwitchToProcess(e.submitter, "Sign in");

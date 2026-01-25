@@ -7,12 +7,9 @@ import {
   switchToProcess,
   removeSpinnerPage,
   cancelSwitchToProcess,
-} from "../../helpers/utils.js";
-import {
-  showEditEntityModal,
-  showDeleteEntityModal,
-} from "../../helpers/modals.js";
-import { renderCategories } from "../../ui/category-ui.js";
+} from "/helpers/utils.js";
+import { showEditEntityModal, showDeleteEntityModal } from "/helpers/modals.js";
+import { renderCategories } from "/ui/category-ui.js";
 
 const user = {};
 
