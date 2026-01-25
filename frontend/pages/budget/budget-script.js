@@ -6,14 +6,14 @@ import {
   toastNotis,
   switchToProcess,
   removeSpinnerPage,
-} from "/helpers/utils.js";
+} from "../../helpers/utils.js";
 import {
   showEditEntityModal,
   showDeleteEntityModal,
   closeModalsAndRemoveEvents,
-} from "/helpers/modals.js";
+} from "../../helpers/modals.js";
 
-import { renderBudgetStatuses } from "/ui/budget-ui.js";
+import { renderBudgetStatuses } from "../../ui/budget-ui.js";
 
 const user = {};
 

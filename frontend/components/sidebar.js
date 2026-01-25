@@ -1,4 +1,4 @@
-import { API_URL, safeApiFetch } from "/helpers/utils.js";
+import { API_URL, safeApiFetch } from "../helpers/utils.js";
 
 const hamburgerIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><line x1="0" y1="3" x2="32" y2="3" stroke="#18212c" stroke-width="3" stroke-linecap="round"/><line x1="0" y1="12" x2="32" y2="12" stroke="#18212c" stroke-width="3" stroke-linecap="round"/><line x1="0" y1="21" x2="32" y2="21" stroke="#18212c" stroke-width="3" stroke-linecap="round"/></svg>`;
 
@@ -24,7 +24,7 @@ function createSidebar() {
   sidebarHeader.classList.add("sidebar-header");
 
   promises.push(
-    fetch("/icons/logo.svg")
+    fetch("../../icons/logo.svg")
       .then((res) => res.text())
       .then((text) => {
         sidebarHeader.innerHTML = text;
@@ -32,20 +32,6 @@ function createSidebar() {
         btn.classList.add("sidebar-resize-btn");
         btn.innerHTML = hamburgerIcon;
         sidebarHeader.appendChild(btn);
-        btn.addEventListener("click", (e) => {
-          sidebar.classList.toggle("sidebar-collapsed");
-          document
-            .querySelector(".main-container")
-            .classList.toggle("main-container-expanded");
-
-          const timeout = sidebar.classList.contains("sidebar-collapsed")
-            ? 140
-            : 60;
-
-          setTimeout(() => {
-            sidebar.classList.toggle("sidebar-collapsed-later");
-          }, timeout);
-        });
       }),
   );
 
@@ -59,8 +45,7 @@ function createSidebar() {
   const listItemOne = document.createElement("li");
   listItemOne.classList.add("sidebar-link");
   const anchorOne = document.createElement("a");
-  anchorOne.id = "transactions-link";
-  anchorOne.href = "/transactions";
+  anchorOne.href = "../transactions/transactions.html";
 
   anchorOne.innerHTML = transactionIcon;
   const spanOne = document.createElement("span");
@@ -72,8 +57,7 @@ function createSidebar() {
   const listItemTwo = document.createElement("li");
   listItemTwo.classList.add("sidebar-link");
   const anchorTwo = document.createElement("a");
-  anchorTwo.href = "/categories";
-  anchorTwo.id = "categories-link";
+  anchorTwo.href = "../categories/categories.html";
 
   anchorTwo.innerHTML = categoryIcon;
   const spanTwo = document.createElement("span");
@@ -86,8 +70,7 @@ function createSidebar() {
   const listItemThree = document.createElement("li");
   listItemThree.classList.add("sidebar-link");
   const anchorThree = document.createElement("a");
-  anchorThree.href = "/budget";
-  anchorThree.id = "budget-link";
+  anchorThree.href = "../budget/budget.html";
 
   anchorThree.innerHTML = budgetIcon;
   const spanThree = document.createElement("span");
@@ -100,8 +83,7 @@ function createSidebar() {
   const listItemFour = document.createElement("li");
   listItemFour.classList.add("sidebar-link");
   const anchorFour = document.createElement("a");
-  anchorFour.href = "/chatbot";
-  anchorFour.id = "chatbot-link";
+  anchorFour.href = "../chatbot/chatbot.html";
 
   anchorFour.innerHTML = chatbotIcon;
   const spanFour = document.createElement("span");
@@ -147,7 +129,7 @@ function createSidebar() {
         "toast",
         JSON.stringify({ type: "success", message: "Logout sucessful" }),
       );
-      window.location.replace("/login");
+      window.location.replace("../login/login.html");
     });
   });
 
@@ -169,10 +151,4 @@ export function insertSidebar(container) {
   });
 }
 
-export function focusCurrentSidebarLink() {
-  const currentPage = window.location.pathname.slice(1);
-
-  const anchorLink = document.querySelector("#" + currentPage + "-link");
-
-  anchorLink.classList.add("current-link");
-}
+export function focusCurrentSidebarLink() {}

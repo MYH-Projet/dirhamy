@@ -1,5 +1,5 @@
-import { deleteIcon, editIcon } from "/ui/common-ui.js";
-import { getKeyByValue } from "/helpers/utils.js";
+import { deleteIcon, editIcon } from "./common-ui.js";
+import { getKeyByValue } from "../helpers/utils.js";
 
 const getTransactionTypeClass = {
   DEPENSE: "expense-color",

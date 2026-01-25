@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register Page</title>
+    <link rel="stylesheet" href="./register-style.css" />
+  </head>
+  <body>
+    <div class="card primary-card login-box" id="register-box">
+      <img
+        src="../../icons/logo.svg"
+        width="180"
+        alt="Dirhamy Logo"
+        class="logo-icon"
+      />
+      <p class="login-box-text">Please enter your details to sign up.</p>
+      <form action="" class="login-form">
+        <label for="form-first-name-input" class="form-label">First Name</label>
+        <input
+          type="text"
+          name="first-name"
+          id="form-first-name-input"
+          placeholder="e.g. John"
+          required
+        />
+        <label for="form-last-name-input" class="form-label">Last Name</label>
+        <input
+          type="text"
+          name="last-name"
+          id="form-last-name-input"
+          placeholder="e.g. Doe"
+          required
+        />
+        <label for="form-mail-input" class="form-label">Email Address</label>
+        <input
+          type="email"
+          name="mail"
+          id="form-mail-input"
+          placeholder="example@example.com"
+          required
+        />
+        <label for="form-pass-input" class="form-label">
+          <p>Password</p>
+        </label>
+        <input
+          type="password"
+          name="password"
+          id="form-pass-input"
+          placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
+          minlength="8"
+          required
+        />
+        <label for="form-confirm-pass-input" class="form-label">
+          <p>Confirm Password</p>
+        </label>
+        <input
+          type="password"
+          name="password"
+          id="form-confirm-pass-input"
+          placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
+          minlength="8"
+          required
+        />
+        <button type="submit" class="btn sign-in-btn">Sign up</button>
+      </form>
+      <p class="login-box-text">
+        Already have an account? <a href="../login/login.html">Sign in</a>
+      </p>
+    </div>
+
+    <p class="copyright-text">
+      &copy; <span class="copyright-year"></span> Dirhamy Inc. All rights
+      reserved.
+    </p>
+    <div class="toasts-container"></div>
+    <script type="module" src="./register-script.js"></script>
+  </body>
+</html>

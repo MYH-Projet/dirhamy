@@ -29,14 +29,17 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-cron.schedule('0 0 * * *', () => {
-  console.log('Cron Triggered: Running Snapshot Worker');
-  generateDailySnapshots();
-});
-cron.schedule("0 0 */15 * *", () => {
-  updateBudgetSnapshots()
-    .catch(e => console.error("Job Failed:", e));
-});
+
+if (process.env.NODE_ENV !== 'test') {
+  cron.schedule('0 0 * * *', () => {
+    console.log('Cron Triggered: Running Snapshot Worker');
+    generateDailySnapshots();
+  });
+  cron.schedule("0 0 */15 * *", () => {
+    updateBudgetSnapshots()
+      .catch(e => console.error("Job Failed:", e));
+  });
+}
 
 
 

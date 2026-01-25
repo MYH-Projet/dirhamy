@@ -4,216 +4,45 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login Page</title>
-    <link rel="stylesheet" href="/login/login-style.css" />
-    <link rel="icon" type="image/svg+xml" size="" href="/icons/favicon.svg" />
+    <link rel="stylesheet" href="./login-style.css" />
   </head>
   <body>
-    <div class="card primary-card box login-box">
+    <div class="card primary-card login-box">
       <img
-        src="/icons/logo.svg"
+        src="../../icons/logo.svg"
         width="180"
         alt="Dirhamy Logo"
         class="logo-icon"
       />
-      <p class="box-text">Please enter your details to sign in.</p>
-      <form action="" class="box-form">
-        <label for="login-mail-input" class="form-label">Email Address</label>
+      <p class="login-box-text">Please enter your details to sign in.</p>
+      <form action="" class="login-form">
+        <label for="form-mail-input" class="form-label">Email Address</label>
         <input
           type="email"
           name="mail"
-          id="login-mail-input"
+          id="form-mail-input"
           placeholder="example@example.com"
           required
         />
-        <label for="login-pass-input" class="form-label">
+        <label for="form-pass-input" class="form-label">
           <p>Password</p>
-          <a href="/forgot-password" class="box-link form-forgot-password"
+          <a href="./index.html" class="form-forgot-password"
             >Forgot password?</a
           >
         </label>
-        <div class="form-pass-input">
-          <input
-            type="password"
-            name="password"
-            id="login-pass-input"
-            placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
-            minlength="8"
-            required
-          />
-        </div>
-
-        <button type="submit" class="btn box-submit-btn">Sign in</button>
-
-        <p class="box-text">
-          Don't have an account?
-          <a href="/register" class="box-link">Sign up</a>
-        </p>
-      </form>
-    </div>
-
-    <div class="card primary-card box register-box">
-      <img
-        src="/icons/logo.svg"
-        width="180"
-        alt="Dirhamy Logo"
-        class="logo-icon"
-      />
-      <p class="box-text">Please enter your details to sign up.</p>
-      <form action="" class="box-form">
-        <label for="register-first-name-input" class="form-label"
-          >First Name</label
-        >
         <input
-          type="text"
-          name="first-name"
-          id="register-first-name-input"
-          placeholder="e.g. John"
+          type="password"
+          name="password"
+          id="form-pass-input"
+          placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
+          minlength="8"
           required
         />
-        <label for="register-last-name-input" class="form-label"
-          >Last Name</label
-        >
-        <input
-          type="text"
-          name="last-name"
-          id="register-last-name-input"
-          placeholder="e.g. Doe"
-          required
-        />
-        <label for="register-mail-input" class="form-label"
-          >Email Address</label
-        >
-        <input
-          type="email"
-          name="mail"
-          id="register-mail-input"
-          placeholder="example@example.com"
-          required
-        />
-        <label for="register-pass-input" class="form-label">
-          <p>Password</p>
-        </label>
-        <div class="form-pass-input">
-          <input
-            type="password"
-            name="password"
-            id="register-pass-input"
-            placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
-            minlength="8"
-            required
-          />
-        </div>
-
-        <label for="register-confirm-pass-input" class="form-label">
-          <p>Confirm Password</p>
-        </label>
-        <div class="form-pass-input">
-          <input
-            type="password"
-            name="password"
-            id="register-confirm-pass-input"
-            placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
-            minlength="8"
-            required
-          />
-        </div>
-        <button type="submit" class="btn box-submit-btn">Sign up</button>
-        <p class="box-text">
-          Already have an account? <a class="box-link" href="/login">Sign in</a>
-        </p>
+        <button type="submit" class="btn sign-in-btn">Sign in</button>
       </form>
-    </div>
-
-    <div class="card primary-card box forgot-pass-box">
-      <img
-        src="/icons/logo.svg"
-        width="180"
-        alt="Dirhamy Logo"
-        class="logo-icon"
-      />
-      <p class="box-text">Please enter your email.</p>
-      <form action="" class="box-form">
-        <label for="forgot-pass-mail-input" class="form-label"
-          >Email Address</label
-        >
-        <input
-          type="email"
-          name="mail"
-          id="forgot-pass-mail-input"
-          placeholder="example@example.com"
-          required
-        />
-        <button type="submit" class="btn box-submit-btn">Send</button>
-        <p class="box-text">
-          Don't have an account?
-          <a class="box-link" href="/register">Sign up</a>
-        </p>
-      </form>
-    </div>
-    <div class="card primary-card box verify-code-box">
-      <img
-        src="/icons/logo.svg"
-        width="180"
-        alt="Dirhamy Logo"
-        class="logo-icon"
-      />
-      <p class="box-text">Please enter verification code.</p>
-      <form action="" class="box-form">
-        <label for="verify-code-input" class="form-label"
-          >Verification Code</label
-        >
-        <input
-          type="number"
-          name="verif-code"
-          id="verify-code-input"
-          placeholder="3414"
-          required
-        />
-        <button type="submit" class="btn box-submit-btn">Send</button>
-        <p class="box-text">
-          Don't have an account? <a href="/register">Sign up</a>
-        </p>
-      </form>
-    </div>
-    <div class="card primary-card box reset-pass-box">
-      <img
-        src="/icons/logo.svg"
-        width="180"
-        alt="Dirhamy Logo"
-        class="logo-icon"
-      />
-      <p class="box-text">Please enter your new password.</p>
-      <form action="" class="box-form">
-        <label for="reset-pass-input" class="form-label">Password</label>
-        <div class="form-pass-input">
-          <input
-            type="password"
-            name="pass"
-            id="reset-pass-input"
-            placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
-            minlength="8"
-            required
-          />
-        </div>
-        <label for="reset-confirm-pass-input" class="form-label"
-          >Confirm Password</label
-        >
-        <div class="form-pass-input">
-          <input
-            type="password"
-            name="pass"
-            id="reset-confirm-pass-input"
-            placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
-            minlength="8"
-            required
-          />
-        </div>
-        <button type="submit" class="btn box-submit-btn">Send</button>
-        <p class="box-text">
-          Don't have an account?
-          <a class="box-link" href="../register">Sign up</a>
-        </p>
-      </form>
+      <p class="login-box-text">
+        Don't have an account? <a href="../register/register.html">Sign up</a>
+      </p>
     </div>
 
     <p class="copyright-text">
@@ -221,6 +50,6 @@
       reserved.
     </p>
     <div class="toasts-container"></div>
-    <script type="module" src="/login/login-script.js"></script>
+    <script type="module" src="./login-script.js"></script>
   </body>
 </html>

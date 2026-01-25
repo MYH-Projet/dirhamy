@@ -12,61 +12,56 @@ env:
   IMAGE_FRONTEND: mba1342004/dirhamy-frontend
 
 jobs:
-  # 🧪 JOB 1 : EXECUTION DES TESTS
+  # -------------------------
+  # 1) CI - Tests backend
+  # -------------------------
   tests:
     runs-on: ubuntu-latest
 
-    # On crée une DB PostgreSQL temporaire juste pour les tests
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: dirhamy_test
-        ports:
-          - 5432:5432
-        # Attendre que la DB soit prête avant de lancer les tests
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
-      - name: Récupération du code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Installation de Node.js 20
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
           cache-dependency-path: backend/package-lock.json
 
-      - name: Installation des dépendances Backend
+      - name: Install deps (backend)
         working-directory: ./backend
         run: npm ci
 
-      - name: Préparation de la Base de Données (Prisma)
+      # .env généré à partir des secrets (ne jamais le commit)
+      - name: Create backend .env (CI)
         working-directory: ./backend
-        env:
-          # On pointe vers le service postgres défini plus haut
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dirhamy_test
+        shell: bash
         run: |
-          npx prisma generate
-          npx prisma migrate deploy
+          cat > .env <<EOF
+          DATABASE_URL=postgresql://postgres:postgres@db:5432/dirhamy
+          PORT=3000
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}
+          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+          GMAIL=${{ secrets.GMAIL }}
+          GMAIL_PASS=${{ secrets.GMAIL_PASS }}
+          REDIS_PORT=6379
+          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+          REDIS_URL=redis
+          EOF
 
-      - name: Lancement des Tests
+      # Optionnel: vérifier docker si tes tests démarrent une DB via containers
+      - name: Docker info (optional)
+        run: docker info
+
+      - name: Run tests
         working-directory: ./backend
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dirhamy_test
-        # Cette commande lance TOUS les tests définis dans ton package.json (Jest, etc.)
         run: npm test
-  # -----------------------------------
-  # CI: build + push images to DockerHub
-  # only on push to develop (not PR)
-  # -----------------------------------
+
+  # -------------------------
+  # 2) CI - build & push images
+  # -------------------------
   build-and-push:
     runs-on: ubuntu-latest
     needs: tests
@@ -85,6 +80,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # Cache build (facultatif mais recommandé)
       - name: Build & push backend (latest + develop)
         uses: docker/build-push-action@v6
         with:
@@ -94,6 +90,8 @@ jobs:
           tags: |
             ${{ env.IMAGE_BACKEND }}:latest
             ${{ env.IMAGE_BACKEND }}:develop
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build & push frontend (latest + develop)
         uses: docker/build-push-action@v6
@@ -107,11 +105,12 @@ jobs:
           tags: |
             ${{ env.IMAGE_FRONTEND }}:latest
             ${{ env.IMAGE_FRONTEND }}:develop
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-  # ----------------------------
-  # CD: deploy on EC2
-  # only when main changes (merge develop -> main)
-  # ----------------------------
+  # -------------------------
+  # 3) CD - deploy on EC2 (master)
+  # -------------------------
   deploy-prod:
     runs-on: ubuntu-latest
     needs: [tests, build-and-push]
@@ -128,11 +127,28 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Deploy via docker compose (pull latest)
+      # Option A (recommandée): le .env est déjà présent sur l’EC2, on ne le touche pas.
+      # Option B: on pousse/écrit le .env depuis GitHub Secrets sur l’EC2 (ci-dessous).
+      - name: Deploy (write .env + pull + up)
+        shell: bash
         run: |
           ssh ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
             set -e
             cd ~/dirhamy
+
+            # Ecrire/mettre à jour le .env sur le serveur
+            cat > .env <<EOT
+            DATABASE_URL=postgresql://postgres:postgres@db:5432/dirhamy
+            PORT=3000
+            JWT_SECRET='${{ secrets.JWT_SECRET }}'
+            REFRESH_TOKEN_SECRET='${{ secrets.REFRESH_TOKEN_SECRET }}'
+            GEMINI_API_KEY='${{ secrets.GEMINI_API_KEY }}'
+            GMAIL='${{ secrets.GMAIL }}'
+            GMAIL_PASS='${{ secrets.GMAIL_PASS }}'
+            REDIS_PORT=6379
+            REDIS_PASSWORD='${{ secrets.REDIS_PASSWORD }}'
+            REDIS_URL=redis
+            EOT
 
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
