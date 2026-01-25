@@ -8,6 +8,61 @@ import {
   getKeyByValue,
 } from "/helpers/utils.js";
 
+const showPassEye = `<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Eye outline -->
+  <path
+    d="M12 64c14-22 34-36 52-36s38 14 52 36c-14 22-34 36-52 36S26 86 12 64z"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Iris -->
+  <circle
+    cx="64"
+    cy="64"
+    r="14"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="6"
+  />
+</svg>`;
+
+const hidePassEye = `<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Eye outline -->
+  <path
+    d="M12 64c14-22 34-36 52-36s38 14 52 36c-14 22-34 36-52 36S26 86 12 64z"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Iris -->
+  <circle
+    cx="64"
+    cy="64"
+    r="14"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="6"
+  />
+
+  <!-- Slash -->
+  <line
+    x1="32"
+    y1="32"
+    x2="96"
+    y2="96"
+    stroke="currentColor"
+    stroke-width="6"
+    stroke-linecap="round"
+  />
+</svg>`;
+
 const boxes = {
   login: document.querySelector(".login-box"),
   register: document.querySelector(".register-box"),
@@ -31,6 +86,9 @@ const hrefToPage = {
   "/verify-code": "verifyCode",
   "/reset-password": "resetPass",
 };
+
+injectShowPassEye();
+wirePasswordVisibility();
 
 showPage(hrefToPage[window.location.pathname]);
 
@@ -247,4 +305,55 @@ function validatePasswordMatching(page) {
       document.querySelector("#reset-confirm-pass-input").value
     );
   }
+}
+
+function injectShowPassEye() {
+  document.querySelectorAll('input[type="password"]').forEach((element) => {
+    const div = document.createElement("div");
+    div.classList.add("toggle-pass-visibility");
+    div.innerHTML = showPassEye;
+    element.parentElement.append(div);
+  });
+}
+
+function wirePasswordVisibility() {
+  document.querySelectorAll(".form-pass-input").forEach((element) => {
+    element.addEventListener("click", (e) => {
+      if (checkIconClick(element, e.target)) {
+        element
+          .closest("form")
+          .querySelectorAll(".form-pass-input")
+          .forEach((container) => {
+            const input = container.firstElementChild;
+            container.removeChild(container.lastElementChild);
+            if (input.type === "password") {
+              const div = document.createElement("div");
+              div.classList.add("toggle-pass-visibility");
+              div.innerHTML = hidePassEye;
+              container.appendChild(div);
+              input.type = "text";
+              input.placeholder = "password123";
+            } else {
+              const div = document.createElement("div");
+              div.classList.add("toggle-pass-visibility");
+              div.innerHTML = showPassEye;
+              container.appendChild(div);
+              input.type = "password";
+              input.placeholder = "••••••";
+            }
+          });
+      }
+    });
+  });
+}
+
+function checkIconClick(element, targetClicked) {
+  const icon = targetClicked.closest(".toggle-pass-visibility");
+
+  if (icon) {
+    if (element.contains(icon)) {
+      return true;
+    }
+  }
+  return false;
 }
