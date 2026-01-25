@@ -1,4 +1,4 @@
-import { API_URL, safeApiFetch } from "../helpers/utils.js";
+import { API_URL, safeApiFetch } from "/helpers/utils.js";
 
 const hamburgerIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><line x1="0" y1="3" x2="32" y2="3" stroke="#18212c" stroke-width="3" stroke-linecap="round"/><line x1="0" y1="12" x2="32" y2="12" stroke="#18212c" stroke-width="3" stroke-linecap="round"/><line x1="0" y1="21" x2="32" y2="21" stroke="#18212c" stroke-width="3" stroke-linecap="round"/></svg>`;
 
@@ -24,7 +24,7 @@ function createSidebar() {
   sidebarHeader.classList.add("sidebar-header");
 
   promises.push(
-    fetch("../../icons/logo.svg")
+    fetch("/icons/logo.svg")
       .then((res) => res.text())
       .then((text) => {
         sidebarHeader.innerHTML = text;
@@ -60,7 +60,7 @@ function createSidebar() {
   listItemOne.classList.add("sidebar-link");
   const anchorOne = document.createElement("a");
   anchorOne.id = "transactions-link";
-  anchorOne.href = "../transactions/transactions.html";
+  anchorOne.href = "/transactions";
 
   anchorOne.innerHTML = transactionIcon;
   const spanOne = document.createElement("span");
@@ -72,7 +72,7 @@ function createSidebar() {
   const listItemTwo = document.createElement("li");
   listItemTwo.classList.add("sidebar-link");
   const anchorTwo = document.createElement("a");
-  anchorTwo.href = "../categories/categories.html";
+  anchorTwo.href = "/categories";
   anchorTwo.id = "categories-link";
 
   anchorTwo.innerHTML = categoryIcon;
@@ -86,7 +86,7 @@ function createSidebar() {
   const listItemThree = document.createElement("li");
   listItemThree.classList.add("sidebar-link");
   const anchorThree = document.createElement("a");
-  anchorThree.href = "../budget/budget.html";
+  anchorThree.href = "/budget";
   anchorThree.id = "budget-link";
 
   anchorThree.innerHTML = budgetIcon;
@@ -100,7 +100,7 @@ function createSidebar() {
   const listItemFour = document.createElement("li");
   listItemFour.classList.add("sidebar-link");
   const anchorFour = document.createElement("a");
-  anchorFour.href = "../chatbot/chatbot.html";
+  anchorFour.href = "/chatbot";
   anchorFour.id = "chatbot-link";
 
   anchorFour.innerHTML = chatbotIcon;
@@ -147,7 +147,7 @@ function createSidebar() {
         "toast",
         JSON.stringify({ type: "success", message: "Logout sucessful" }),
       );
-      window.location.replace("../login/login.html");
+      window.location.replace("/login");
     });
   });
 
@@ -170,9 +170,8 @@ export function insertSidebar(container) {
 }
 
 export function focusCurrentSidebarLink() {
-  const currentPage = window.location.pathname
-    .split("/")[3]
-    .replace(".html", "");
+  const currentPage = window.location.pathname.slice(1);
+
   const anchorLink = document.querySelector("#" + currentPage + "-link");
 
   anchorLink.classList.add("current-link");

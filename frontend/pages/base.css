@@ -187,14 +187,14 @@ ul {
 }
 
 .toast-box-success::before {
-  content: url("../icons/toasts-icons/tick-symbol.svg");
+  content: url("/icons/toasts-icons/tick-symbol.svg");
 
   width: 40px;
   height: 40px;
 }
 
 .toast-box-error::before {
-  content: url("../icons/toasts-icons/cross-symbol.svg");
+  content: url("/icons/toasts-icons/cross-symbol.svg");
 
   width: 40px;
   height: 40px;
@@ -741,7 +741,7 @@ table.list-entity-container {
 }
 
 .modal .action-btn:disabled,
-.sign-in-btn:disabled,
+.box-submit-btn:disabled,
 .add-entity-form .form-submit-btn:disabled {
   background-color: #0d948887 !important;
 }

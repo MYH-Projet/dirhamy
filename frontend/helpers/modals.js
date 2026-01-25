@@ -1,4 +1,4 @@
-import { switchToProcess, cancelSwitchToProcess } from "./utils.js";
+import { switchToProcess, cancelSwitchToProcess } from "/helpers/utils.js";
 
 export function showDeleteEntityModal(modalName, entityId, submitCallback) {
   const modalBackground = document.querySelector(".modal-background");

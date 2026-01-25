@@ -103,9 +103,7 @@ export const forgetpasswordMail = async (mail:string)=>{
     const code:string = crypto.randomInt(100000, 1000000).toString();
     const key = `reset:${mail}`;
     const hash = crypto.createHash('sha512').update(key).digest('hex');
-    await redisClient.set(hash,code,{
-        EX:15*60
-    })
+    await redisClient.set(hash,code,"EX",15*60)
     await sendMail(mail,code);
 }
 
@@ -114,7 +112,7 @@ export const validateCode = async (mail:string,code:string)=>{
     const hash = crypto.createHash('sha512').update(key).digest('hex');
     const storedCode = await redisClient.get(hash);
     if(!storedCode || storedCode !== code){
-        throw new AppError('the code not valid',401);
+        throw new AppError('the code not valid',404);
     }
     await redisClient.del(hash);
 }

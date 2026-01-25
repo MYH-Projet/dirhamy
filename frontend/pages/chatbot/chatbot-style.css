@@ -1,4 +1,4 @@
-@import url("../base.css");
+@import url("/base.css");
 
 /* Chatbot Layout */
 /* Main Container Override for Chatbot */
@@ -59,7 +59,11 @@
 .header-brand-pill.ai-pill {
   width: 42px;
   height: 42px;
-  background: linear-gradient(135deg, rgba(13, 148, 136, 0.1), rgba(13, 148, 136, 0.05));
+  background: linear-gradient(
+    135deg,
+    rgba(13, 148, 136, 0.1),
+    rgba(13, 148, 136, 0.05)
+  );
   border: 1px solid rgba(13, 148, 136, 0.2);
   border-radius: 12px;
   color: var(--primary-color);
@@ -73,7 +77,6 @@
 }
 
 @keyframes pulse-glow {
-
   0%,
   100% {
     opacity: 0.8;
@@ -131,7 +134,11 @@
 
 .gradient-text {
   /* Subtle gradient using app vars */
-  background: linear-gradient(135deg, var(--primary-color), var(--lighter-primary-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--lighter-primary-color)
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -174,7 +181,6 @@
   font-weight: 500;
   color: #6b7280;
 }
-
 
 /* Messages Area with Watermark */
 .chat-messages {
@@ -222,7 +228,6 @@
   font-size: 48px;
   margin-bottom: var(--md-spacing);
 }
-
 
 .empty-state h3 {
   font-size: 18px;
@@ -289,7 +294,6 @@
 }
 
 @keyframes typing {
-
   0%,
   100% {
     transform: scale(1);
@@ -387,7 +391,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   .suggestion-chip,
   .refresh-btn:hover {
     transition: none;
