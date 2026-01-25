@@ -1,4 +1,4 @@
-import { loadInitialStructure } from "/helpers/utils.js";
+import { loadInitialStructure } from "../../helpers/utils.js";
 
 // Initialize user data if needed
 const user = {};
@@ -44,9 +44,8 @@ loadInitialStructure(user).then(() => {
     if (typeof detectContext === "function") detectContext(userMsg);
     if (typeof resetRotationTimer === "function") resetRotationTimer();
     // Optional: Refresh chips immediately after send to show "what's next"
-    setTimeout(() => {
-      if (typeof renderSuggestions === "function") renderSuggestions();
-    }, 1000);
+    setTimeout(() => { if (typeof renderSuggestions === "function") renderSuggestions(); }, 1000);
+
 
     // Add typing indicator
     const typingMsg = addMessage("", "ai", true);
@@ -56,7 +55,7 @@ loadInitialStructure(user).then(() => {
       const response = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMsg }),
+        body: JSON.stringify({ message: userMsg })
       });
 
       console.log(response);
@@ -66,6 +65,7 @@ loadInitialStructure(user).then(() => {
       // Remove typing indicator and add actual response
       document.querySelector(".typing-indicator")?.remove(); // remove animation
       addMessage(data.reply, "ai");
+
     } catch (e) {
       console.error(e);
       document.querySelector(".typing-indicator")?.remove();
@@ -124,7 +124,7 @@ loadInitialStructure(user).then(() => {
       "Export my transaction history",
       "Forecast my expenses",
       "Smart financial advice",
-    ],
+    ]
   };
 
   // State for suggestions
@@ -143,7 +143,7 @@ loadInitialStructure(user).then(() => {
 
     // Select 4 unique random suggestions
     const selected = [];
-    const available = pool.filter((s) => !displayedSuggestions.has(s));
+    const available = pool.filter(s => !displayedSuggestions.has(s));
 
     // If we've shown most of them, reset the history
     const candidates = available.length < 4 ? pool : available;
@@ -160,7 +160,7 @@ loadInitialStructure(user).then(() => {
     const chips = getSuggestions(context);
 
     // Update history
-    chips.forEach((c) => displayedSuggestions.add(c));
+    chips.forEach(c => displayedSuggestions.add(c));
     if (displayedSuggestions.size > 15) displayedSuggestions.clear(); // keep history bounded
 
     // Clear and render new chips
@@ -184,31 +184,10 @@ loadInitialStructure(user).then(() => {
 
   const detectContext = (text) => {
     const lower = text.toLowerCase();
-    if (
-      lower.includes("budget") ||
-      lower.includes("category") ||
-      lower.includes("class")
-    )
-      currentContext = "budget";
-    else if (
-      lower.includes("save") ||
-      lower.includes("goal") ||
-      lower.includes("fund")
-    )
-      currentContext = "saving";
-    else if (
-      lower.includes("overspend") ||
-      lower.includes("limit") ||
-      lower.includes("exceed")
-    )
-      currentContext = "overspending";
-    else if (
-      lower.includes("summary") ||
-      lower.includes("week") ||
-      lower.includes("month") ||
-      lower.includes("balance")
-    )
-      currentContext = "overview";
+    if (lower.includes("budget") || lower.includes("category") || lower.includes("class")) currentContext = "budget";
+    else if (lower.includes("save") || lower.includes("goal") || lower.includes("fund")) currentContext = "saving";
+    else if (lower.includes("overspend") || lower.includes("limit") || lower.includes("exceed")) currentContext = "overspending";
+    else if (lower.includes("summary") || lower.includes("week") || lower.includes("month") || lower.includes("balance")) currentContext = "overview";
     else if (Math.random() > 0.7) currentContext = "general"; // occasionally switch to general
   };
 
@@ -229,12 +208,10 @@ loadInitialStructure(user).then(() => {
   startRotationTimer();
 
   // Refresh Button Logic
-  document
-    .getElementById("refresh-suggestions")
-    ?.addEventListener("click", () => {
-      renderSuggestions();
-      resetRotationTimer();
-    });
+  document.getElementById("refresh-suggestions")?.addEventListener("click", () => {
+    renderSuggestions();
+    resetRotationTimer();
+  });
 
   // Event Listeners
   sendBtn.addEventListener("click", () => sendMessage());
@@ -247,4 +224,7 @@ loadInitialStructure(user).then(() => {
   });
 
   // No static suggestions listener needed anymore as they are dynamic
+
 });
+
+

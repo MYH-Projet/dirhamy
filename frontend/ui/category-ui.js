@@ -1,4 +1,4 @@
-import { deleteIcon, editIcon } from "/ui/common-ui.js";
+import { deleteIcon, editIcon } from "./common-ui.js";
 
 export function renderCategories(categories) {
   const tableBody = document.querySelector("table.list-entity-container tbody");

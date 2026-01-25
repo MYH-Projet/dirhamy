@@ -1,12 +1,12 @@
 /* style.css */
 
-@import url("/base.css");
+@import url("../base.css");
 
 body {
   background-color: var(--lightest-gray-color);
 }
 
-.box {
+.login-box {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -24,7 +24,7 @@ body {
     margin-bottom: var(--s-spacing);
   }
 
-  .box-header {
+  .login-box-header {
     color: var(--black-text-color);
     margin-bottom: var(--s-spacing);
 
@@ -32,7 +32,7 @@ body {
     font-weight: bold;
   }
 
-  .box-form {
+  .login-form {
     display: flex;
     flex-direction: column;
 
@@ -59,14 +59,13 @@ body {
     input {
       margin-bottom: var(--md-spacing);
       font-size: 13px;
-      width: 100%;
     }
 
     .form-forgot-password {
       color: var(--primary-color);
     }
 
-    .box-submit-btn {
+    .sign-in-btn {
       font-weight: bold;
 
       margin-top: var(--s-spacing);
@@ -74,7 +73,7 @@ body {
     }
   }
 
-  .box-text {
+  .login-box-text {
     color: var(--gray-color);
     margin-bottom: 24px;
     font-size: 14px;
@@ -84,15 +83,6 @@ body {
       color: var(--primary-color);
     }
   }
-  form .box-text {
-    align-self: center;
-    margin-top: var(--large-spacing);
-    margin-bottom: 0;
-  }
-}
-
-.register-box {
-  margin-top: 10vh;
 }
 
 .copyright-text {
@@ -105,27 +95,4 @@ body {
   text-align: center;
 
   margin-bottom: 10vh;
-}
-
-.form-pass-input {
-  position: relative;
-}
-
-.toggle-pass-visibility {
-  position: absolute;
-  top: 43%;
-  right: 12px;
-
-  transform: translateY(-50%);
-
-  z-index: 10;
-
-  cursor: pointer;
-
-  svg {
-    color: var(--gray-color);
-
-    height: 20px;
-    width: 20px;
-  }
 }
