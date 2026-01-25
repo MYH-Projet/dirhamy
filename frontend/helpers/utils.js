@@ -46,7 +46,6 @@ export function safeApiFetch(url, parameterObject) {
     return res
       .json()
       .then((data) => {
-        console.log(res);
         if (res.ok) {
           return data;
         } else if (res.status === 401 || res.status === 403) {

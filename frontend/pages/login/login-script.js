@@ -5,6 +5,7 @@ import {
   switchToProcess,
   cancelSwitchToProcess,
   safeApiFetch,
+  getKeyByValue,
 } from "/helpers/utils.js";
 
 const boxes = {
@@ -31,7 +32,7 @@ const hrefToPage = {
   "/reset-password": "resetPass",
 };
 
-showPage("login");
+showPage(hrefToPage[window.location.pathname]);
 
 const toastContainer = document.querySelector(".toasts-container");
 
@@ -66,6 +67,8 @@ function showPage(page) {
   }
   disableAllBoxes();
   changePageTitle(page);
+  // changes uri without reloading
+  history.replaceState(null, "", getKeyByValue(hrefToPage, page));
   boxes[page].style.display = "flex";
 }
 

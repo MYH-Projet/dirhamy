@@ -187,14 +187,14 @@ ul {
 }
 
 .toast-box-success::before {
-  content: url("../icons/toasts-icons/tick-symbol.svg");
+  content: url("/icons/toasts-icons/tick-symbol.svg");
 
   width: 40px;
   height: 40px;
 }
 
 .toast-box-error::before {
-  content: url("../icons/toasts-icons/cross-symbol.svg");
+  content: url("/icons/toasts-icons/cross-symbol.svg");
 
   width: 40px;
   height: 40px;
