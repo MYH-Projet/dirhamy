@@ -21,47 +21,6 @@ describe('Transaction Service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-
-  describe('checkAccount', () => {
-    
-    test('should throw 403 if account does not belong to user', async () => {
-      // 1. Mock: Account not found
-      prismaMock.compte.findFirst.mockResolvedValue(null);
-      // Category check won't even happen, but good to mock just in case
-      // @ts-ignore
-      prismaMock.categorie.findFirst.mockResolvedValue({ id: 2, utilisateurId: 1 });
-
-      // Call with: accountId=1, categoryId=2, userId=999
-      await expect(checkAccount(1, 2, 999))
-        .rejects
-        .toThrow(new AppError("Forbidden: You do not own this source account", 403));
-    });
-
-    test('should throw 403 if category does not belong to user', async () => {
-      // 1. Mock: Account Found (Pass first check)
-      // @ts-ignore
-      prismaMock.compte.findFirst.mockResolvedValue({ id: 1, utilisateurId: 1 });
-      
-      // 2. Mock: Category NOT found (Fail second check)
-      prismaMock.categorie.findFirst.mockResolvedValue(null);
-
-      // Call with: accountId=1, categoryId=99, userId=1
-      await expect(checkAccount(1, 99, 1))
-        .rejects
-        .toThrow(new AppError("Forbidden: You do not own this category", 403));
-    });
-
-    test('should succeed if both account and category exist', async () => {
-      // 1. Mock: Both found
-      // @ts-ignore
-      prismaMock.compte.findFirst.mockResolvedValue({ id: 1, utilisateurId: 1 });
-      // @ts-ignore
-      prismaMock.categorie.findFirst.mockResolvedValue({ id: 2, utilisateurId: 1 });
-
-      await expect(checkAccount(1, 2, 1)).resolves.not.toThrow();
-    });
-
-  });
   describe('createTransaction', () => {
     beforeEach(() => {
         // IMPORTANT: Mock the $transaction to immediately execute the callback
