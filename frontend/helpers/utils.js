@@ -75,8 +75,6 @@ export function safeApiFetch(url, parameterObject) {
             "error",
           );
         });
-        // i could rethrow the error but would it stop execution anyway to be verified
-        return Promise.reject();
       });
   });
 }

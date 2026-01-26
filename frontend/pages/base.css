@@ -104,8 +104,6 @@ input:disabled {
 .main-container {
   margin-left: 260px;
   padding: 50px 45px;
-
-  transition: margin-left 0.2s;
 }
 
 ul {
@@ -231,23 +229,10 @@ ul {
 
   width: 260px;
   height: 100%;
-
-  transition: width 0.2s ease-out;
-
-  span,
-  p,
-  .sidebar-header > svg {
-    opacity: 1;
-    white-space: nowrap;
-    transition:
-      opacity 0.2s ease-out,
-      width 0.2s ease-out;
-  }
 }
 .sidebar-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
 
   padding: 24px var(--md-spacing);
 
@@ -257,11 +242,14 @@ ul {
 .sidebar-header > svg {
   width: 120px;
   height: 30px;
+  align-self: center;
 }
 
 .sidebar-resize-btn {
   margin-top: 2px;
   padding: 10px;
+
+  align-self: center;
 
   border: none;
   border-radius: var(--border-radius);
@@ -276,7 +264,7 @@ ul {
   height: 16px;
 }
 .sidebar-resize-btn:hover {
-  background-color: rgba(208, 208, 208, 0.181);
+  background-color: rgba(208, 208, 208, 0.187);
 }
 
 .sidebar-nav {
@@ -284,7 +272,7 @@ ul {
 
   padding: var(--normal-spacing) var(--normal-spacing);
 
-  .sidebar-link a {
+  a {
     font-size: 15px;
 
     display: flex;
@@ -301,25 +289,17 @@ ul {
     border: none;
     border-radius: var(--border-radius);
 
+    color: var(--black-text-color);
     svg {
       margin-right: var(--s-spacing);
 
       flex-shrink: 0;
     }
   }
-  .sidebar-link a:hover {
+  a:hover {
     transform: translateX(2px);
     color: var(--primary-color);
-    background-color: #11a09416;
-    svg {
-      color: var(--primary-color);
-    }
-  }
-
-  .current-link {
-    transform: translateX(1px);
-    color: var(--primary-color);
-    background-color: #11a0940f;
+    background-color: #11a09411;
     svg {
       color: var(--primary-color);
     }
@@ -361,8 +341,6 @@ ul {
 
   padding: 0 var(--normal-spacing);
   gap: var(--md-spacing);
-
-  transition: gap 0.2s;
 }
 
 .sidebar-disconnect {
@@ -386,16 +364,11 @@ ul {
   border-radius: var(--border-radius);
 
   transition:
-    gap 0.2s,
     color 0.2s,
     background-color 0.2s,
     transform 0.2s;
 
   cursor: pointer;
-
-  svg {
-    flex-shrink: 0;
-  }
 }
 
 .sidebar-disconnect:hover {
@@ -405,34 +378,6 @@ ul {
   transform: translateY(-2px);
 
   box-shadow: 0px 0px 10px 0px #c422227a;
-}
-
-.sidebar-collapsed {
-  width: 72px;
-
-  span,
-  p,
-  .sidebar-header > svg {
-    width: 0;
-    opacity: 0;
-  }
-  .sidebar-profile {
-    gap: 0;
-  }
-  .sidebar-disconnect {
-    gap: 0;
-  }
-  .sidebar-footer {
-  }
-}
-
-.main-container-expanded {
-  margin-left: 72px;
-}
-.sidebar-collapsed-later {
-  .sidebar-footer {
-    align-items: center;
-  }
 }
 
 /*Importent repeated styles like crud and modals*/

@@ -1,59 +1,95 @@
 import { Request, Response } from 'express';
-import { AuthRequest, JwtPayload } from '../Middleware/authMiddleware'; // Adjust path as needed
-import { prisma } from "../lib/prisma"; // Adjust path as needed
+import { AuthRequest, JwtPayload } from '../Middleware/authMiddleware';
+import { prisma } from "../lib/prisma";
 
 export const getBalance = async (req: AuthRequest, res: Response) => {
     const user = req.user as JwtPayload;
+    if (!user) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
     const userId = Number(user.id);
-    const compteId = Number(req.query.compteId); 
+    const compteIdQuery = req.query.compteId;
 
     try {
-        // 1. Verify Compte exists AND belongs to the User (Security)
-        const compte = await prisma.compte.findFirst({
-            where: { 
-                id: compteId,
-                utilisateurId: userId 
+        if (compteIdQuery) {
+            const compteId = Number(compteIdQuery);
+            if (isNaN(compteId)) {
+                return res.status(400).json({ error: "Invalid account ID" });
             }
-        });
 
-        if (!compte) {
-            return res.status(404).json({ error: "Account not found or access denied" });
-        }
+            // 1. Verify Compte exists AND belongs to the User (Security)
+            const compte = await prisma.compte.findFirst({
+                where: {
+                    id: compteId,
+                    utilisateurId: userId
+                }
+            });
 
-        // 2. Get the most recent snapshot (Save Point)
-        const lastSnapshot = await prisma.balanceSnapshot.findFirst({
-            where: { compteId },
-            orderBy: { date: 'desc' },
-        });
+            if (!compte) {
+                return res.status(404).json({ error: "Account not found or access denied" });
+            }
 
-        // If a snapshot exists, use its data. If not, start from the beginning of time with 0 balance.
-        const lastSnapshotDate = lastSnapshot?.date || new Date(0); 
-        const baseBalance = lastSnapshot?.solde || 0;
+            // 2. Get the most recent snapshot (Save Point)
+            const lastSnapshot = await prisma.balanceSnapshot.findFirst({
+                where: { compteId },
+                orderBy: { date: 'desc' },
+            });
 
-        // 3. Sum all transactions that happened AFTER the snapshot
-        const transactionAggregates = await prisma.transaction.aggregate({
-            where: {
+            // If a snapshot exists, use its data. If not, start from the beginning of time with 0 balance.
+            const lastSnapshotDate = lastSnapshot?.date || new Date(0);
+            const baseBalance = lastSnapshot?.solde || 0;
+
+            // 3. Sum all transactions that happened AFTER the snapshot
+            const transactionAggregates = await prisma.transaction.aggregate({
+                where: {
+                    compteId,
+                    date: { gt: lastSnapshotDate }
+                },
+                _sum: {
+                    montant: true
+                }
+            });
+
+            const recentTransactionsSum = transactionAggregates._sum.montant || 0;
+
+            // 4. Calculate Final Live Balance
+            const finalBalance = baseBalance + recentTransactionsSum;
+
+            return res.status(200).json({
                 compteId,
-                date: { gt: lastSnapshotDate } 
-            },
-            _sum: {
-                montant: true
+                snapshotDate: lastSnapshotDate,
+                finalBalance
+            });
+        } else {
+            // Calculate TOTAL balance across all accounts
+            const comptes = await prisma.compte.findMany({
+                where: { utilisateurId: userId }
+            });
+
+            let totalBalance = 0;
+
+            for (const compte of comptes) {
+                const lastSnapshot = await prisma.balanceSnapshot.findFirst({
+                    where: { compteId: compte.id },
+                    orderBy: { date: 'desc' },
+                });
+
+                const base = lastSnapshot?.solde || 0;
+                const date = lastSnapshot?.date || new Date(0);
+
+                const txSum = await prisma.transaction.aggregate({
+                    where: { compteId: compte.id, date: { gt: date } },
+                    _sum: { montant: true }
+                });
+
+                totalBalance += (base + (txSum._sum.montant || 0));
             }
-        });
 
-        const recentTransactionsSum = transactionAggregates._sum.montant || 0;
-
-        // 4. Calculate Final Live Balance
-        const finalBalance = baseBalance + recentTransactionsSum;
-
-        return res.status(200).json({ 
-            compteId,
-            snapshotDate: lastSnapshotDate,
-            finalBalance 
-        });
+            return res.status(200).json({ totalBalance });
+        }
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "Error calculating balance" });
+        return res.status(500).json({ error: "Error calculating balance", details: String(error) });
     }
 }
