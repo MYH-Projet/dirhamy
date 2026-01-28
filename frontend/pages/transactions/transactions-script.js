@@ -10,16 +10,13 @@ import {
   cancelSwitchToProcess,
   trimIsoDateToInput,
   adaptTime,
-} from "../../helpers/utils.js";
-import {
-  showEditEntityModal,
-  showDeleteEntityModal,
-} from "../../helpers/modals.js";
+} from "/helpers/utils.js";
+import { showEditEntityModal, showDeleteEntityModal } from "/helpers/modals.js";
 import {
   renderAccounts,
   renderTransactions,
   checkTransactionIconClick,
-} from "../../ui/transaction-ui.js";
+} from "/ui/transaction-ui.js";
 
 /*
   Very important thing for future myself or different collaborator,

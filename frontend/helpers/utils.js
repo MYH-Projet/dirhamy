@@ -1,5 +1,5 @@
-import { renderInitialStucture } from "../ui/common-ui.js";
-import { displayToast } from "../components/toast.js";
+import { renderInitialStucture } from "/ui/common-ui.js";
+import { displayToast } from "/components/toast.js";
 
 export const API_URL = "/api";
 
@@ -56,7 +56,8 @@ export function safeApiFetch(url, parameterObject) {
               message: data.error || data.message || "Logged out",
             }),
           );
-          window.location.replace("../login/login.html");
+          window.location.replace("/login");
+          return Promise.reject();
         } else {
           let errorToSend = [{ message: "Some type of error" }];
           if (data.error) {
@@ -75,6 +76,8 @@ export function safeApiFetch(url, parameterObject) {
             "error",
           );
         });
+        // i could rethrow the error but would it stop execution anyway to be verified
+        return Promise.reject();
       });
   });
 }
