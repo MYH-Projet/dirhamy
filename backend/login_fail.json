@@ -1,8 +1,0 @@
-{
-  "status": 401,
-  "body": {
-    "error": "Invalid credentials"
-  },
-  "userEmail": "test1769242796158@example.com",
-  "sentPassword": "password123"
-}

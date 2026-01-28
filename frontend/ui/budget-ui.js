@@ -1,4 +1,4 @@
-import { deleteIcon, editIcon } from "./common-ui.js";
+import { deleteIcon, editIcon } from "/ui/common-ui.js";
 
 const warningIcon = `<svg width="17" height="17" viewBox="0 0 17 17" fill="none">
     <circle cx="8.5" cy="8.5" r="7.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
