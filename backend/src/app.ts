@@ -18,7 +18,6 @@ import aiRouter from './routers/aiRouter';
 
 import {authenticateToken , AuthRequest} from './Middleware/authMiddleware'
 import { limitApiTraffic } from './Middleware/ratelimiterMiddleware';
-import { cacheMiddl } from './Middleware/cacheMiddleware';
 
 
 
@@ -59,7 +58,6 @@ app.get('/', async (req:Request, res:Response) => {
 app.use("/auth",authRoutes);
 app.use(limitApiTraffic);
 app.use(authenticateToken);
-app.use(cacheMiddl);
 app.use('/transactions', transactionRoutes);
 app.use('/balance',balanceRouters);
 app.use('/categories', categorieRoutes);

@@ -233,6 +233,7 @@ export type CategorieOrderByWithRelationInput = {
 
 export type CategorieWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  id_nom?: Prisma.CategorieIdNomCompoundUniqueInput
   AND?: Prisma.CategorieWhereInput | Prisma.CategorieWhereInput[]
   OR?: Prisma.CategorieWhereInput[]
   NOT?: Prisma.CategorieWhereInput | Prisma.CategorieWhereInput[]
@@ -242,7 +243,7 @@ export type CategorieWhereUniqueInput = Prisma.AtLeast<{
   utilisateur?: Prisma.XOR<Prisma.UtilisateurScalarRelationFilter, Prisma.UtilisateurWhereInput>
   transactions?: Prisma.TransactionListRelationFilter
   snapshots?: Prisma.BudgetSnapshotListRelationFilter
-}, "id">
+}, "id" | "id_nom">
 
 export type CategorieOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -327,6 +328,11 @@ export type CategorieListRelationFilter = {
 
 export type CategorieOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type CategorieIdNomCompoundUniqueInput = {
+  id: number
+  nom: string
 }
 
 export type CategorieCountOrderByAggregateInput = {

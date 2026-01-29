@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import { AuthRequest, JwtPayload } from '../Middleware/authMiddleware';
 import { prisma } from "../lib/prisma";
+import { cache, keyGenerator } from '../utils/cache';
 
 export const getBalance = async (req: AuthRequest, res: Response) => {
     const user = req.user as JwtPayload;
+    const cacheInfo = keyGenerator(req);
     if (!user) {
         return res.status(401).json({ error: "Unauthorized" });
     }
@@ -55,11 +57,15 @@ export const getBalance = async (req: AuthRequest, res: Response) => {
             // 4. Calculate Final Live Balance
             const finalBalance = baseBalance + recentTransactionsSum;
 
-            return res.status(200).json({
+            const result ={
                 compteId,
                 snapshotDate: lastSnapshotDate,
                 finalBalance
-            });
+            }
+
+            cache(cacheInfo,result)
+
+            return res.status(200).json(result);
         } else {
             // Calculate TOTAL balance across all accounts
             const comptes = await prisma.compte.findMany({

@@ -12,11 +12,13 @@ import {
     removeTransactionSchema,
     getTransactionSchema
 } from '../schemas/transactionSchema';
-import {authenticateToken , AuthRequest} from '../Middleware/authMiddleware'
+import { cacheWithDependencies } from '../Middleware/cacheMiddleware';
 
 
 const router = Router();
 
+
+router.use(cacheWithDependencies(['balance','budget']))
 // ==========================================
 // 1. READ: Get Transactions for a User
 // ==========================================

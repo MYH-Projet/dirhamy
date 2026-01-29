@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { AuthRequest } from "../Middleware/authMiddleware";
+import { cache, keyGenerator } from "../utils/cache";
 
 export const getBudgetStatus = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
+    const cacheInfo = keyGenerator(req);
 
     if (!userId) {
       return res.status(401).json({ error: "User not authenticated" });
@@ -81,6 +83,8 @@ export const getBudgetStatus = async (req: AuthRequest, res: Response) => {
         };
       }),
     );
+
+    cache(cacheInfo,budgetData);
 
     return res.status(200).json(budgetData);
   } catch (error) {

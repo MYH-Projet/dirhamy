@@ -2,18 +2,15 @@ import { Request, Response } from "express";
 import { AuthRequest, JwtPayload } from "../Middleware/authMiddleware";
 import { prisma } from "../lib/prisma";
 import * as transactionServices from "../services/transactionServices";
-import { TypeTransaction } from "../../generated/prisma/enums";
 import { AppError } from "../utils/AppError";
-import { trace } from "console";
-import { cache, keyGenerator } from "../utils/cache";
+import { keyGenerator,cache } from "../utils/cache";
 
 export const getTransaction = async (req: AuthRequest, res: Response) => {
   // 1. Parse User ID
   const user = req.user as JwtPayload;
   const userId = Number(user.id);
-  console.log('in controller: ',req.path, req.params)
-  const key = keyGenerator(req);
-  console.log('key in the controller: ',key)
+  const cacheInfo = keyGenerator(req);
+  console.log('key in the controller: ',cacheInfo.key,cacheInfo.tags)
   // 2. Parse Cursor (from query param ?cursor=123)
   const cursorParam = req.query.cursor;
   const cursorId = cursorParam ? Number(cursorParam) : undefined;
@@ -64,7 +61,7 @@ export const getTransaction = async (req: AuthRequest, res: Response) => {
       },
     }
 
-    await cache(key,result);
+    await cache(cacheInfo,result);
     // 5. Send Response
     return res.status(200).json(result);
   } catch (e) {

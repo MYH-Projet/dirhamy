@@ -6,10 +6,12 @@ import {
     updateCategory, 
     deleteCategory 
 } from '../controllers/categoryController';
+import { cacheWithDependencies } from '../Middleware/cacheMiddleware';
 // Adjust this import path to where your actual middleware is located
-import { authenticateToken } from '../Middleware/authMiddleware'; 
 
 const router = Router();
+
+router.use(cacheWithDependencies([]))
 
 
 // 2. Define Routes

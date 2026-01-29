@@ -56,17 +56,6 @@ const setcookies=(res:Response,token:any,refreshToken:any)=>{
 
 
 export const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (process.env.NODE_ENV === 'test'){
-        req.user = {
-            id: 2,
-            nom: "Doe",
-            prenom: "John",
-            email: "john.doe@example.com",
-            // We set 'iat' and 'exp' to future dates so it never appears expired
-            
-        };
-        return next();
-    }
   // Read from Cookie instead of Header
   const token = req.cookies.jwt; 
 
