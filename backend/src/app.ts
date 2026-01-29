@@ -59,6 +59,7 @@ app.get('/', async (req:Request, res:Response) => {
 app.use("/auth",authRoutes);
 app.use(limitApiTraffic);
 app.use(authenticateToken);
+app.use(cacheMiddl);
 app.use('/transactions', transactionRoutes);
 app.use('/balance',balanceRouters);
 app.use('/categories', categorieRoutes);
