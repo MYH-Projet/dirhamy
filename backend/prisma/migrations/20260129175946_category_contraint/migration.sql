@@ -5,10 +5,9 @@
 
 */
 -- DropIndex
-DROP INDEX "Transaction_compteId_date_montant_idx";
-
+DROP INDEX IF EXISTS "Transaction_compteId_date_montant_idx";
 -- CreateIndex
 CREATE UNIQUE INDEX "Categorie_id_nom_key" ON "Categorie"("id", "nom");
 
 -- CreateIndex
-CREATE INDEX "Transaction_compteId_date_id_montant_idx" ON "Transaction"("compteId", "date", "id", "montant");
+CREATE INDEX IF NOT EXISTS "Transaction_compteId_date_id_montant_idx" ON "Transaction"("compteId", "date", "id", "montant");

@@ -156,3 +156,6 @@ backend/generated/prisma
 cdc/
 .vscode/
 backend/test/ai.test.ts
+
+
+backend/generate/*
