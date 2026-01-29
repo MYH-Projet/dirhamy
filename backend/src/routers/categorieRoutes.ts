@@ -11,9 +11,6 @@ import { authenticateToken } from '../Middleware/authMiddleware';
 
 const router = Router();
 
-// 1. Apply Authentication Middleware
-// This ensures 'req.user' is populated before any controller is hit.
-router.use(authenticateToken);
 
 // 2. Define Routes
 // POST /api/categories - Create a new category
