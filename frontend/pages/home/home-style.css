@@ -1447,22 +1447,77 @@ body {
 
 
 /* --- RESPONSIVE --- */
-@media (max-width: 1024px) {
-    .hero-grid {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 40px;
+
+/* Mobile Drawer Styles */
+.mobile-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 280px;
+    background: white;
+    z-index: 2000;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.1);
+    display: none;
+    flex-direction: column;
+}
+
+.mobile-drawer.active {
+    transform: translateX(0);
+}
+
+.drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--p-bg-subtle);
+}
+
+.drawer-close {
+    background: transparent;
+    border: none;
+    color: var(--p-text-body);
+    padding: 8px;
+    margin-right: -8px;
+    cursor: pointer;
+}
+
+.drawer-links {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.drawer-links a {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--p-text-main);
+    text-decoration: none;
+    padding: 12px 0;
+    border-bottom: 1px solid transparent;
+}
+
+.drawer-links a:hover {
+    color: var(--p-primary);
+}
+
+.drawer-links a.highlight {
+    color: var(--p-primary);
+    font-weight: 700;
+}
+
+/* Tablet & Mobile Breakpoints */
+/* CHANGED from 1024px to 991px per requirements */
+@media (max-width: 991px) {
+    .container {
+        padding: 0 20px;
     }
 
-    .hero-btns,
-    .hero-trust {
-        justify-content: center;
-    }
-
-    .features-grid {
-        grid-template-columns: 1fr;
-    }
-
+    /* Nav */
     .nav-desktop-links,
     .nav-actions {
         display: none;
@@ -1472,36 +1527,156 @@ body {
         display: block;
     }
 
-    .mockup-container {
-        transform: none;
-        margin-top: 40px;
+    .mobile-drawer {
+        display: flex;
     }
 
-    .float-badge {
-        position: relative;
-        bottom: auto;
-        left: auto;
-        margin: 20px auto;
-        max-width: 300px;
+    /* Hero */
+    .hero-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 60px;
+    }
+
+    .hero-content {
+        margin: 0 auto;
+    }
+
+    .hero-btns {
+        justify-content: center;
+    }
+
+    .hero-trust {
+        justify-content: center;
+    }
+
+    .mockup-container {
+        transform: perspective(1000px) rotateY(-4deg) rotateX(2deg);
+        margin: 0 auto;
+        max-width: 500px;
+    }
+
+    /* How It Works - Linear Flow */
+    .works-flow-container {
+        height: auto;
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .flow-line-svg {
+        display: none;
+    }
+
+    /* Override inline styles via !important for responsiveness */
+    .flow-step {
+        position: static !important;
+        /* Forces static positioning */
+        top: auto !important;
+        left: auto !important;
+        transform: none;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .flow-card {
+        margin-bottom: 16px;
+    }
+
+    .flow-text {
+        position: static;
+        width: 100%;
+        transform: none;
+        text-align: center;
+    }
+
+    .flow-text p {
+        margin-bottom: 0;
     }
 }
 
 @media (max-width: 768px) {
+    :root {
+        --nav-height: 70px;
+    }
+
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 2.25rem;
     }
 
-    .footer-row {
+    .features-grid {
         grid-template-columns: 1fr;
-        text-align: center;
     }
 
-    .hero-content .hero-btns {
+    .tiles-wrapper {
+        overflow-x: auto;
+        padding: 20px 0;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tiles-track {
+        width: max-content;
+        /* Horizontal scroll */
+        padding: 4px;
+    }
+
+    .tile-btn {
+        width: auto;
+        white-space: nowrap;
+    }
+
+    /* Adjust AI Chat for mobile */
+    .ai-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .chat-chips {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .footer-trust-strip .trust-row {
         flex-direction: column;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .trust-item {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn {
         width: 100%;
     }
 
-    .hero-btns .btn {
+    .hero-btns {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .hero-visual {
+        padding: 0 10px;
+    }
+
+    .mock-stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .float-badge {
+        position: relative;
+        left: auto;
+        bottom: auto;
+        margin-top: -20px;
+        margin-left: auto;
+        margin-right: auto;
+        animation: none;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         width: 100%;
+        max-width: 280px;
     }
 }

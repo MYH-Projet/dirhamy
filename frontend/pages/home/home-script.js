@@ -25,14 +25,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isOpen) {
             drawer.classList.add('active');
             document.body.style.overflow = 'hidden';
+            menuToggle.setAttribute('aria-expanded', 'true');
         } else {
             drawer.classList.remove('active');
             document.body.style.overflow = '';
+            menuToggle.setAttribute('aria-expanded', 'false');
         }
     }
 
     if (menuToggle) menuToggle.addEventListener('click', () => toggleDrawer(true));
     if (drawerClose) drawerClose.addEventListener('click', () => toggleDrawer(false));
+
+    // Close on Escape Key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && drawer.classList.contains('active')) {
+            toggleDrawer(false);
+        }
+    });
+
+    // Close on Outside Click
+    document.addEventListener('click', (e) => {
+        if (drawer.classList.contains('active') &&
+            !drawer.contains(e.target) &&
+            !menuToggle.contains(e.target)) {
+            toggleDrawer(false);
+        }
+    });
 
     // Close drawer when clicking a link
     drawerLinks.forEach(link => {
