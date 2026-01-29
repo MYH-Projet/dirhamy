@@ -1,6 +1,4 @@
 import { deleteIcon, editIcon } from "/ui/common-ui.js";
-import { getKeyByValue } from "/helpers/utils.js";
-import { displayToast } from "/components/toast.js";
 
 // make all this in one object
 const getTransactionTypeClass = {
@@ -155,9 +153,9 @@ export function getNeededTransactionData(tableRow) {
   transactionData.date = currentTd.dataset.fullDate;
 
   currentTd = currentTd.nextSibling;
-  transactionData.type = getKeyByValue(
-    getTransactionTypeName,
-    currentTd.textContent,
+  transactionData.type = getTxTypeByText(
+    getTransactionTypeInfo,
+    currentTd.querySelector("span").textContent,
   );
 
   currentTd = currentTd.nextSibling;
@@ -168,6 +166,10 @@ export function getNeededTransactionData(tableRow) {
   transactionData.description = currentTd.textContent;
 
   currentTd = currentTd.nextSibling;
+  // this is account td i guess no need for it now
+
+  currentTd = currentTd.nextSibling;
+
   transactionData.amount = Math.abs(+currentTd.textContent);
 
   return transactionData;
@@ -244,4 +246,10 @@ function createBalanceCard(account) {
 
   card.append(cardLabel, cardBalance);
   return card;
+}
+
+// tx stands for transaction
+
+function getTxTypeByText(object, text) {
+  return Object.keys(object).find((key) => object[key].name === text);
 }

@@ -20,14 +20,10 @@ import {
 } from "/ui/transaction-ui.js";
 
 /*
-  Very important thing for future myself or different collaborator,
-  Backend accepts full iso date, while date local time input only goes to seconds
-  we would be only taking date input from the user up to minutes which would improve usabiliy, 
-  but reduces accuracy
-  this compromise is acceptable for the current app just bear in mind we send to backend full isoString
-  and only show trimmedIsoDate(its a function)
-  (another thing i'm only showing the date (y,m,d) in the table that's why i'm storing the minutes and seconds as 
-  data attribute)
+  TO DO
+  Improve show more mechanism
+
+
 */
 
 const user = {};
@@ -266,6 +262,9 @@ function submitDeleteTransaction(transactionId) {
 }
 
 function refreshPage() {
+  for (const prop of Object.getOwnPropertyNames(transferTransactionsTreated)) {
+    delete transferTransactionsTreated[prop];
+  }
   return Promise.all([getAccountBalances(user), getTransactions(user)]);
 }
 
