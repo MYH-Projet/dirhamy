@@ -37,7 +37,7 @@ loadInitialStructure(user).then(() => {
   Promise.all([
     getAccountBalances(user),
     fetchAndRenderAddTransactionContainer(user),
-    getTransactions(),
+    getTransactionsTest(user),
   ]).then(() => {
     removeSpinnerPage();
     toastNotis();
@@ -255,57 +255,44 @@ function refreshPage() {
   return Promise.all([getAccountBalances(user), getTransactions()]);
 }
 
-const transferIdTreated = [];
-function adaptTransactions(transactions) {
-  const allInfoNeeded = {
-    array: [],
-    transactionsNeedTransferEquivalent: [],
-  };
-  let found = false;
-  for (let i = 0; i < transactions.length; i++) {
-    if (transactions[i].type === "TRANSFER" && transactions[i].isTreated) {
-      continue;
-    } else if (transactions[i].type === "TRANSFER") {
-      for (let j = i + 1; i < transactions.length; i++) {
-        if (transactions[i].transferId === transactions[j].transferId) {
-          transactions[i].account2 = transactions[j].compte;
-          transactions[j].isTreated = true;
-          found = true;
-        }
-      }
-      if (found == false) {
-        transactionsNeedTransferEquivalent.push(transactions[i]);
-        continue;
-      }
+const transferTransactionsTreated = {};
+
+function adaptTransactionsList(user, list) {
+  for (let i = 0; i < list.length; i++) {
+    let transaction = list[i];
+
+    if (
+      transaction.type === "TRANSFER" &&
+      !transferTransactionsTreated[transaction.transferId]
+    ) {
+      // this works because we guarantee that a user's transfer is to an account that belongs to the user
+      transaction.destinationAccount = user.accounts.find(
+        (account) => account.id === transaction.idDestination,
+      );
+      transferTransactionsTreated[transaction.transferId] = true;
+    } else if (
+      transaction.type === "TRANSFER" &&
+      transferTransactionsTreated[transaction.transferId]
+    ) {
+      list.splice(i, 1);
+      i--;
     }
-    allInfoNeeded.array.push(transactions[i]);
   }
-  return allInfoNeeded;
+
+  return list;
 }
 
-function getTransactionsTest(
-  finalArray = [],
-  cursor = null,
-  firstCall = true,
-  needsMoreCalls = false,
-) {
-  while (
-    (finalArray.length < 10 && (!cursor === null || firstCall)) ||
-    needsMoreCalls
-  ) {
-    let url = cursor
-      ? API_URL + "/transactions/user?cursor=" + cursor
-      : API_URL + "/transactions/user";
+function getTransactionsTest(user, cursor, list = []) {
+  let url = API_URL + "/transactions/user";
+  url = cursor ? url + "?cursor=" + cursor : url;
 
-    return safeApiFetch(url).then((data) => {
-      const infoNeeded = adaptTransactions(data.data);
-      finalArray = [...finalArray, ...infoNeeded.array];
+  return safeApiFetch(url).then((data) => {
+    let result = adaptTransactionsList(user, data.data);
+    list = [...list, ...result];
 
-      cursor = data.meta.nextCursor;
-      return getTransactionsTest(finalArray, cursor, false);
-    });
-  }
-  return { transactions: finalArray, cursor: cursor };
+    if (list.length >= 10 || !data.hasMore) {
+      return renderTransactions(list, user);
+    }
+    return getTransactionsTest(user, data.meta.nextCursor, list);
+  });
 }
-
-getTransactionsTest().then((data) => console.log(data));
