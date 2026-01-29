@@ -104,9 +104,7 @@ export const forgetpasswordMail = async (mail: string) => {
     const code: string = crypto.randomInt(100000, 1000000).toString();
     const key = `reset:${mail}`;
     const hash = crypto.createHash('sha512').update(key).digest('hex');
-    await redisClient.set(hash, code, {
-        EX: 15 * 60
-    })
+    await redisClient.set(hash, code,'EX',15*60);
     await sendMail(mail, code);
 }
 
