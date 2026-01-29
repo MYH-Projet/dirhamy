@@ -72,10 +72,15 @@ export const createTransaction = async (req: AuthRequest, res: Response) => {
   const user = req.user as JwtPayload;
   const userId = Number(user.id);
   // 2. Cast req.body to our interface so TypeScript knows the fields exist
-  const { compteId, categorieId } = req.body;
+  const { compteId, categorieId, idDestination } = req.body;
 
   try {
-    await transactionServices.checkAccount(compteId, categorieId, userId);
+    await transactionServices.checkAccount(
+      compteId,
+      idDestination,
+      categorieId,
+      userId,
+    );
     const result = await transactionServices.createTransaction(req.body);
 
     return res.status(201).json(result);

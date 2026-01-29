@@ -47,7 +47,8 @@ model Compte {
   utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
 
   // Relationships
-  transactionsSent Transaction[] @relation("SourceAccount")
+  transactionsSent     Transaction[] @relation("SourceAccount")
+  transactionsReceived Transaction[] @relation("DestinationAccount")
 
   snapshots BalanceSnapshot[]
 }
@@ -96,6 +97,9 @@ model Transaction {
   // Foreign Keys
   compteId Int
   compte   Compte @relation("SourceAccount", fields: [compteId], references: [id])
+
+  idDestination Int?
+  destination   Compte? @relation("DestinationAccount", fields: [idDestination], references: [id])
 
   transferId Int?
   transfer   Transfer? @relation(fields: [transferId], references: [id])

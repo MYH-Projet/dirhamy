@@ -238,7 +238,6 @@ ul {
   p,
   .sidebar-header > svg {
     opacity: 1;
-    white-space: nowrap;
     transition:
       opacity 0.2s ease-out,
       width 0.2s ease-out;
@@ -525,7 +524,7 @@ table.list-entity-container {
   }
   th,
   td {
-    flex: 3 0;
+    flex: 4 0;
     text-align: left;
     font-size: 15px;
   }

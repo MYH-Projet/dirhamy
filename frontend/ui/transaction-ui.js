@@ -1,6 +1,7 @@
 import { deleteIcon, editIcon } from "/ui/common-ui.js";
 import { getKeyByValue } from "/helpers/utils.js";
 
+// make all this in one object
 const getTransactionTypeClass = {
   DEPENSE: "expense-color",
   REVENU: "income-color",
@@ -13,9 +14,30 @@ const getTransactionTypeName = {
   TRANSFER: "Transfer",
 };
 
-export function renderTransactions(transactions) {
-  transactions = transactions.data;
+const incomeIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M4 12L12 4M12 4L12 9M12 4L7 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+const expenseIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12 4L4 12M4 12L4 7M4 12L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+const transferIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M3 5L13 5M13 5L10 2M13 5L10 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M13 11L3 11M3 11L6 8M3 11L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
 
+const getTransactionTypeInfo = {
+  DEPENSE: { class: "expense-color", icon: expenseIcon, name: "Expense" },
+  REVENU: { class: "income-color", icon: incomeIcon, name: "Income" },
+  TRANSFER: { class: "transfer-color", icon: transferIcon, name: "Transfer" },
+};
+
+const getTransactionTypeIcon = {
+  DEPENSE: expenseIcon,
+  REVENU: incomeIcon,
+  TRANSFER: transferIcon,
+};
+
+export function renderTransactions(transactions, user) {
   const tableBody = document.querySelector("table.list-entity-container tbody");
   tableBody.innerHTML = "";
   transactions
@@ -25,35 +47,74 @@ export function renderTransactions(transactions) {
       return -(dateA.getTime() <= dateB.getTime());
     })
     .forEach((transaction) => {
-      const tableRow = createTransactionRow(transaction);
+      const tableRow = createTransactionRow(transaction, user);
       tableBody.append(tableRow);
     });
 }
 
-export function createTransactionRow(transaction) {
+export function createTransactionRow(transaction, user) {
   const tableRow = document.createElement("tr");
   tableRow.dataset.id = transaction.id;
 
   const transactionDate = document.createElement("td");
+  transactionDate.classList.add("date-column");
   transactionDate.dataset.fullDate = transaction.date;
   transactionDate.textContent = transaction.date.split("T")[0];
 
-  const transactionClass = getTransactionTypeClass[transaction.type];
+  const transactionInfo = getTransactionTypeInfo[transaction.type];
 
   const transactionType = document.createElement("td");
-  transactionType.classList.add(transactionClass, "type-column");
-  transactionType.textContent = getTransactionTypeName[transaction.type];
+  transactionType.classList.add("type-column");
+  transactionType.innerHTML = `<div>${transactionInfo.icon} <span></span></div>`;
+  transactionType.querySelector("div").classList.add(transactionInfo.class);
+  transactionType.querySelector("span").textContent = transactionInfo.name;
 
   const transactionCategory = document.createElement("td");
+  transactionCategory.classList.add("category-column");
+
   transactionCategory.textContent = transaction.categorie.nom;
   transactionCategory.dataset.categoryId = transaction.categorieId;
 
   const transactionDescription = document.createElement("td");
   transactionDescription.textContent = transaction.description;
 
+  const transactionAccount = document.createElement("td");
+  transactionAccount.classList.add("account-column");
+
   const transactionAmount = document.createElement("td");
-  transactionAmount.classList.add(transactionClass, "amount-column");
-  transactionAmount.textContent = transaction.montant;
+  transactionAmount.classList.add(transactionInfo.class, "amount-column");
+
+  const accountColumn = {};
+  if (transaction.type === "TRANSFER") {
+    accountColumn.accountDebited = document.createElement("span");
+
+    accountColumn.accountDebited.textContent =
+      transaction.montant > 0
+        ? transaction.destinationAccount.nom
+        : transaction.compte.nom;
+    accountColumn.downwardArror = document.createElement("span");
+    accountColumn.downwardArror.classList.add("downward-arrow");
+    accountColumn.downwardArror.textContent = "↓";
+
+    accountColumn.accountTransfered = document.createElement("span");
+    accountColumn.accountTransfered.textContent =
+      transaction.montant > 0
+        ? transaction.compte.nom
+        : transaction.destinationAccount.nom;
+
+    transactionAmount.textContent = Math.abs(transaction.montant);
+  } else {
+    accountColumn.accountConcerned = document.createElement("span");
+    accountColumn.accountConcerned.textContent = transaction.compte.nom;
+    transactionAmount.textContent = transaction.montant;
+  }
+  // this is only for styling reasons
+  const accountsContainer = document.createElement("div");
+
+  for (const key in accountColumn) {
+    accountsContainer.appendChild(accountColumn[key]);
+  }
+  transactionAccount.appendChild(accountsContainer);
 
   const actionBtns = document.createElement("td");
   actionBtns.classList.add("action-btns");
@@ -64,6 +125,7 @@ export function createTransactionRow(transaction) {
     transactionType,
     transactionCategory,
     transactionDescription,
+    transactionAccount,
     transactionAmount,
     actionBtns,
   );
