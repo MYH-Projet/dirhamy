@@ -1,5 +1,4 @@
 import { deleteIcon, editIcon } from "/ui/common-ui.js";
-import { getKeyByValue } from "/helpers/utils.js";
 
 // make all this in one object
 const getTransactionTypeClass = {
@@ -37,9 +36,14 @@ const getTransactionTypeIcon = {
   TRANSFER: transferIcon,
 };
 
-export function renderTransactions(transactions, user) {
+export function renderTransactions(transactions, nextCursor) {
   const tableBody = document.querySelector("table.list-entity-container tbody");
   tableBody.innerHTML = "";
+  appendTransactionsToTable(transactions, nextCursor);
+}
+
+export function appendTransactionsToTable(transactions, nextCursor) {
+  const tableBody = document.querySelector("table.list-entity-container tbody");
   transactions
     .toSorted((a, b) => {
       const dateA = new Date(a.date);
@@ -47,12 +51,20 @@ export function renderTransactions(transactions, user) {
       return -(dateA.getTime() <= dateB.getTime());
     })
     .forEach((transaction) => {
-      const tableRow = createTransactionRow(transaction, user);
+      const tableRow = createTransactionRow(transaction);
       tableBody.append(tableRow);
     });
-}
 
-export function createTransactionRow(transaction, user) {
+  const showMoreBtn = document.querySelector("#show-more-btn");
+  if (nextCursor) {
+    showMoreBtn.disabled = false;
+    showMoreBtn.dataset.cursor = nextCursor;
+  } else {
+    showMoreBtn.disabled = true;
+    showMoreBtn.dataset.cursor = "";
+  }
+}
+export function createTransactionRow(transaction) {
   const tableRow = document.createElement("tr");
   tableRow.dataset.id = transaction.id;
 
@@ -141,9 +153,9 @@ export function getNeededTransactionData(tableRow) {
   transactionData.date = currentTd.dataset.fullDate;
 
   currentTd = currentTd.nextSibling;
-  transactionData.type = getKeyByValue(
-    getTransactionTypeName,
-    currentTd.textContent,
+  transactionData.type = getTxTypeByText(
+    getTransactionTypeInfo,
+    currentTd.querySelector("span").textContent,
   );
 
   currentTd = currentTd.nextSibling;
@@ -154,6 +166,10 @@ export function getNeededTransactionData(tableRow) {
   transactionData.description = currentTd.textContent;
 
   currentTd = currentTd.nextSibling;
+  // this is account td i guess no need for it now
+
+  currentTd = currentTd.nextSibling;
+
   transactionData.amount = Math.abs(+currentTd.textContent);
 
   return transactionData;
@@ -230,4 +246,10 @@ function createBalanceCard(account) {
 
   card.append(cardLabel, cardBalance);
   return card;
+}
+
+// tx stands for transaction
+
+function getTxTypeByText(object, text) {
+  return Object.keys(object).find((key) => object[key].name === text);
 }

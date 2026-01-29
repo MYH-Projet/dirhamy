@@ -135,3 +135,13 @@ table.list-entity-container {
 .type-column > div.income-color {
   background-color: #0d948916;
 }
+
+#show-more-btn {
+  margin: var(--md-spacing) auto;
+
+  padding: var(--normal-spacing) var(--md-spacing);
+
+  display: block;
+
+  font-weight: 500;
+}
