@@ -739,6 +739,7 @@ table.list-entity-container {
   }
 }
 
+#show-more-btn:disabled,
 .modal .action-btn:disabled,
 .box-submit-btn:disabled,
 .add-entity-form .form-submit-btn:disabled {

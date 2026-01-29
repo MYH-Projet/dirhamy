@@ -1,5 +1,6 @@
 import { deleteIcon, editIcon } from "/ui/common-ui.js";
 import { getKeyByValue } from "/helpers/utils.js";
+import { displayToast } from "/components/toast.js";
 
 // make all this in one object
 const getTransactionTypeClass = {
@@ -37,9 +38,14 @@ const getTransactionTypeIcon = {
   TRANSFER: transferIcon,
 };
 
-export function renderTransactions(transactions, user) {
+export function renderTransactions(transactions, nextCursor) {
   const tableBody = document.querySelector("table.list-entity-container tbody");
   tableBody.innerHTML = "";
+  appendTransactionsToTable(transactions, nextCursor);
+}
+
+export function appendTransactionsToTable(transactions, nextCursor) {
+  const tableBody = document.querySelector("table.list-entity-container tbody");
   transactions
     .toSorted((a, b) => {
       const dateA = new Date(a.date);
@@ -47,12 +53,20 @@ export function renderTransactions(transactions, user) {
       return -(dateA.getTime() <= dateB.getTime());
     })
     .forEach((transaction) => {
-      const tableRow = createTransactionRow(transaction, user);
+      const tableRow = createTransactionRow(transaction);
       tableBody.append(tableRow);
     });
-}
 
-export function createTransactionRow(transaction, user) {
+  const showMoreBtn = document.querySelector("#show-more-btn");
+  if (nextCursor) {
+    showMoreBtn.disabled = false;
+    showMoreBtn.dataset.cursor = nextCursor;
+  } else {
+    showMoreBtn.disabled = true;
+    showMoreBtn.dataset.cursor = "";
+  }
+}
+export function createTransactionRow(transaction) {
   const tableRow = document.createElement("tr");
   tableRow.dataset.id = transaction.id;
 

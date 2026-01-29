@@ -16,6 +16,7 @@ import {
   renderAccounts,
   renderTransactions,
   checkTransactionIconClick,
+  appendTransactionsToTable,
 } from "/ui/transaction-ui.js";
 
 /*
@@ -37,7 +38,7 @@ loadInitialStructure(user).then(() => {
   Promise.all([
     getAccountBalances(user),
     fetchAndRenderAddTransactionContainer(user),
-    getTransactionsTest(user),
+    getTransactions(user),
   ]).then(() => {
     removeSpinnerPage();
     toastNotis();
@@ -47,6 +48,23 @@ loadInitialStructure(user).then(() => {
 // setting up events
 wireTableEvents();
 wireAddContainerEvents();
+
+document.querySelector("#show-more-btn").addEventListener("click", (e) => {
+  // i assume it will not be enabled if there is no more data but i will check anyway
+  const btnDataset = e.target.dataset;
+  if (btnDataset.cursor) {
+    switchToProcess(e.target);
+    getAndAppendTransactions(user, btnDataset.cursor).finally(() => {
+      cancelSwitchToProcess(e.target, "Show more");
+      // disabling btn if no more transactions
+      if (btnDataset.cursor) {
+        e.target.disabled = false;
+      } else {
+        e.target.disabled = true;
+      }
+    });
+  }
+});
 
 // Populates the user object with the new balance
 function getAccountBalances(user) {
@@ -63,10 +81,6 @@ function getAccountBalances(user) {
   return Promise.all(promises).then(() => {
     renderAccounts(user);
   });
-}
-
-function getTransactions() {
-  return fetchAndRender(API_URL + "/transactions/user", renderTransactions);
 }
 
 function fetchAndRenderAddTransactionContainer(user) {
@@ -252,7 +266,7 @@ function submitDeleteTransaction(transactionId) {
 }
 
 function refreshPage() {
-  return Promise.all([getAccountBalances(user), getTransactions()]);
+  return Promise.all([getAccountBalances(user), getTransactions(user)]);
 }
 
 const transferTransactionsTreated = {};
@@ -282,7 +296,7 @@ function adaptTransactionsList(user, list) {
   return list;
 }
 
-function getTransactionsTest(user, cursor, list = []) {
+function getTransactions(user, cursor, list = []) {
   let url = API_URL + "/transactions/user";
   url = cursor ? url + "?cursor=" + cursor : url;
 
@@ -291,8 +305,23 @@ function getTransactionsTest(user, cursor, list = []) {
     list = [...list, ...result];
 
     if (list.length >= 10 || !data.hasMore) {
-      return renderTransactions(list, user);
+      return renderTransactions(list, data.meta.nextCursor);
     }
-    return getTransactionsTest(user, data.meta.nextCursor, list);
+    return getTransactions(user, data.meta.nextCursor, list);
+  });
+}
+
+function getAndAppendTransactions(user, cursor, list = []) {
+  let url = API_URL + "/transactions/user";
+  url = cursor ? url + "?cursor=" + cursor : url;
+
+  return safeApiFetch(url).then((data) => {
+    let result = adaptTransactionsList(user, data.data);
+    list = [...list, ...result];
+
+    if (list.length >= 10 || !data.hasMore) {
+      return appendTransactionsToTable(list, data.meta.nextCursor);
+    }
+    return getTransactions(user, data.meta.nextCursor, list);
   });
 }
