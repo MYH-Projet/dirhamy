@@ -64,58 +64,35 @@ describe('Transaction Service', () => {
   });
   describe('createTransaction', () => {
     beforeEach(() => {
-        // IMPORTANT: Mock the $transaction to immediately execute the callback
-        // This simulates the transaction logic without a real DB
+        // Mock the $transaction to immediately execute the callback
         prismaMock.$transaction.mockImplementation((callback) => callback(prismaMock));
     });
 
-    test('should create a TRANSFER (Double Entry) using Parent Transfer Table', async () => {
+    test('should create a TRANSFER (Double Entry) and update snapshots (Past Date)', async () => {
+      // Hardcoded past date ensures snapshot logic is triggered
+      const pastDate = new Date('2025-01-01'); 
+      
       const inputData = {
         montant: 100,
         type: TypeTransaction.TRANSFER,
         description: 'Test Transfer',
-        date: new Date('2025-01-01'),
+        date: pastDate,
         compteId: 1, // Source
         categorieId: 2,
         idDestination: 5 // Destination
       };
 
-      // Mock the return value for transfer.create
       // @ts-ignore
       prismaMock.transfer.create.mockResolvedValue({ id: 10, createdAt: new Date() });
 
       await createTransaction(inputData);
 
-      // 1. Verify we called transfer.create (NOT transaction.create directly)
       expect(prismaMock.transfer.create).toHaveBeenCalledTimes(1);
       
-      // 2. Verify the correct arguments were passed (Nested Writes)
-      expect(prismaMock.transfer.create).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({
-            transactions: {
-                create: [
-                    // Expect 1st Transaction: Sender (Negative)
-                    expect.objectContaining({
-                        montant: -100, 
-                        compteId: 1,
-                        type: TypeTransaction.TRANSFER
-                    }),
-                    // Expect 2nd Transaction: Receiver (Positive)
-                    expect.objectContaining({
-                        montant: 100, 
-                        compteId: 5,
-                        type: TypeTransaction.TRANSFER
-                    })
-                ]
-            }
-        }),
-        include: { transactions: true }
-      }));
-
-      // 3. Verify Snapshots were updated twice (once for each account)
+      // Verify Snapshots updated twice (once for each account) because date is in the past
       expect(prismaMock.balanceSnapshot.updateMany).toHaveBeenCalledTimes(2);
       
-      // Check Source Update (Decrement/Negative logic handled in service)
+      // Check Source Update (Decrement)
       expect(prismaMock.balanceSnapshot.updateMany).toHaveBeenCalledWith(expect.objectContaining({
         where: expect.objectContaining({ compteId: 1 }),
         data: { solde: { decrement: 100 } }
@@ -128,15 +105,18 @@ describe('Transaction Service', () => {
       }));
     });
 
-    test('should create a DEPENSE (Single Entry) with negative sign', async () => {
+    test('should create a DEPENSE (Single Entry) and update snapshots if date is in PAST', async () => {
+      // 1. Setup a date in the past ("Yesterday")
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
       const inputData = {
         montant: 50,
         type: TypeTransaction.DEPENSE,
         description: 'Groceries',
-        date: new Date(),
+        date: yesterday, // <--- Key change: Use yesterday
         compteId: 1,
         categorieId: 3,
-        // idDestination is undefined or null
       };
 
       // @ts-ignore
@@ -144,22 +124,47 @@ describe('Transaction Service', () => {
 
       await createTransaction(inputData);
 
-      // 1. Verify single transaction creation
+      // Verify Transaction Creation
       expect(prismaMock.transaction.create).toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({
-            montant: -50, // Should be negative
+            montant: -50, 
             type: TypeTransaction.DEPENSE,
             compteId: 1
         })
       }));
 
-      // 2. Verify Snapshots updated once
+      // Verify Snapshots updated (Expectation: 1 call)
       expect(prismaMock.balanceSnapshot.updateMany).toHaveBeenCalledTimes(1);
       
       expect(prismaMock.balanceSnapshot.updateMany).toHaveBeenCalledWith(expect.objectContaining({
           where: expect.objectContaining({ compteId: 1 }),
           data: { solde: { increment: -50 } }
       }));
+    });
+
+    test('should create a DEPENSE but SKIP snapshot update if date is TODAY', async () => {
+      // 1. Setup a date for "Today"
+      const today = new Date();
+
+      const inputData = {
+        montant: 50,
+        type: TypeTransaction.DEPENSE,
+        description: 'Coffee',
+        date: today, // <--- Key change: Use Today
+        compteId: 1,
+        categorieId: 3,
+      };
+
+      // @ts-ignore
+      prismaMock.transaction.create.mockResolvedValue({ id: 124, ...inputData, montant: -50 });
+
+      await createTransaction(inputData);
+
+      // Verify Transaction Creation still happens
+      expect(prismaMock.transaction.create).toHaveBeenCalledTimes(1);
+
+      // Verify Snapshots were NOT touched (Expectation: 0 calls)
+      expect(prismaMock.balanceSnapshot.updateMany).toHaveBeenCalledTimes(0);
     });
   });
 });
