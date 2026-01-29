@@ -45,7 +45,8 @@ desktop.ini
 *.sw?
 
 # Prisma
-/backend/prisma/generated/
+#5aliw hada rakayna likay genery dakxi flocal
+/backend/generated/*
 # Keep schema and migrations
 !/backend/prisma/schema.prisma
 !/backend/prisma/migrations/
