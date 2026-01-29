@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { prisma } from '../lib/prisma';
+import {prisma} from '../lib/prisma';
 import { AuthRequest, JwtPayload } from '../Middleware/authMiddleware';
 
 
@@ -7,8 +7,8 @@ import { AuthRequest, JwtPayload } from '../Middleware/authMiddleware';
 export const createCategory = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.body) {
-      return res.status(400).json({ error: "Request body is missing" });
-    }
+            return res.status(400).json({ error: "Request body is missing" });
+        }
     const { nom } = req.body;
     const userId = req.user?.id;
 
@@ -88,17 +88,13 @@ export const getCategoryById = async (req: AuthRequest, res: Response) => {
 
 // Update a Category
 export const updateCategory = async (req: AuthRequest, res: Response) => {
-  try {
+    try {
     const id = parseInt(req.params.id);
 
     if (!req.body) {
-      return res.status(400).json({ error: "Request body is missing" });
+        return res.status(400).json({ error: "Request body is missing" });
     }
     const { nom } = req.body;
-
-    if (!nom) {
-      return res.status(400).json({ error: 'Name (nom) is required' });
-    }
     const userId = req.user?.id;
 
 
@@ -153,8 +149,8 @@ export const deleteCategory = async (req: AuthRequest, res: Response) => {
     res.status(200).json({ message: 'Category deleted successfully' });
   } catch (error: any) {
     if (error.code === 'P2003') {
-      return res.status(400).json({
-        error: 'Cannot delete this category because it is used in existing transactions.'
+      return res.status(400).json({ 
+        error: 'Cannot delete this category because it is used in existing transactions.' 
       });
     }
     console.error('Error deleting category:', error);
