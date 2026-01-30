@@ -1,10 +1,12 @@
 import { Router } from 'express';
-import {getBalance} from '../controllers/BalanceControler'
-import {authenticateToken , AuthRequest} from '../Middleware/authMiddleware'
+import {getBalance} from '../controllers/BalanceControler';
+import { cacheWithDependencies } from '../Middleware/cacheMiddleware';
+
+
 
 
 const router = Router();
 
-router.get('/',authenticateToken,getBalance)
+router.get('/',cacheWithDependencies([]),getBalance)
 
 export default router;

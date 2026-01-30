@@ -2,7 +2,6 @@ import { prisma } from "../lib/prisma";
 import { AppError } from "../utils/AppError";
 import { TypeTransaction } from "../../generated/prisma/enums";
 import { Transaction } from "../../generated/prisma/browser";
-import { p } from "vitest/dist/chunks/reporters.d.CWXNI2jG";
 
 interface CreateTransactionData {
   montant: number;
@@ -56,7 +55,10 @@ export const checkAccount = async (compteId: number,idDestination:number,categor
 
 export const createTransaction = async (data: CreateTransactionData) => {
     console.log("i reach to the service create transaction")
-  const { montant, type, description, date, compteId, categorieId, idDestination } = data;
+    const { montant, type, description, date, compteId, categorieId, idDestination } = data;
+    const todayMidnight = new Date();
+    todayMidnight.setHours(0, 0, 0, 0);
+
 
   // --- BRANCH 1: TRANSFER (Double Entry) ---
   if (type === TypeTransaction.TRANSFER) {
@@ -93,7 +95,8 @@ export const createTransaction = async (data: CreateTransactionData) => {
             }
         });
 
-      // 3. Update Snapshots for Sender (Decrease Balance)
+      if(date < todayMidnight){
+        // 3. Update Snapshots for Sender (Decrease Balance)
       await tx.balanceSnapshot.updateMany({
         where: {
           compteId: compteId,
@@ -114,6 +117,7 @@ export const createTransaction = async (data: CreateTransactionData) => {
           solde: { increment: montant }
         }
       });
+      }
 
       return transfers;
     });
@@ -140,17 +144,20 @@ export const createTransaction = async (data: CreateTransactionData) => {
       }
     });
 
-    // 2. Update Snapshots
-    await tx.balanceSnapshot.updateMany({
-      where: {
-        compteId: compteId,
-        date: { gte: date }
-      },
-      data: {
-        solde: { increment: finalAmount } // Works for both positive (income) and negative (expense)
-      }
-    });
+    if(date < todayMidnight){
 
+        // 2. Update Snapshots
+        await tx.balanceSnapshot.updateMany({
+        where: {
+            compteId: compteId,
+            date: { gte: date }
+        },
+        data: {
+            solde: { increment: finalAmount } // Works for both positive (income) and negative (expense)
+        }
+        });
+
+    }
     return transaction; 
   });
 };

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import {prisma} from '../lib/prisma';
 import { AuthRequest, JwtPayload } from '../Middleware/authMiddleware';
+import { cache, keyGenerator } from '../utils/cache';
 
 
 // Create a new Category
@@ -38,7 +39,7 @@ export const createCategory = async (req: AuthRequest, res: Response) => {
 export const getAllCategories = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-
+    const cacheInfo = keyGenerator(req);
     if (!userId) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
@@ -51,6 +52,8 @@ export const getAllCategories = async (req: AuthRequest, res: Response) => {
         nom: 'asc',
       },
     });
+
+    cache(cacheInfo,categories);
 
     res.status(200).json(categories);
   } catch (error) {

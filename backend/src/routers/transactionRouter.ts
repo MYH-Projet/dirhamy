@@ -12,17 +12,19 @@ import {
     removeTransactionSchema,
     getTransactionSchema
 } from '../schemas/transactionSchema';
-import {authenticateToken , AuthRequest} from '../Middleware/authMiddleware'
+import { cacheWithDependencies } from '../Middleware/cacheMiddleware';
 
 
 const router = Router();
 
+
+router.use(cacheWithDependencies(['balance','budget']))
 // ==========================================
 // 1. READ: Get Transactions for a User
 // ==========================================
 // Route: GET /api/transactions/user/:id?cursor=123
 // Params: :id = User ID
-router.get('/user',authenticateToken,validation(getTransactionSchema), getTransaction);
+router.get('/user',validation(getTransactionSchema), getTransaction);
 
 
 // ==========================================
@@ -30,7 +32,7 @@ router.get('/user',authenticateToken,validation(getTransactionSchema), getTransa
 // ==========================================
 // Route: POST /api/transactions
 // Body: { montant, type, description, compteId, ... }
-router.post('/',authenticateToken,(req,res,next)=>{
+router.post('/',(req,res,next)=>{
     console.log("what the f********");
     next(); 
 },validation(createTransactionSchema),(req,res,next)=>{
@@ -44,7 +46,7 @@ router.post('/',authenticateToken,(req,res,next)=>{
 // ==========================================
 // Route: PUT /api/transactions/:id
 // Params: :id = Transaction ID
-router.put('/:id',authenticateToken,validation(updateTransactionSchema), updateTransaction);
+router.put('/:id',validation(updateTransactionSchema), updateTransaction);
 
 
 // ==========================================
@@ -52,6 +54,6 @@ router.put('/:id',authenticateToken,validation(updateTransactionSchema), updateT
 // ==========================================
 // Route: DELETE /api/transactions/:id
 // Params: :id = Transaction ID
-router.delete('/:id', authenticateToken,validation(removeTransactionSchema), removeTransaction);
+router.delete('/:id',validation(removeTransactionSchema), removeTransaction);
 
 export default router;

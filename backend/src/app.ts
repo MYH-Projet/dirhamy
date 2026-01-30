@@ -54,12 +54,13 @@ app.get('/', async (req:Request, res:Response) => {
 
 app.use("/auth",authRoutes);
 app.use(limitApiTraffic);
+app.use(authenticateToken);
 app.use('/transactions', transactionRoutes);
 app.use('/balance',balanceRouters);
 app.use('/categories', categorieRoutes);
 app.use('/budget',budgetRouter);
 app.use('/ai', aiRouter);
-app.get('/profile', authenticateToken,async (req: AuthRequest, res) => {
+app.get('/profile',async (req: AuthRequest, res) => {
   
   res.json({ 
     message: 'Welcome to the protected route', 

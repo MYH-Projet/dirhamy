@@ -2,15 +2,15 @@ import { Request, Response } from "express";
 import { AuthRequest, JwtPayload } from "../Middleware/authMiddleware";
 import { prisma } from "../lib/prisma";
 import * as transactionServices from "../services/transactionServices";
-import { TypeTransaction } from "../../generated/prisma/enums";
 import { AppError } from "../utils/AppError";
-import { trace } from "console";
+import { keyGenerator,cache } from "../utils/cache";
 
 export const getTransaction = async (req: AuthRequest, res: Response) => {
   // 1. Parse User ID
   const user = req.user as JwtPayload;
   const userId = Number(user.id);
-
+  const cacheInfo = keyGenerator(req);
+  console.log('key in the controller: ',cacheInfo.key,cacheInfo.tags)
   // 2. Parse Cursor (from query param ?cursor=123)
   const cursorParam = req.query.cursor;
   const cursorId = cursorParam ? Number(cursorParam) : undefined;
@@ -53,14 +53,17 @@ export const getTransaction = async (req: AuthRequest, res: Response) => {
       nextCursor = transactions[transactions.length - 1].id;
     }
 
-    // 5. Send Response
-    return res.status(200).json({
+    const result ={
       data: transactions,
       meta: {
         nextCursor: nextCursor,
         hasMore: nextCursor !== null,
       },
-    });
+    }
+
+    await cache(cacheInfo,result);
+    // 5. Send Response
+    return res.status(200).json(result);
   } catch (e) {
     console.error("❌ Error fetching transactions:", e);
     return res.status(500).json({ error: "Internal Server Error" });

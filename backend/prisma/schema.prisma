@@ -65,6 +65,8 @@ model Categorie {
   // Relationships
   transactions Transaction[]
   snapshots    BudgetSnapshot[]
+
+  @@unique([id, nom])
 }
 
 model BudgetSnapshot {
