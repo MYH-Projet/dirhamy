@@ -34,10 +34,13 @@ const months = [
 
 // Create Initial Structure and populate the user object
 loadInitialStructure(user).then(() => {
-  // write your code here
+  // First load budgets fast
   getBudgetStatuses().then(() => {
     removeSpinnerPage();
     toastNotis();
+
+    // Then fetch AI insights asynchronously and update cards
+    fetchAndApplyAIInsights();
   });
 });
 
@@ -58,6 +61,61 @@ function getBudgetStatuses() {
     renderBudgetStatuses,
     wireBudgetCardEvents,
   );
+}
+
+// Fetch AI insights asynchronously and update budget cards
+async function fetchAndApplyAIInsights() {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(API_URL + "/ai/insight", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.warn("AI insights unavailable");
+      return;
+    }
+
+    const data = await response.json();
+    console.log("AI insights received:", data);
+
+    // Update budget cards with AI insights
+    if (data.insights && data.insights.insights) {
+      updateBudgetCardsWithInsights(data.insights.insights);
+    } else if (data.insights && data.insights.raw) {
+      // If AI response couldn't be parsed as JSON
+      console.warn("AI returned unparsed response:", data.insights.raw);
+    }
+  } catch (error) {
+    console.error("Failed to fetch AI insights:", error);
+    // Cards still work, just without AI messages
+  }
+}
+
+// Update existing budget cards with AI-generated messages
+function updateBudgetCardsWithInsights(insights) {
+  const budgetCards = document.querySelectorAll(".budget-card");
+
+  budgetCards.forEach((card) => {
+    const categoryName = card.querySelector(".budget-card-category")?.textContent;
+    if (!categoryName) return;
+
+    // Find matching insight for this category
+    const insight = insights.find(
+      (i) => i.categoryName?.toLowerCase() === categoryName.toLowerCase()
+    );
+
+    if (insight && insight.message) {
+      const messageSpan = card.querySelector(".budget-card-message span");
+      if (messageSpan) {
+        messageSpan.textContent = insight.message;
+      }
+    }
+  });
 }
 
 function showEditLimitModal(budgetStatus) {
