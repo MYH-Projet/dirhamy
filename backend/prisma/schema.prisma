@@ -35,6 +35,8 @@ model Utilisateur {
   // Relationships
   comptes    Compte[]
   categories Categorie[]
+    //relation for weekly summary
+  weeklySummaries WeeklySummary[]
 }
 
 model Compte {
@@ -121,4 +123,21 @@ model BalanceSnapshot {
   compte   Compte @relation(fields: [compteId], references: [id])
 
   @@index([compteId, date]) // Important for finding the "latest" snapshot quickly
+}
+
+
+//weejly summary for the Embeddings
+
+model WeeklySummary {
+  id          Int       @id @default(autoincrement())
+  weekStart   DateTime  // Start of the week (e.g., Monday 00:00)
+  weekEnd     DateTime  // End of the week (e.g., Sunday 23:59)
+  summary     String    // Text summary of user behavior
+  embedding   Unsupported("vector(768)")? // Gemini text-embedding-004 produces 768 dims
+  createdAt   DateTime  @default(now())
+  // Foreign Key
+  utilisateurId Int
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
+  @@unique([utilisateurId, weekStart])
+  @@index([utilisateurId])
 }
