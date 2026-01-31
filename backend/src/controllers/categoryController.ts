@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import {prisma} from '../lib/prisma';
 import { AuthRequest, JwtPayload } from '../Middleware/authMiddleware';
 import { cache, keyGenerator } from '../utils/cache';
+import { error } from 'console';
 
 
 // Create a new Category
@@ -19,6 +20,17 @@ export const createCategory = async (req: AuthRequest, res: Response) => {
 
     if (!nom) {
       return res.status(400).json({ error: 'Name (nom) is required' });
+    }
+
+    const categorie = await prisma.categorie.findFirst({
+      where:{
+        utilisateurId:userId,
+        nom,
+      }
+    })
+
+    if(categorie){
+      return res.status(402).json({error:"that category is already exist "})
     }
 
     const newCategory = await prisma.categorie.create({

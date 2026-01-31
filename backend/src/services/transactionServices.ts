@@ -76,7 +76,8 @@ export const createTransaction = async (data: CreateTransactionData) => {
                             description: description,
                             type: type, // or however you handle types
                             date: date,
-                            categorieId: categorieId
+                            categorieId: categorieId,
+                            idDestination:idDestination
                         },
                         // Transaction 2: Credit Account B (Positive amount)
                         {
@@ -85,7 +86,8 @@ export const createTransaction = async (data: CreateTransactionData) => {
                             description: description,
                             type: type,
                             date: date,
-                            categorieId: categorieId
+                            categorieId: categorieId,
+                            idDestination:compteId
                         }
                     ]
                 }
