@@ -19,17 +19,23 @@ async function main() {
   // Order is critical due to Foreign Key constraints
   await prisma.balanceSnapshot.deleteMany();
   await prisma.budgetSnapshot.deleteMany();
-  
+
   // Transactions depend on Transfers, so delete transactions first
-  await prisma.transaction.deleteMany(); 
+  await prisma.transaction.deleteMany();
   // Now safe to delete Transfers
   await prisma.transfer.deleteMany();
-  
+
   await prisma.categorie.deleteMany();
   await prisma.compte.deleteMany();
+
+  // Delete AI-related tables before user
+  await prisma.weeklySummary.deleteMany();
+  await prisma.chatMessage.deleteMany();
+
   await prisma.utilisateur.deleteMany();
 
   console.log('🧹 Database cleaned');
+
 
   // ---------------------------------------------------------
   // 2. USER & BASICS
@@ -39,7 +45,7 @@ async function main() {
       nom: 'Charkaoui',
       prenom: 'Mohamed Anas',
       email: 'mac@example.com',
-      motDePasse: await bcrypt.hash('password123', 10), 
+      motDePasse: await bcrypt.hash('password123', 10),
     },
   });
 
@@ -79,7 +85,7 @@ async function main() {
     data: {
       montant: 3000.0,
       type: TypeTransaction.REVENU,
-      date: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1), 
+      date: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1),
       description: 'Monthly Salary',
       compteId: bankAccount.id,
       categorieId: catSalary.id,
@@ -101,7 +107,7 @@ async function main() {
   // --- C. ATM Withdrawal (TRANSFER) ---
   // We use the 'Transfer' model to link the withdrawal and deposit
   const transferDate = new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 5);
-  
+
   await prisma.transfer.create({
     data: {
       createdAt: transferDate,
@@ -116,7 +122,7 @@ async function main() {
             description: 'ATM Withdrawal - Out',
             compteId: bankAccount.id,
             categorieId: catTransport.id,
-            idDestination:cashWallet.id
+            idDestination: cashWallet.id
           },
           // 2. Money entering Cash (Positive)
           {
@@ -126,7 +132,7 @@ async function main() {
             description: 'ATM Withdrawal - In',
             compteId: cashWallet.id,
             categorieId: catTransport.id,
-            idDestination:bankAccount.id
+            idDestination: bankAccount.id
           }
         ]
       }
@@ -138,7 +144,7 @@ async function main() {
     data: {
       montant: -85.50,
       type: TypeTransaction.DEPENSE,
-      date: new Date(), 
+      date: new Date(),
       description: 'Supermarket Run',
       compteId: cashWallet.id,
       categorieId: catGroceries.id,
@@ -150,7 +156,7 @@ async function main() {
   // ---------------------------------------------------------
   // 4. SNAPSHOTS
   // ---------------------------------------------------------
-  
+
   // Budget Snapshot (for Groceries last month)
   await prisma.budgetSnapshot.create({
     data: {
@@ -164,8 +170,8 @@ async function main() {
   // Balance Snapshot (Bank account balance from 10 days ago)
   await prisma.balanceSnapshot.create({
     data: {
-      date: new Date(new Date().setDate(today.getDate() - 10)), 
-      solde: 1600.0, 
+      date: new Date(new Date().setDate(today.getDate() - 10)),
+      solde: 1600.0,
       compteId: bankAccount.id,
     },
   });

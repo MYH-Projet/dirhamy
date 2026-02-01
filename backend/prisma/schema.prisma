@@ -35,8 +35,8 @@ model Utilisateur {
   // Relationships
   comptes    Compte[]
   categories Categorie[]
-    //relation for weekly summary
   weeklySummaries WeeklySummary[]
+  chatMessages ChatMessage[]
 }
 
 model Compte {
@@ -140,4 +140,17 @@ model WeeklySummary {
   utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
   @@unique([utilisateurId, weekStart])
   @@index([utilisateurId])
+}
+
+// Chat history for AI conversations
+model ChatMessage {
+  id        Int      @id @default(autoincrement())
+  content   String
+  sender    String   // "user" or "ai"
+  createdAt DateTime @default(now())
+
+  utilisateurId Int
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
+
+  @@index([utilisateurId, createdAt])
 }

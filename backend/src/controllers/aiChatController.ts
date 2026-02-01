@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { dataAggregator } from '../services/dataAggregator';
 import { AuthRequest, JwtPayload } from '../Middleware/authMiddleware';
 import { retrieveRelevantSummaries } from '../services/weeklySummaryService';
+import { saveMessage } from './chatHistoryController';
 
 export const chat = async (req: AuthRequest, res: Response) => {
 
@@ -12,6 +13,12 @@ export const chat = async (req: AuthRequest, res: Response) => {
   if (isNaN(userId)) {
     return res.status(400).json({ error: "Invalid User ID" });
   }
+
+  // getting the user's request
+  const userMessage = req.body.message;
+
+  // Save user message to history
+  await saveMessage(userId, userMessage, "user");
 
   // get user data from the dataAggregator function
   let userData: string;
@@ -23,9 +30,6 @@ export const chat = async (req: AuthRequest, res: Response) => {
     console.error("❌ Error aggregating user data:", e);
     return res.status(500).json({ error: "Failed to gather user data" });
   }
-
-  // getting the user's request
-  const userMessage = req.body.message;
 
   // RAG: Retrieve relevant historical context
   let historicalContext: string[] = [];
@@ -43,13 +47,17 @@ export const chat = async (req: AuthRequest, res: Response) => {
   let reply: string;
   try {
     reply = await generateResponse(userMessage, userData, historicalContext);
-    console.log("reply of chat ai")
+    console.log("reply of chat ai");
   } catch (e) {
     console.error("❌ Gemini API error:", e);
     return res.status(500).json({ error: "AI service failed" });
   }
 
+  // Save AI response to history
+  await saveMessage(userId, reply, "ai");
+
   return res.status(200).json({ reply });
 
 }
+
 

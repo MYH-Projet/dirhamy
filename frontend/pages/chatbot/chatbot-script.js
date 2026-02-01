@@ -2,7 +2,7 @@ import { loadInitialStructure } from "/helpers/utils.js";
 
 // Initialize user data if needed
 const user = {};
-loadInitialStructure(user).then(() => {
+loadInitialStructure(user).then(async () => {
   // UI elements
   const messagesDiv = document.getElementById("chat-messages");
   const input = document.getElementById("chat-input");
@@ -32,6 +32,56 @@ loadInitialStructure(user).then(() => {
     scrollToBottom();
     return msg;
   };
+
+  // Load chat history from server
+  const loadChatHistory = async () => {
+    try {
+      console.log("🔄 Loading chat history...");
+      const response = await fetch("/api/ai/history");
+      console.log("📡 History API response status:", response.status);
+
+      if (!response.ok) {
+        console.warn("⚠️ History API returned error:", response.status, response.statusText);
+        return;
+      }
+
+      const data = await response.json();
+      console.log("📦 History data received:", data);
+
+      if (data.messages && data.messages.length > 0) {
+        data.messages.forEach(msg => {
+          addMessage(msg.content, msg.sender);
+        });
+        console.log(`📚 Loaded ${data.messages.length} messages from history`);
+      } else {
+        console.log("📭 No chat history found");
+      }
+    } catch (e) {
+      console.error("❌ Failed to load chat history:", e);
+    }
+  };
+
+
+  // Clear chat history
+  const clearChatHistory = async () => {
+    try {
+      const response = await fetch("/api/ai/history", { method: "DELETE" });
+      if (response.ok) {
+        // Clear UI
+        messagesDiv.innerHTML = "";
+        if (emptyState) {
+          messagesDiv.appendChild(emptyState);
+          emptyState.style.display = "";
+        }
+        console.log("🗑️ Chat history cleared");
+      }
+    } catch (e) {
+      console.error("Failed to clear chat history:", e);
+    }
+  };
+
+  // Load history on page load
+  await loadChatHistory();
 
   const sendMessage = async (text = null) => {
     const userMsg = text || input.value.trim();
@@ -235,6 +285,16 @@ loadInitialStructure(user).then(() => {
       renderSuggestions();
       resetRotationTimer();
     });
+
+  // Clear Chat Button Logic
+  document
+    .getElementById("clear-chat-btn")
+    ?.addEventListener("click", () => {
+      if (confirm("Clear all chat history?")) {
+        clearChatHistory();
+      }
+    });
+
 
   // Event Listeners
   sendBtn.addEventListener("click", () => sendMessage());
