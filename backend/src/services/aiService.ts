@@ -5,10 +5,20 @@ dotenv.config();
 const genAi = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 //the mode is either "chat" for the chatbot responses or "Goal" for the goal setting responses
-export async function generateResponse(userMessage: string, userData: string) {
+export async function generateResponse(
+  userMessage: string,
+  userData: string,
+  historicalContext?: string[] // NEW: RAG-retrieved summaries
+) {
   try {
     const model = genAi.getGenerativeModel({ model: "gemma-3-27b-it" });
     console.log("model created");
+
+    // Build historical context section if available
+    const historySection = historicalContext && historicalContext.length > 0
+      ? `\n\nHistorical Context (past weekly summaries for reference):\n${historicalContext.map((s, i) => `Week ${i + 1}: ${s}`).join("\n")}\n`
+      : "";
+
     const prompt = `
                 you are a financial advisor for an app called Dirhamy.\n
                 your job is to help the user manage their money,educate them and help them acheinve financial literacy and freedom\n
@@ -17,7 +27,8 @@ export async function generateResponse(userMessage: string, userData: string) {
                 your replies shouldn't contain ** ** at all beceause it doesn't represent bold text in html\n
                 your replies should be well formated and do not have "\n" and do not have slash n to make it readable\n
                 Response should be logical, easy to understand and based on the user's data provided below\n
-                user data : ${userData}\n
+                ${historySection}
+                Current user data : ${userData}\n
                 user message : ${userMessage}`;
 
     const result = await model.generateContent(prompt);
@@ -29,7 +40,7 @@ export async function generateResponse(userMessage: string, userData: string) {
   }
 }
 
-export async function generateInsight(userData: string,budgetData: Object[]) {
+export async function generateInsight(userData: string, budgetData: Object[]) {
   try {
     const model = genAi.getGenerativeModel({ model: "gemma-3-27b-it" });
     /* old prompt
