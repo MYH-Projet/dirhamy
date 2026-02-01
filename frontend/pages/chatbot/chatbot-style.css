@@ -4,28 +4,179 @@
 /* Main Container Override for Chatbot */
 .main-container {
   padding: 0 !important;
-  /* Remove outer padding */
   height: 100vh;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  /* Sidebar + Chat side by side */
 }
 
-/* Chatbot Layout */
+/* ============================================
+   SIDEBAR STYLES
+   ============================================ */
+.chat-sidebar {
+  width: 280px;
+  height: 100%;
+  background-color: #f9fafb;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar-header {
+  padding: var(--md-spacing);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-spacing);
+}
+
+.sidebar-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-color);
+  margin: 0;
+}
+
+.new-chat-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.new-chat-btn:hover {
+  background-color: var(--lighter-primary-color);
+  transform: translateY(-1px);
+}
+
+.conversation-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--s-spacing);
+}
+
+.no-conversations {
+  text-align: center;
+  color: var(--gray-color);
+  padding: var(--large-spacing);
+  font-size: 13px;
+}
+
+.conversation-item {
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 4px;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.conversation-item:hover {
+  background-color: #f3f4f6;
+}
+
+.conversation-item.active {
+  background-color: rgba(13, 148, 136, 0.1);
+  border-left: 3px solid var(--primary-color);
+}
+
+.conversation-item .conv-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--black-text-color);
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation-item .conv-preview {
+  font-size: 12px;
+  color: var(--gray-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation-item .conv-delete {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  background: none;
+  border: none;
+  color: var(--gray-color);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.conversation-item:hover .conv-delete {
+  opacity: 1;
+}
+
+.conversation-item .conv-delete:hover {
+  color: #ef4444;
+  background-color: #fee2e2;
+}
+
+/* Toggle Sidebar Button (visible on mobile) */
+.toggle-sidebar-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--gray-color);
+  cursor: pointer;
+  padding: 8px;
+  margin-right: var(--s-spacing);
+}
+
+@media (max-width: 768px) {
+  .chat-sidebar {
+    position: fixed;
+    left: -280px;
+    top: 0;
+    z-index: 100;
+    transition: left 0.3s;
+  }
+
+  .chat-sidebar.open {
+    left: 0;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .toggle-sidebar-btn {
+    display: flex;
+  }
+}
+
+/* ============================================
+   CHAT CONTAINER (Main Area)
+   ============================================ */
 .chat-container {
   display: flex;
   flex-direction: column;
   flex: 1;
-  /* Fill remaining height */
   max-width: none;
-  /* Remove width restriction */
   height: 100%;
   margin: 0;
   background-color: var(--secondary-color);
   border: none;
   border-radius: 0;
-  /* Seamless look */
   box-shadow: none;
 }
+
 
 /* Header */
 .chat-header {
@@ -59,11 +210,9 @@
 .header-brand-pill.ai-pill {
   width: 42px;
   height: 42px;
-  background: linear-gradient(
-    135deg,
-    rgba(13, 148, 136, 0.1),
-    rgba(13, 148, 136, 0.05)
-  );
+  background: linear-gradient(135deg,
+      rgba(13, 148, 136, 0.1),
+      rgba(13, 148, 136, 0.05));
   border: 1px solid rgba(13, 148, 136, 0.2);
   border-radius: 12px;
   color: var(--primary-color);
@@ -77,6 +226,7 @@
 }
 
 @keyframes pulse-glow {
+
   0%,
   100% {
     opacity: 0.8;
@@ -134,11 +284,9 @@
 
 .gradient-text {
   /* Subtle gradient using app vars */
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--lighter-primary-color)
-  );
+  background: linear-gradient(135deg,
+      var(--primary-color),
+      var(--lighter-primary-color));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -322,6 +470,7 @@
 }
 
 @keyframes typing {
+
   0%,
   100% {
     transform: scale(1);
@@ -419,6 +568,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .suggestion-chip,
   .refresh-btn:hover {
     transition: none;

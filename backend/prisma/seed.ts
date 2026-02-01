@@ -28,9 +28,10 @@ async function main() {
   await prisma.categorie.deleteMany();
   await prisma.compte.deleteMany();
 
-  // Delete AI-related tables before user
+  // Delete AI-related tables before user (order matters for FK constraints)
   await prisma.weeklySummary.deleteMany();
   await prisma.chatMessage.deleteMany();
+  await prisma.conversation.deleteMany();
 
   await prisma.utilisateur.deleteMany();
 

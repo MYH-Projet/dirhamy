@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { dataAggregator } from '../services/dataAggregator';
 import { AuthRequest, JwtPayload } from '../Middleware/authMiddleware';
 import { retrieveRelevantSummaries } from '../services/weeklySummaryService';
-import { saveMessage } from './chatHistoryController';
+import { saveMessage, getOrCreateConversation } from './chatHistoryController';
 
 export const chat = async (req: AuthRequest, res: Response) => {
 
@@ -14,11 +14,20 @@ export const chat = async (req: AuthRequest, res: Response) => {
     return res.status(400).json({ error: "Invalid User ID" });
   }
 
-  // getting the user's request
+  // getting the user's request and conversationId
   const userMessage = req.body.message;
+  let conversationId = req.body.conversationId ? Number(req.body.conversationId) : undefined;
+
+  // Get or create conversation
+  try {
+    conversationId = await getOrCreateConversation(userId, conversationId);
+  } catch (e) {
+    console.error("❌ Error getting/creating conversation:", e);
+    return res.status(500).json({ error: "Failed to manage conversation" });
+  }
 
   // Save user message to history
-  await saveMessage(userId, userMessage, "user");
+  await saveMessage(conversationId, userMessage, "user");
 
   // get user data from the dataAggregator function
   let userData: string;
@@ -54,10 +63,8 @@ export const chat = async (req: AuthRequest, res: Response) => {
   }
 
   // Save AI response to history
-  await saveMessage(userId, reply, "ai");
+  await saveMessage(conversationId, reply, "ai");
 
-  return res.status(200).json({ reply });
+  return res.status(200).json({ reply, conversationId });
 
 }
-
-
