@@ -81,7 +81,6 @@ async function fetchAndApplyAIInsights() {
     }
 
     const data = await response.json();
-    console.log("AI insights received:", data);
 
     // Update budget cards with AI insights
     if (data.insights && data.insights.insights) {

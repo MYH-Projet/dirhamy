@@ -580,6 +580,13 @@ loadInitialStructure(user).then(async () => {
     }
   });
 
+  // Toggle Conversations Sidebar
+  const toggleConvSidebarBtn = document.getElementById("toggle-conv-sidebar-btn");
+  toggleConvSidebarBtn?.addEventListener("click", () => {
+    sidebar?.classList.toggle("collapsed");
+    toggleConvSidebarBtn.classList.toggle("active");
+  });
+
   // ============================================
   // INITIALIZE
   // ============================================

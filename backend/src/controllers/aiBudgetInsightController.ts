@@ -26,7 +26,6 @@ export const budgetInsight = async (req: AuthRequest, res: Response) => {
     // Get user data from the dataAggregator function
     let userData: string;
     try {
-        console.log("user id : ", userId);
         userData = await dataAggregator(userId);
     } catch (e) {
         console.error("❌ Error aggregating user data:", e);

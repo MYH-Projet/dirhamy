@@ -20,6 +20,21 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  white-space: nowrap;
+  /* Prevent text wrapping */
+}
+
+/* Prevent content squashing during animation */
+.chat-sidebar>* {
+  min-width: 280px;
+}
+
+/* Collapsed state for sidebar */
+.chat-sidebar.collapsed {
+  width: 0;
+  border-left: none;
 }
 
 .chat-sidebar .sidebar-header {
@@ -573,6 +588,35 @@
   color: #ef4444;
 }
 
+/* Toggle Conversations Sidebar Button */
+.toggle-conv-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary-color);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.toggle-conv-btn:hover {
+  background: var(--lighter-primary-color);
+}
+
+.toggle-conv-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.toggle-conv-btn.active svg {
+  transform: rotate(180deg);
+}
 
 /* Messages Area with Watermark */
 .chat-messages {
