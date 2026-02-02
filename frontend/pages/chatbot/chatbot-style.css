@@ -1,13 +1,12 @@
 @import url("/base.css");
 
-/* Chatbot Layout */
-/* Main Container Override for Chatbot */
-.main-container {
+/* Chatbot Layout - scoped to prevent affecting global layout */
+.chatbot-layout {
   padding: 0 !important;
   height: 100vh;
   display: flex;
-  flex-direction: row;
-  /* Sidebar + Chat side by side */
+  flex-direction: row-reverse;
+  /* Sidebar on right */
 }
 
 /* ============================================
@@ -17,7 +16,7 @@
   width: 280px;
   height: 100%;
   background-color: #f9fafb;
-  border-right: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
