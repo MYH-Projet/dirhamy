@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { dataAggregator } from '../services/dataAggregator';
 import { AuthRequest, JwtPayload } from '../Middleware/authMiddleware';
 import { retrieveRelevantSummaries } from '../services/weeklySummaryService';
+import { saveMessage, getOrCreateConversation } from './chatHistoryController';
 
 export const chat = async (req: AuthRequest, res: Response) => {
 
@@ -13,27 +14,35 @@ export const chat = async (req: AuthRequest, res: Response) => {
     return res.status(400).json({ error: "Invalid User ID" });
   }
 
+  // getting the user's request and conversationId
+  const userMessage = req.body.message;
+  let conversationId = req.body.conversationId ? Number(req.body.conversationId) : undefined;
+
+  // Get or create conversation
+  try {
+    conversationId = await getOrCreateConversation(userId, conversationId);
+  } catch (e) {
+    console.error("❌ Error getting/creating conversation:", e);
+    return res.status(500).json({ error: "Failed to manage conversation" });
+  }
+
+  // Save user message to history
+  await saveMessage(conversationId, userMessage, "user");
+
   // get user data from the dataAggregator function
   let userData: string;
   try {
-    console.log("user id : ", userId);
     userData = await dataAggregator(userId);
-    console.log("user data : ", userData);
   } catch (e) {
     console.error("❌ Error aggregating user data:", e);
     return res.status(500).json({ error: "Failed to gather user data" });
   }
 
-  // getting the user's request
-  const userMessage = req.body.message;
-
   // RAG: Retrieve relevant historical context
   let historicalContext: string[] = [];
   try {
-    console.log("🔍 Retrieving relevant historical summaries...");
     const relevantSummaries = await retrieveRelevantSummaries(userId, userMessage, 5);
     historicalContext = relevantSummaries.map(s => s.summary);
-    console.log(`📚 Found ${historicalContext.length} relevant summaries`);
   } catch (e) {
     console.warn("⚠️ Failed to retrieve historical context (continuing without):", e);
     // Continue without historical context - not a critical failure
@@ -43,13 +52,14 @@ export const chat = async (req: AuthRequest, res: Response) => {
   let reply: string;
   try {
     reply = await generateResponse(userMessage, userData, historicalContext);
-    console.log("reply of chat ai")
   } catch (e) {
     console.error("❌ Gemini API error:", e);
     return res.status(500).json({ error: "AI service failed" });
   }
 
-  return res.status(200).json({ reply });
+  // Save AI response to history
+  await saveMessage(conversationId, reply, "ai");
+
+  return res.status(200).json({ reply, conversationId });
 
 }
-

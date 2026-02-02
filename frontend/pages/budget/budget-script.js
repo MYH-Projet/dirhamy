@@ -77,11 +77,11 @@ async function fetchAndApplyAIInsights() {
 
     if (!response.ok) {
       console.warn("AI insights unavailable");
+      restoreDefaultMessages();
       return;
     }
 
     const data = await response.json();
-    console.log("AI insights received:", data);
 
     // Update budget cards with AI insights
     if (data.insights && data.insights.insights) {
@@ -89,11 +89,23 @@ async function fetchAndApplyAIInsights() {
     } else if (data.insights && data.insights.raw) {
       // If AI response couldn't be parsed as JSON
       console.warn("AI returned unparsed response:", data.insights.raw);
+      restoreDefaultMessages();
     }
   } catch (error) {
     console.error("Failed to fetch AI insights:", error);
-    // Cards still work, just without AI messages
+    restoreDefaultMessages();
   }
+}
+
+function restoreDefaultMessages() {
+  const budgetCards = document.querySelectorAll(".budget-card");
+  budgetCards.forEach((card) => {
+    const messageSpan = card.querySelector(".budget-card-message span");
+    if (messageSpan && messageSpan.dataset.defaultMessage) {
+      messageSpan.textContent = messageSpan.dataset.defaultMessage;
+      messageSpan.classList.remove("typing-indicator");
+    }
+  });
 }
 
 // Update existing budget cards with AI-generated messages
@@ -113,6 +125,7 @@ function updateBudgetCardsWithInsights(insights) {
       const messageSpan = card.querySelector(".budget-card-message span");
       if (messageSpan) {
         messageSpan.textContent = insight.message;
+        messageSpan.classList.remove("typing-indicator");
       }
     }
   });

@@ -2,16 +2,66 @@ import { loadInitialStructure } from "/helpers/utils.js";
 
 // Initialize user data if needed
 const user = {};
-loadInitialStructure(user).then(() => {
+loadInitialStructure(user).then(async () => {
   // UI elements
   const messagesDiv = document.getElementById("chat-messages");
   const input = document.getElementById("chat-input");
   const sendBtn = document.getElementById("send-btn");
-  const suggestions = document.querySelectorAll(".suggestion-chip");
   const emptyState = document.querySelector(".empty-state");
+  const conversationList = document.getElementById("conversation-list");
+  const sidebar = document.getElementById("chat-sidebar");
+
+  // State
+  let currentConversationId = null;
+  let conversations = [];
+  let pendingDeleteId = null;
+
+  // Toast notification helper
+  const showToast = (message, type = 'success') => {
+    const container = document.querySelector('.toasts-container');
+    const toast = document.createElement('div');
+    toast.className = `toast-box toast-box-${type}`;
+    toast.innerHTML = `
+      <span>${message}</span>
+      <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+    `;
+    container.appendChild(toast);
+
+    // Auto-remove after 3s
+    setTimeout(() => toast.remove(), 3000);
+  };
 
   const scrollToBottom = () => {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  };
+
+  // Simple markdown parser for AI responses
+  const parseMarkdown = (text) => {
+    return text
+      // Escape HTML first
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      // Bold text **text**
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      // Italic text *text*
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      // Bullet points (• or -)
+      .replace(/^[•\-]\s+(.+)$/gm, '<li>$1</li>')
+      // Numbered lists
+      .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
+      // Wrap consecutive <li> in <ul>
+      .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+      // Line breaks (double newline = paragraph)
+      .replace(/\n\n/g, '</p><p>')
+      // Single line breaks
+      .replace(/\n/g, '<br>')
+      // Wrap in paragraph
+      .replace(/^(.+)$/, '<p>$1</p>')
+      // Clean up empty paragraphs
+      .replace(/<p><\/p>/g, '')
+      .replace(/<p><br>/g, '<p>')
+      .replace(/<br><\/p>/g, '</p>');
   };
 
   const addMessage = (text, sender, isTyping = false) => {
@@ -24,7 +74,11 @@ loadInitialStructure(user).then(() => {
     if (isTyping) {
       msg.classList.add("typing-indicator");
       msg.innerHTML = "<span></span><span></span><span></span>";
+    } else if (sender === "ai") {
+      // Parse markdown for AI responses
+      msg.innerHTML = parseMarkdown(text);
     } else {
+      // Plain text for user messages
       msg.textContent = text;
     }
 
@@ -33,39 +87,304 @@ loadInitialStructure(user).then(() => {
     return msg;
   };
 
+  const clearMessages = () => {
+    messagesDiv.innerHTML = "";
+    if (emptyState) {
+      messagesDiv.appendChild(emptyState);
+      emptyState.style.display = "";
+    }
+  };
+
+  // ============================================
+  // CONVERSATION MANAGEMENT
+  // ============================================
+
+  // Delete Modal elements (defined early for use in renderConversationList)
+  const deleteModal = document.getElementById("delete-chat-modal");
+  const deleteConvNameSpan = document.getElementById("delete-conv-name");
+
+  const showDeleteModal = (id) => {
+    const conv = conversations.find(c => c.id === id);
+    if (!conv) return;
+
+    pendingDeleteId = id;
+    if (deleteConvNameSpan) deleteConvNameSpan.textContent = conv.title;
+    if (deleteModal) deleteModal.classList.add("active");
+  };
+
+  const hideDeleteModal = () => {
+    if (deleteModal) deleteModal.classList.remove("active");
+    pendingDeleteId = null;
+  };
+
+  const loadConversations = async () => {
+    try {
+      const response = await fetch("/api/ai/conversations");
+      if (!response.ok) return;
+
+      const data = await response.json();
+      conversations = data.conversations || [];
+      renderConversationList();
+    } catch (e) {
+      console.error("Failed to load conversations:", e);
+    }
+  };
+
+  const renderConversationList = () => {
+    if (conversations.length === 0) {
+      conversationList.innerHTML = `
+        <div class="no-conversations">
+          <p>No conversations yet</p>
+        </div>
+      `;
+      return;
+    }
+
+    conversationList.innerHTML = conversations.map(conv => `
+      <div class="conversation-item ${conv.id === currentConversationId ? 'active' : ''}" data-id="${conv.id}">
+        <p class="conv-title" data-id="${conv.id}">${escapeHtml(conv.title)}</p>
+        <p class="conv-preview">${conv.lastMessage ? escapeHtml(conv.lastMessage) : 'No messages'}</p>
+        <div class="conv-actions">
+          <button class="conv-edit" data-id="${conv.id}" title="Rename">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </button>
+          <button class="conv-delete" data-id="${conv.id}" title="Delete">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    // Add click handlers for selecting conversation
+    conversationList.querySelectorAll('.conversation-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.conv-delete') || e.target.closest('.conv-edit') || e.target.closest('.conv-title-input')) return;
+        const id = parseInt(item.dataset.id);
+        selectConversation(id);
+      });
+    });
+
+    // Add click handlers for delete
+    conversationList.querySelectorAll('.conv-delete').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = parseInt(btn.dataset.id);
+        showDeleteModal(id);
+      });
+    });
+
+    // Add click handlers for edit/rename
+    conversationList.querySelectorAll('.conv-edit').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = parseInt(btn.dataset.id);
+        startEditingTitle(id);
+      });
+    });
+
+    // Double-click on title to edit
+    conversationList.querySelectorAll('.conv-title').forEach(title => {
+      title.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        const id = parseInt(title.dataset.id);
+        startEditingTitle(id);
+      });
+    });
+  };
+
+  const startEditingTitle = (conversationId) => {
+    const conv = conversations.find(c => c.id === conversationId);
+    if (!conv) return;
+
+    const item = conversationList.querySelector(`.conversation-item[data-id="${conversationId}"]`);
+    const titleEl = item.querySelector('.conv-title');
+
+    // Replace title with input
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'conv-title-input';
+    input.value = conv.title;
+    input.dataset.id = conversationId;
+
+    titleEl.replaceWith(input);
+    input.focus();
+    input.select();
+
+    let saved = false;
+
+    // Save on Enter or blur
+    const saveTitle = async () => {
+      if (saved) return; // Prevent double save
+      saved = true;
+      const newTitle = input.value.trim() || 'New Chat';
+      await renameConversation(conversationId, newTitle);
+    };
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        input.blur(); // This will trigger saveTitle via blur
+      } else if (e.key === 'Escape') {
+        saved = true; // Prevent blur from saving
+        renderConversationList(); // Cancel edit
+      }
+    });
+
+    input.addEventListener('blur', saveTitle);
+  };
+
+  const renameConversation = async (id, newTitle, showNotification = true) => {
+    try {
+      const response = await fetch(`/api/ai/conversations/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: newTitle })
+      });
+      if (response.ok) {
+        await loadConversations();
+        if (showNotification) {
+          showToast('Conversation renamed successfully', 'success');
+        }
+      } else {
+        showToast('Failed to rename conversation', 'error');
+      }
+    } catch (e) {
+      console.error("Failed to rename conversation:", e);
+      showToast('Failed to rename conversation', 'error');
+      renderConversationList();
+    }
+  };
+
+  const escapeHtml = (text) => {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  };
+
+  const selectConversation = async (id) => {
+    currentConversationId = id;
+    renderConversationList();
+    await loadMessages(id);
+  };
+
+  const loadMessages = async (conversationId) => {
+    try {
+      clearMessages();
+      const response = await fetch(`/api/ai/conversations/${conversationId}/messages`);
+      if (!response.ok) return;
+
+      const data = await response.json();
+      if (data.messages && data.messages.length > 0) {
+        data.messages.forEach(msg => {
+          addMessage(msg.content, msg.sender);
+        });
+      }
+    } catch (e) {
+      console.error("Failed to load messages:", e);
+    }
+  };
+
+  const createConversation = async (title = "New Chat") => {
+    try {
+      const response = await fetch("/api/ai/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title })
+      });
+      if (!response.ok) return null;
+
+      const data = await response.json();
+      currentConversationId = data.conversation.id;
+
+      // Update the title if provided
+      if (title && title !== "New Chat") {
+        await renameConversation(data.conversation.id, title, false);
+      }
+
+      await loadConversations();
+      clearMessages();
+      return data.conversation.id;
+    } catch (e) {
+      console.error("Failed to create conversation:", e);
+      return null;
+    }
+  };
+
+  const deleteConversation = async (id) => {
+    try {
+      const conv = conversations.find(c => c.id === id);
+      const convName = conv?.title || 'Conversation';
+
+      const response = await fetch(`/api/ai/conversations/${id}`, { method: "DELETE" });
+      if (response.ok) {
+        if (currentConversationId === id) {
+          currentConversationId = null;
+          clearMessages();
+        }
+        await loadConversations();
+        // Select first conversation if available
+        if (conversations.length > 0 && !currentConversationId) {
+          selectConversation(conversations[0].id);
+        }
+        showToast(`"${convName}" deleted successfully`, 'success');
+      } else {
+        showToast('Failed to delete conversation', 'error');
+      }
+    } catch (e) {
+      console.error("Failed to delete conversation:", e);
+      showToast('Failed to delete conversation', 'error');
+    }
+  };
+
+  // ============================================
+  // SEND MESSAGE
+  // ============================================
+
   const sendMessage = async (text = null) => {
     const userMsg = text || input.value.trim();
     if (!userMsg) return;
 
+    // Create new conversation if needed
+    if (!currentConversationId) {
+      await createConversation();
+    }
+
     addMessage(userMsg, "user");
     input.value = "";
-
-    // Update context based on user input and rotate chips
-    if (typeof detectContext === "function") detectContext(userMsg);
-    if (typeof resetRotationTimer === "function") resetRotationTimer();
-    // Optional: Refresh chips immediately after send to show "what's next"
-    setTimeout(() => {
-      if (typeof renderSuggestions === "function") renderSuggestions();
-    }, 1000);
 
     // Add typing indicator
     const typingMsg = addMessage("", "ai", true);
 
     try {
-      console.log("Sending message to server");
       const response = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMsg }),
+        body: JSON.stringify({
+          message: userMsg,
+          conversationId: currentConversationId
+        }),
       });
 
-      console.log(response);
       if (!response.ok) throw new Error("Network error");
       const data = await response.json();
 
+      // Update conversationId if returned (for new conversations)
+      if (data.conversationId) {
+        currentConversationId = data.conversationId;
+      }
+
       // Remove typing indicator and add actual response
-      document.querySelector(".typing-indicator")?.remove(); // remove animation
+      document.querySelector(".typing-indicator")?.remove();
       addMessage(data.reply, "ai");
+
+      // Refresh conversation list to update title/preview
+      await loadConversations();
     } catch (e) {
       console.error(e);
       document.querySelector(".typing-indicator")?.remove();
@@ -73,170 +392,185 @@ loadInitialStructure(user).then(() => {
     }
   };
 
-  // Suggestions Data Pool
+  // ============================================
+  // SUGGESTIONS (keeping existing functionality)
+  // ============================================
+
   const suggestionsData = {
     overview: [
       "Summarize my spending this week",
       "Show my recent transactions",
-      "How much did I spend this month?",
-      "What is my balance?",
-      "Weekly spending detailed report",
-      "Total expenses vs income",
-      "Did I stick to my budget?",
-      "Show spending breakdown",
+      "What's my current balance?",
+      "How much have I spent today?",
     ],
-    saving: [
-      "How can I save 500 MAD this month?",
-      "Set a savings goal for a car",
-      "Tips to save money on groceries",
-      "Create a savings plan",
-      "How much should I save?",
-      "Help me build an emergency fund",
-      "Savings opportunities analysis",
-      "Track my savings progress",
+    budgeting: [
+      "Am I on track with my budget?",
+      "Which category am I overspending on?",
+      "How much can I spend this week?",
+      "Suggest a savings goal for me",
     ],
-    budget: [
-      "Create a budget for food",
-      "Set a limit for entertainment",
-      "Am I over my shopping budget?",
-      "Adjust my travel budget",
-      "Suggest a realistic budget",
-      "Budget vs Actual for this month",
-      "Categorize my unassigned expenses",
-      "How much is left for dining out?",
+    trends: [
+      "Compare my spending to last month",
+      "What's my biggest expense category?",
+      "Show my income vs expenses",
+      "Any unusual charges lately?",
     ],
-    overspending: [
-      "Why did I overspend?",
-      "Alert me if I exceed 2000 MAD",
-      "Analyze my high spending areas",
-      "Cut down unnecessary expenses",
-      "Where can I reduce costs?",
-      "Spending patterns analysis",
-      "Identify impulse purchases",
-      "Compare with last month's spending",
-    ],
-    general: [
-      "What can you do?",
-      "Help me manage my finances",
-      "Financial health checkup",
-      "Start a new financial goal",
-      "Reset my preferences",
-      "Export my transaction history",
-      "Forecast my expenses",
-      "Smart financial advice",
+    tips: [
+      "Tips to reduce my expenses",
+      "How can I save more?",
+      "Advice for my groceries budget",
+      "Help me plan for next month",
     ],
   };
 
-  // State for suggestions
   let currentContext = "overview";
-  let displayedSuggestions = new Set();
-  let rotationInterval;
-
-  const getSuggestions = (context = "overview") => {
-    // Determine the primary category based on context
-    let pool = suggestionsData[context] || suggestionsData.overview;
-
-    // If we don't have enough specific chips, mix in some general ones
-    if (pool.length < 4) {
-      pool = [...pool, ...suggestionsData.general];
-    }
-
-    // Select 4 unique random suggestions
-    const selected = [];
-    const available = pool.filter((s) => !displayedSuggestions.has(s));
-
-    // If we've shown most of them, reset the history
-    const candidates = available.length < 4 ? pool : available;
-
-    // Shuffle and pick 4
-    const shuffled = [...candidates].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 4);
+  const detectContext = (msg) => {
+    const lowerMsg = msg.toLowerCase();
+    if (lowerMsg.includes("budget") || lowerMsg.includes("limit"))
+      currentContext = "budgeting";
+    else if (lowerMsg.includes("trend") || lowerMsg.includes("compare"))
+      currentContext = "trends";
+    else if (lowerMsg.includes("tip") || lowerMsg.includes("save"))
+      currentContext = "tips";
+    else currentContext = "overview";
   };
 
-  const renderSuggestions = (context = currentContext) => {
-    const container = document.getElementById("chat-suggestions");
-    if (!container) return;
+  const chipsContainer = document.getElementById("chat-suggestions");
+  const getRandomSuggestions = (count = 3) => {
+    const pool = [
+      ...suggestionsData[currentContext],
+      ...suggestionsData.overview,
+    ];
+    const unique = [...new Set(pool)];
+    const shuffled = unique.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
 
-    const chips = getSuggestions(context);
-
-    // Update history
-    chips.forEach((c) => displayedSuggestions.add(c));
-    if (displayedSuggestions.size > 15) displayedSuggestions.clear(); // keep history bounded
-
-    // Clear and render new chips
-    container.innerHTML = "";
-    chips.forEach((text, index) => {
-      const btn = document.createElement("button");
-      btn.className = "suggestion-chip";
-      btn.textContent = text;
-      btn.style.animationDelay = `${index * 50}ms`; // Stagger animations
-
-      btn.addEventListener("click", () => {
-        sendMessage(text);
-        detectContext(text); // switch context immediately
-        resetRotationTimer(); // restart timer
-        renderSuggestions(); // fresh chips immediately
-      });
-
-      container.appendChild(btn);
+  const renderSuggestions = () => {
+    const chips = getRandomSuggestions(3);
+    chipsContainer.innerHTML = chips
+      .map(
+        (chip, i) =>
+          `<button class="suggestion-chip" style="animation-delay: ${i * 0.1}s">${chip}</button>`
+      )
+      .join("");
+    chipsContainer.querySelectorAll(".suggestion-chip").forEach((chip) => {
+      chip.addEventListener("click", () => sendMessage(chip.textContent));
     });
   };
 
-  const detectContext = (text) => {
-    const lower = text.toLowerCase();
-    if (
-      lower.includes("budget") ||
-      lower.includes("category") ||
-      lower.includes("class")
-    )
-      currentContext = "budget";
-    else if (
-      lower.includes("save") ||
-      lower.includes("goal") ||
-      lower.includes("fund")
-    )
-      currentContext = "saving";
-    else if (
-      lower.includes("overspend") ||
-      lower.includes("limit") ||
-      lower.includes("exceed")
-    )
-      currentContext = "overspending";
-    else if (
-      lower.includes("summary") ||
-      lower.includes("week") ||
-      lower.includes("month") ||
-      lower.includes("balance")
-    )
-      currentContext = "overview";
-    else if (Math.random() > 0.7) currentContext = "general"; // occasionally switch to general
-  };
-
+  let rotationTimer;
   const startRotationTimer = () => {
-    clearInterval(rotationInterval);
-    const randomTime = 8000 + Math.random() * 4000; // 8-12s
-    rotationInterval = setInterval(() => {
+    clearTimeout(rotationTimer);
+    const randomTime = 8000 + Math.random() * 8000;
+    rotationTimer = setTimeout(() => {
       renderSuggestions();
+      startRotationTimer();
     }, randomTime);
   };
 
-  const resetRotationTimer = () => {
-    startRotationTimer();
+  // ============================================
+  // EVENT LISTENERS
+  // ============================================
+
+  // Modal elements
+  const modal = document.getElementById("new-chat-modal");
+  const convNameInput = document.getElementById("conv-name-input");
+  const modalCreateBtn = document.getElementById("modal-create-btn");
+  const modalCancelBtn = document.getElementById("modal-cancel-btn");
+
+  const showModal = () => {
+    modal?.classList.add("active");
+    convNameInput.value = "";
+    convNameInput.focus();
   };
 
-  // Initialize
-  renderSuggestions();
-  startRotationTimer();
+  const hideModal = () => {
+    modal?.classList.remove("active");
+  };
 
-  // Refresh Button Logic
-  document
-    .getElementById("refresh-suggestions")
-    ?.addEventListener("click", () => {
-      renderSuggestions();
-      resetRotationTimer();
-    });
+  // New Chat Button - show modal
+  document.getElementById("new-chat-btn")?.addEventListener("click", () => {
+    showModal();
+  });
 
-  // Event Listeners
+  // Modal Create Button
+  modalCreateBtn?.addEventListener("click", async () => {
+    const title = convNameInput.value.trim() || "New Chat";
+    hideModal();
+    await createConversation(title);
+  });
+
+  // Modal Cancel Button
+  modalCancelBtn?.addEventListener("click", () => {
+    hideModal();
+  });
+
+  // Close modal on overlay click
+  modal?.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      hideModal();
+    }
+  });
+
+  // Close modal on Escape, create on Enter
+  convNameInput?.addEventListener("keydown", async (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const title = convNameInput.value.trim() || "New Chat";
+      hideModal();
+      await createConversation(title);
+    } else if (e.key === "Escape") {
+      hideModal();
+    }
+  });
+
+  // ============================================
+  // DELETE MODAL EVENT LISTENERS
+  // ============================================
+  const deleteConfirmBtn = document.getElementById("delete-confirm-btn");
+  const deleteCancelBtn = document.getElementById("delete-cancel-btn");
+
+  // Delete Confirm Button
+  deleteConfirmBtn?.addEventListener("click", async () => {
+    if (pendingDeleteId) {
+      const idToDelete = pendingDeleteId; // Save ID before hiding modal clears it
+      hideDeleteModal();
+      await deleteConversation(idToDelete);
+    }
+  });
+
+  // Delete Cancel Button
+  deleteCancelBtn?.addEventListener("click", () => {
+    hideDeleteModal();
+  });
+
+  // Close delete modal on overlay click
+  deleteModal?.addEventListener("click", (e) => {
+    if (e.target === deleteModal) {
+      hideDeleteModal();
+    }
+  });
+
+  // Delete Current Conversation Button (header)
+  document.getElementById("delete-conv-btn")?.addEventListener("click", () => {
+    if (currentConversationId) {
+      showDeleteModal(currentConversationId);
+    }
+  });
+
+  // Toggle Sidebar (Mobile)
+  document.getElementById("toggle-sidebar-btn")?.addEventListener("click", () => {
+    sidebar?.classList.toggle("open");
+  });
+
+  // Refresh Suggestions
+  document.getElementById("refresh-suggestions")?.addEventListener("click", () => {
+    renderSuggestions();
+    startRotationTimer();
+  });
+
+  // Send Message
   sendBtn.addEventListener("click", () => sendMessage());
 
   input.addEventListener("keypress", (e) => {
@@ -246,5 +580,24 @@ loadInitialStructure(user).then(() => {
     }
   });
 
-  // No static suggestions listener needed anymore as they are dynamic
+  // Toggle Conversations Sidebar
+  const toggleConvSidebarBtn = document.getElementById("toggle-conv-sidebar-btn");
+  toggleConvSidebarBtn?.addEventListener("click", () => {
+    sidebar?.classList.toggle("collapsed");
+    toggleConvSidebarBtn.classList.toggle("active");
+  });
+
+  // ============================================
+  // INITIALIZE
+  // ============================================
+
+  await loadConversations();
+
+  // Select first conversation or show empty state
+  if (conversations.length > 0) {
+    selectConversation(conversations[0].id);
+  }
+
+  renderSuggestions();
+  startRotationTimer();
 });
