@@ -18,7 +18,6 @@ export async function generateResponse(
   historicalContext?: string[] // NEW: RAG-retrieved summaries
 ) {
   try {
-    console.log("🚀 Calling Groq API with model:", CHAT_MODEL);
 
     // Build historical context section if available
     const historySection = historicalContext && historicalContext.length > 0
@@ -63,7 +62,6 @@ User message: ${userMessage}`;
       max_tokens: 1024,
     });
 
-    console.log("✅ Groq response generated");
     return completion.choices[0]?.message?.content || "I couldn't generate a response. Please try again!";
   } catch (error) {
     console.error("❌ Groq API error:", error);
@@ -73,7 +71,6 @@ User message: ${userMessage}`;
 
 export async function generateInsight(userData: string, budgetData: Object[]) {
   try {
-    console.log("🚀 Calling Groq API for insights with model:", INSIGHT_MODEL);
 
     const systemPrompt = `You are a financial advisor analyzing budget data. Your job is to create goal advice based on user's budget data.
 
@@ -107,7 +104,6 @@ Analyze the budget data and provide insights for each category.`;
       max_tokens: 1024,
     });
 
-    console.log("✅ Groq insight response generated");
     return completion.choices[0]?.message?.content || '{"insights": []}';
   } catch (error) {
     console.error("❌ Groq API error:", error);

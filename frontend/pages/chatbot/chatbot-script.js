@@ -14,6 +14,22 @@ loadInitialStructure(user).then(async () => {
   // State
   let currentConversationId = null;
   let conversations = [];
+  let pendingDeleteId = null;
+
+  // Toast notification helper
+  const showToast = (message, type = 'success') => {
+    const container = document.querySelector('.toasts-container');
+    const toast = document.createElement('div');
+    toast.className = `toast-box toast-box-${type}`;
+    toast.innerHTML = `
+      <span>${message}</span>
+      <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+    `;
+    container.appendChild(toast);
+
+    // Auto-remove after 3s
+    setTimeout(() => toast.remove(), 3000);
+  };
 
   const scrollToBottom = () => {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -83,6 +99,24 @@ loadInitialStructure(user).then(async () => {
   // CONVERSATION MANAGEMENT
   // ============================================
 
+  // Delete Modal elements (defined early for use in renderConversationList)
+  const deleteModal = document.getElementById("delete-chat-modal");
+  const deleteConvNameSpan = document.getElementById("delete-conv-name");
+
+  const showDeleteModal = (id) => {
+    const conv = conversations.find(c => c.id === id);
+    if (!conv) return;
+
+    pendingDeleteId = id;
+    if (deleteConvNameSpan) deleteConvNameSpan.textContent = conv.title;
+    if (deleteModal) deleteModal.classList.add("active");
+  };
+
+  const hideDeleteModal = () => {
+    if (deleteModal) deleteModal.classList.remove("active");
+    pendingDeleteId = null;
+  };
+
   const loadConversations = async () => {
     try {
       const response = await fetch("/api/ai/conversations");
@@ -91,7 +125,6 @@ loadInitialStructure(user).then(async () => {
       const data = await response.json();
       conversations = data.conversations || [];
       renderConversationList();
-      console.log(`📚 Loaded ${conversations.length} conversations`);
     } catch (e) {
       console.error("Failed to load conversations:", e);
     }
@@ -139,12 +172,10 @@ loadInitialStructure(user).then(async () => {
 
     // Add click handlers for delete
     conversationList.querySelectorAll('.conv-delete').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
+      btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const id = parseInt(btn.dataset.id);
-        if (confirm("Delete this conversation?")) {
-          await deleteConversation(id);
-        }
+        showDeleteModal(id);
       });
     });
 
@@ -185,8 +216,12 @@ loadInitialStructure(user).then(async () => {
     input.focus();
     input.select();
 
+    let saved = false;
+
     // Save on Enter or blur
     const saveTitle = async () => {
+      if (saved) return; // Prevent double save
+      saved = true;
       const newTitle = input.value.trim() || 'New Chat';
       await renameConversation(conversationId, newTitle);
     };
@@ -194,8 +229,9 @@ loadInitialStructure(user).then(async () => {
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        saveTitle();
+        input.blur(); // This will trigger saveTitle via blur
       } else if (e.key === 'Escape') {
+        saved = true; // Prevent blur from saving
         renderConversationList(); // Cancel edit
       }
     });
@@ -203,7 +239,7 @@ loadInitialStructure(user).then(async () => {
     input.addEventListener('blur', saveTitle);
   };
 
-  const renameConversation = async (id, newTitle) => {
+  const renameConversation = async (id, newTitle, showNotification = true) => {
     try {
       const response = await fetch(`/api/ai/conversations/${id}`, {
         method: 'PATCH',
@@ -212,9 +248,15 @@ loadInitialStructure(user).then(async () => {
       });
       if (response.ok) {
         await loadConversations();
+        if (showNotification) {
+          showToast('Conversation renamed successfully', 'success');
+        }
+      } else {
+        showToast('Failed to rename conversation', 'error');
       }
     } catch (e) {
       console.error("Failed to rename conversation:", e);
+      showToast('Failed to rename conversation', 'error');
       renderConversationList();
     }
   };
@@ -262,7 +304,7 @@ loadInitialStructure(user).then(async () => {
 
       // Update the title if provided
       if (title && title !== "New Chat") {
-        await renameConversation(data.conversation.id, title);
+        await renameConversation(data.conversation.id, title, false);
       }
 
       await loadConversations();
@@ -276,6 +318,9 @@ loadInitialStructure(user).then(async () => {
 
   const deleteConversation = async (id) => {
     try {
+      const conv = conversations.find(c => c.id === id);
+      const convName = conv?.title || 'Conversation';
+
       const response = await fetch(`/api/ai/conversations/${id}`, { method: "DELETE" });
       if (response.ok) {
         if (currentConversationId === id) {
@@ -287,9 +332,13 @@ loadInitialStructure(user).then(async () => {
         if (conversations.length > 0 && !currentConversationId) {
           selectConversation(conversations[0].id);
         }
+        showToast(`"${convName}" deleted successfully`, 'success');
+      } else {
+        showToast('Failed to delete conversation', 'error');
       }
     } catch (e) {
       console.error("Failed to delete conversation:", e);
+      showToast('Failed to delete conversation', 'error');
     }
   };
 
@@ -476,10 +525,37 @@ loadInitialStructure(user).then(async () => {
     }
   });
 
-  // Delete Current Conversation Button
-  document.getElementById("delete-conv-btn")?.addEventListener("click", async () => {
-    if (currentConversationId && confirm("Delete this conversation?")) {
-      await deleteConversation(currentConversationId);
+  // ============================================
+  // DELETE MODAL EVENT LISTENERS
+  // ============================================
+  const deleteConfirmBtn = document.getElementById("delete-confirm-btn");
+  const deleteCancelBtn = document.getElementById("delete-cancel-btn");
+
+  // Delete Confirm Button
+  deleteConfirmBtn?.addEventListener("click", async () => {
+    if (pendingDeleteId) {
+      const idToDelete = pendingDeleteId; // Save ID before hiding modal clears it
+      hideDeleteModal();
+      await deleteConversation(idToDelete);
+    }
+  });
+
+  // Delete Cancel Button
+  deleteCancelBtn?.addEventListener("click", () => {
+    hideDeleteModal();
+  });
+
+  // Close delete modal on overlay click
+  deleteModal?.addEventListener("click", (e) => {
+    if (e.target === deleteModal) {
+      hideDeleteModal();
+    }
+  });
+
+  // Delete Current Conversation Button (header)
+  document.getElementById("delete-conv-btn")?.addEventListener("click", () => {
+    if (currentConversationId) {
+      showDeleteModal(currentConversationId);
     }
   });
 

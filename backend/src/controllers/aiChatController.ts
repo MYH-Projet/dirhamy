@@ -32,7 +32,6 @@ export const chat = async (req: AuthRequest, res: Response) => {
   // get user data from the dataAggregator function
   let userData: string;
   try {
-    console.log("user id : ", userId);
     userData = await dataAggregator(userId);
   } catch (e) {
     console.error("❌ Error aggregating user data:", e);
@@ -42,10 +41,8 @@ export const chat = async (req: AuthRequest, res: Response) => {
   // RAG: Retrieve relevant historical context
   let historicalContext: string[] = [];
   try {
-    console.log("🔍 Retrieving relevant historical summaries...");
     const relevantSummaries = await retrieveRelevantSummaries(userId, userMessage, 5);
     historicalContext = relevantSummaries.map(s => s.summary);
-    console.log(`📚 Found ${historicalContext.length} relevant summaries`);
   } catch (e) {
     console.warn("⚠️ Failed to retrieve historical context (continuing without):", e);
     // Continue without historical context - not a critical failure
@@ -55,7 +52,6 @@ export const chat = async (req: AuthRequest, res: Response) => {
   let reply: string;
   try {
     reply = await generateResponse(userMessage, userData, historicalContext);
-    console.log("reply of chat ai");
   } catch (e) {
     console.error("❌ Gemini API error:", e);
     return res.status(500).json({ error: "AI service failed" });

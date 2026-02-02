@@ -132,6 +132,32 @@
     </div>
   </div>
 
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="delete-chat-modal">
+    <div class="chat-modal chat-delete-modal">
+      <div class="modal-header">
+        <div class="delete-icon-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h3>Delete Conversation?</h3>
+      </div>
+      <div class="modal-body">
+        <p class="delete-warning">Are you sure you want to delete "<span id="delete-conv-name"></span>"?</p>
+        <p class="delete-info">⚠️ This action cannot be undone. All messages in this conversation will be permanently
+          deleted.</p>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel-btn" id="delete-cancel-btn">Cancel</button>
+        <button class="modal-delete-btn" id="delete-confirm-btn">Delete</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toasts-container"></div>
   <script src="/chatbot/chatbot-script.js" type="module"></script>
 </body>
