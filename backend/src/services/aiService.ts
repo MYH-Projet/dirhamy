@@ -42,7 +42,7 @@ export async function generateResponse(
 
 export async function generateInsight(userData: string, budgetData: Object[]) {
   try {
-    const model = genAi.getGenerativeModel({ model: "gemma-3-27b-it" });
+    const model = genAi.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
     /* old prompt
         your job is to create a goal advice based on the user's data provided below
         the response should be 3 lines long at max and should contain advices to make him reach to goal or stay in budget

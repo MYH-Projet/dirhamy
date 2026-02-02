@@ -22,7 +22,7 @@
   flex-shrink: 0;
 }
 
-.sidebar-header {
+.chat-sidebar .sidebar-header {
   padding: var(--md-spacing);
   border-bottom: 1px solid var(--border-color);
   display: flex;
@@ -30,7 +30,7 @@
   gap: var(--s-spacing);
 }
 
-.sidebar-header h3 {
+.chat-sidebar .sidebar-header h3 {
   font-size: 14px;
   font-weight: 600;
   color: var(--gray-color);
@@ -153,6 +153,125 @@
   border-radius: 4px;
   outline: none;
   background: white;
+}
+
+/* ============================================
+   MODAL STYLES
+   ============================================ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.chat-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  width: 400px;
+  max-width: 90%;
+  animation: modalSlideIn 0.2s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-modal .modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.chat-modal .modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--black-text-color);
+}
+
+.chat-modal .modal-body {
+  padding: 24px;
+}
+
+.chat-modal .modal-body label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-color);
+  margin-bottom: 8px;
+}
+
+.chat-modal .modal-body input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.chat-modal .modal-body input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.chat-modal .modal-actions {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modal-cancel-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: white;
+  color: var(--gray-color);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.modal-cancel-btn:hover {
+  background: #f3f4f6;
+}
+
+.modal-create-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary-color);
+  color: white;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.modal-create-btn:hover {
+  background: var(--lighter-primary-color);
 }
 
 /* Toggle Sidebar Button (visible on mobile) */

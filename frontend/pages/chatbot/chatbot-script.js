@@ -215,13 +215,23 @@ loadInitialStructure(user).then(async () => {
     }
   };
 
-  const createConversation = async () => {
+  const createConversation = async (title = "New Chat") => {
     try {
-      const response = await fetch("/api/ai/conversations", { method: "POST" });
+      const response = await fetch("/api/ai/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title })
+      });
       if (!response.ok) return null;
 
       const data = await response.json();
       currentConversationId = data.conversation.id;
+
+      // Update the title if provided
+      if (title && title !== "New Chat") {
+        await renameConversation(data.conversation.id, title);
+      }
+
       await loadConversations();
       clearMessages();
       return data.conversation.id;
@@ -381,9 +391,56 @@ loadInitialStructure(user).then(async () => {
   // EVENT LISTENERS
   // ============================================
 
-  // New Chat Button
-  document.getElementById("new-chat-btn")?.addEventListener("click", async () => {
-    await createConversation();
+  // Modal elements
+  const modal = document.getElementById("new-chat-modal");
+  const convNameInput = document.getElementById("conv-name-input");
+  const modalCreateBtn = document.getElementById("modal-create-btn");
+  const modalCancelBtn = document.getElementById("modal-cancel-btn");
+
+  const showModal = () => {
+    modal?.classList.add("active");
+    convNameInput.value = "";
+    convNameInput.focus();
+  };
+
+  const hideModal = () => {
+    modal?.classList.remove("active");
+  };
+
+  // New Chat Button - show modal
+  document.getElementById("new-chat-btn")?.addEventListener("click", () => {
+    showModal();
+  });
+
+  // Modal Create Button
+  modalCreateBtn?.addEventListener("click", async () => {
+    const title = convNameInput.value.trim() || "New Chat";
+    hideModal();
+    await createConversation(title);
+  });
+
+  // Modal Cancel Button
+  modalCancelBtn?.addEventListener("click", () => {
+    hideModal();
+  });
+
+  // Close modal on overlay click
+  modal?.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      hideModal();
+    }
+  });
+
+  // Close modal on Escape, create on Enter
+  convNameInput?.addEventListener("keydown", async (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const title = convNameInput.value.trim() || "New Chat";
+      hideModal();
+      await createConversation(title);
+    } else if (e.key === "Escape") {
+      hideModal();
+    }
   });
 
   // Delete Current Conversation Button
