@@ -104,14 +104,26 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-right: 50px;
 }
 
-.conversation-item .conv-delete {
+.conversation-item .conv-actions {
   position: absolute;
   right: 8px;
   top: 50%;
   transform: translateY(-50%);
   opacity: 0;
+  display: flex;
+  gap: 4px;
+  transition: opacity 0.15s;
+}
+
+.conversation-item:hover .conv-actions {
+  opacity: 1;
+}
+
+.conversation-item .conv-edit,
+.conversation-item .conv-delete {
   background: none;
   border: none;
   color: var(--gray-color);
@@ -121,13 +133,26 @@
   transition: all 0.15s;
 }
 
-.conversation-item:hover .conv-delete {
-  opacity: 1;
+.conversation-item .conv-edit:hover {
+  color: var(--primary-color);
+  background-color: rgba(13, 148, 136, 0.1);
 }
 
 .conversation-item .conv-delete:hover {
   color: #ef4444;
   background-color: #fee2e2;
+}
+
+/* Inline title editing input */
+.conv-title-input {
+  width: 100%;
+  padding: 4px 8px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  outline: none;
+  background: white;
 }
 
 /* Toggle Sidebar Button (visible on mobile) */

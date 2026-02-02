@@ -34,7 +34,6 @@ export const chat = async (req: AuthRequest, res: Response) => {
   try {
     console.log("user id : ", userId);
     userData = await dataAggregator(userId);
-    console.log("user data : ", userData);
   } catch (e) {
     console.error("❌ Error aggregating user data:", e);
     return res.status(500).json({ error: "Failed to gather user data" });

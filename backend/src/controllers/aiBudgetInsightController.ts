@@ -28,7 +28,6 @@ export const budgetInsight = async (req: AuthRequest, res: Response) => {
     try {
         console.log("user id : ", userId);
         userData = await dataAggregator(userId);
-        console.log("user data : ", userData);
     } catch (e) {
         console.error("❌ Error aggregating user data:", e);
         return res.status(500).json({ error: "Failed to gather user data" });
@@ -38,7 +37,6 @@ export const budgetInsight = async (req: AuthRequest, res: Response) => {
     let budgetData: BudgetStatus[];
     try {
         budgetData = await getBudgetData(userId);
-        console.log("budget data : ", budgetData);
     } catch (e) {
         console.error("❌ Error fetching budget data:", e);
         return res.status(500).json({ error: "Failed to gather budget data" });

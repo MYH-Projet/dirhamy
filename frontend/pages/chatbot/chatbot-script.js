@@ -76,26 +76,35 @@ loadInitialStructure(user).then(async () => {
 
     conversationList.innerHTML = conversations.map(conv => `
       <div class="conversation-item ${conv.id === currentConversationId ? 'active' : ''}" data-id="${conv.id}">
-        <p class="conv-title">${escapeHtml(conv.title)}</p>
+        <p class="conv-title" data-id="${conv.id}">${escapeHtml(conv.title)}</p>
         <p class="conv-preview">${conv.lastMessage ? escapeHtml(conv.lastMessage) : 'No messages'}</p>
-        <button class="conv-delete" data-id="${conv.id}" title="Delete">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
+        <div class="conv-actions">
+          <button class="conv-edit" data-id="${conv.id}" title="Rename">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </button>
+          <button class="conv-delete" data-id="${conv.id}" title="Delete">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
       </div>
     `).join('');
 
-    // Add click handlers
+    // Add click handlers for selecting conversation
     conversationList.querySelectorAll('.conversation-item').forEach(item => {
       item.addEventListener('click', (e) => {
-        if (e.target.closest('.conv-delete')) return;
+        if (e.target.closest('.conv-delete') || e.target.closest('.conv-edit') || e.target.closest('.conv-title-input')) return;
         const id = parseInt(item.dataset.id);
         selectConversation(id);
       });
     });
 
+    // Add click handlers for delete
     conversationList.querySelectorAll('.conv-delete').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -105,6 +114,76 @@ loadInitialStructure(user).then(async () => {
         }
       });
     });
+
+    // Add click handlers for edit/rename
+    conversationList.querySelectorAll('.conv-edit').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = parseInt(btn.dataset.id);
+        startEditingTitle(id);
+      });
+    });
+
+    // Double-click on title to edit
+    conversationList.querySelectorAll('.conv-title').forEach(title => {
+      title.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        const id = parseInt(title.dataset.id);
+        startEditingTitle(id);
+      });
+    });
+  };
+
+  const startEditingTitle = (conversationId) => {
+    const conv = conversations.find(c => c.id === conversationId);
+    if (!conv) return;
+
+    const item = conversationList.querySelector(`.conversation-item[data-id="${conversationId}"]`);
+    const titleEl = item.querySelector('.conv-title');
+
+    // Replace title with input
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'conv-title-input';
+    input.value = conv.title;
+    input.dataset.id = conversationId;
+
+    titleEl.replaceWith(input);
+    input.focus();
+    input.select();
+
+    // Save on Enter or blur
+    const saveTitle = async () => {
+      const newTitle = input.value.trim() || 'New Chat';
+      await renameConversation(conversationId, newTitle);
+    };
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        saveTitle();
+      } else if (e.key === 'Escape') {
+        renderConversationList(); // Cancel edit
+      }
+    });
+
+    input.addEventListener('blur', saveTitle);
+  };
+
+  const renameConversation = async (id, newTitle) => {
+    try {
+      const response = await fetch(`/api/ai/conversations/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: newTitle })
+      });
+      if (response.ok) {
+        await loadConversations();
+      }
+    } catch (e) {
+      console.error("Failed to rename conversation:", e);
+      renderConversationList();
+    }
   };
 
   const escapeHtml = (text) => {
