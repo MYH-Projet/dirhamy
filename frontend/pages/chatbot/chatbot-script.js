@@ -19,6 +19,35 @@ loadInitialStructure(user).then(async () => {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   };
 
+  // Simple markdown parser for AI responses
+  const parseMarkdown = (text) => {
+    return text
+      // Escape HTML first
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      // Bold text **text**
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      // Italic text *text*
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      // Bullet points (• or -)
+      .replace(/^[•\-]\s+(.+)$/gm, '<li>$1</li>')
+      // Numbered lists
+      .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
+      // Wrap consecutive <li> in <ul>
+      .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+      // Line breaks (double newline = paragraph)
+      .replace(/\n\n/g, '</p><p>')
+      // Single line breaks
+      .replace(/\n/g, '<br>')
+      // Wrap in paragraph
+      .replace(/^(.+)$/, '<p>$1</p>')
+      // Clean up empty paragraphs
+      .replace(/<p><\/p>/g, '')
+      .replace(/<p><br>/g, '<p>')
+      .replace(/<br><\/p>/g, '</p>');
+  };
+
   const addMessage = (text, sender, isTyping = false) => {
     // Hide empty state on first message
     if (emptyState) emptyState.style.display = "none";
@@ -29,7 +58,11 @@ loadInitialStructure(user).then(async () => {
     if (isTyping) {
       msg.classList.add("typing-indicator");
       msg.innerHTML = "<span></span><span></span><span></span>";
+    } else if (sender === "ai") {
+      // Parse markdown for AI responses
+      msg.innerHTML = parseMarkdown(text);
     } else {
+      // Plain text for user messages
       msg.textContent = text;
     }
 

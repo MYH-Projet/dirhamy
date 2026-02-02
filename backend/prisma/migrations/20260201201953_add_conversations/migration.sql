@@ -1,3 +1,6 @@
+-- Enable pgvector extension for embeddings
+CREATE EXTENSION IF NOT EXISTS vector;
+
 -- CreateTable
 CREATE TABLE "WeeklySummary" (
     "id" SERIAL NOT NULL,

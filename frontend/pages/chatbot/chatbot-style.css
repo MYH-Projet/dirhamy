@@ -590,6 +590,44 @@
   border-radius: 12px 12px 12px 2px;
 }
 
+/* Markdown formatting in AI messages */
+.message.ai p {
+  margin: 0 0 8px 0;
+}
+
+.message.ai p:last-child {
+  margin-bottom: 0;
+}
+
+.message.ai strong {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.message.ai em {
+  font-style: italic;
+}
+
+.message.ai ul {
+  margin: 8px 0;
+  padding-left: 20px;
+  list-style: none;
+}
+
+.message.ai ul li {
+  position: relative;
+  margin-bottom: 4px;
+  padding-left: 4px;
+}
+
+.message.ai ul li::before {
+  content: "•";
+  position: absolute;
+  left: -14px;
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
 .typing-indicator span {
   display: inline-block;
   width: 6px;
