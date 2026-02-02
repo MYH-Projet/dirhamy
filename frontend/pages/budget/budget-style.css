@@ -14,11 +14,13 @@
 
       margin-bottom: var(--xs-spacing);
     }
+
     p {
       font-size: 14px;
       color: #777171;
     }
   }
+
   .add-budget-limit-btn {
     align-self: center;
 
@@ -28,6 +30,7 @@
     font-weight: 450;
   }
 }
+
 .list-budget-limits {
   --warning-color: rgb(246, 138, 0);
   --warning-background: #f2792815;
@@ -98,11 +101,13 @@
   .progress-used {
     flex: 0.925;
   }
+
   .progress-left {
     background-color: #e3e3e3;
     flex: 0.075;
   }
 }
+
 .budget-card-amounts {
   font-size: 15px;
 
@@ -145,12 +150,15 @@
 .good-progress-used {
   background-color: var(--good-color);
 }
+
 .on-track-progress-used {
   background-color: var(--on-track-color);
 }
+
 .warning-progress-used {
   background-color: var(--warning-color);
 }
+
 .over-progress-used {
   background-color: var(--over-color);
 }
@@ -173,4 +181,43 @@
 .over-budget-status {
   color: var(--over-color);
   background-color: var(--over-background);
+}
+
+/* Typing Indicator Animation (matching chatbot) */
+.typing-indicator span {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background-color: currentColor;
+  /* Inherit color from parent text */
+  border-radius: 50%;
+  margin: 0 2px;
+  animation: typing 1.4s infinite ease-in-out;
+  opacity: 0.6;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
 }

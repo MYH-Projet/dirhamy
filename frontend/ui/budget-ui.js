@@ -93,7 +93,11 @@ function createBudgetCard(budgetStatus) {
 
   cardMessage.innerHTML = classes.cardIcon;
   const message = document.createElement("span");
-  message.textContent = classes.cardMessage;
+  // Show typing indicator initially while waiting for AI
+  message.classList.add("typing-indicator");
+  message.innerHTML = "<span></span><span></span><span></span>";
+  // Store default message for fallback
+  message.dataset.defaultMessage = classes.cardMessage;
   cardMessage.append(message);
 
   budgetCard.append(
