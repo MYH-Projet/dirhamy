@@ -48,7 +48,7 @@ export function appendTransactionsToTable(transactions, nextCursor) {
     .toSorted((a, b) => {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);
-      return -(dateA.getTime() <= dateB.getTime());
+      return (dateA.getTime() <= dateB.getTime());
     })
     .forEach((transaction) => {
       const tableRow = createTransactionRow(transaction);
