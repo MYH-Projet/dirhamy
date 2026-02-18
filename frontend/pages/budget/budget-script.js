@@ -34,14 +34,8 @@ const months = [
 
 // Create Initial Structure and populate the user object
 loadInitialStructure(user).then(() => {
-  // First load budgets fast
-  getBudgetStatuses().then(() => {
-    removeSpinnerPage();
-    toastNotis();
-
-    // Then fetch AI insights asynchronously and update cards
-    fetchAndApplyAIInsights();
-  });
+  // First load budgets
+  getBudgetStatuses();
 });
 
 const currentDate = new Date();
@@ -60,18 +54,24 @@ function getBudgetStatuses() {
     API_URL + "/budget/status",
     renderBudgetStatuses,
     wireBudgetCardEvents,
-  );
+  ).then(() => {
+    // checking if its first page load
+    if (document.querySelector(".loading-overlay")) {
+      removeSpinnerPage();
+      toastNotis();
+    }
+
+    return fetchAndApplyAIInsights();
+  });
 }
 
 // Fetch AI insights asynchronously and update budget cards
 async function fetchAndApplyAIInsights() {
   try {
-    const token = localStorage.getItem("token");
     const response = await fetch(API_URL + "/ai/insight", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
       },
     });
 
@@ -113,12 +113,14 @@ function updateBudgetCardsWithInsights(insights) {
   const budgetCards = document.querySelectorAll(".budget-card");
 
   budgetCards.forEach((card) => {
-    const categoryName = card.querySelector(".budget-card-category")?.textContent;
+    const categoryName = card.querySelector(
+      ".budget-card-category",
+    )?.textContent;
     if (!categoryName) return;
 
     // Find matching insight for this category
     const insight = insights.find(
-      (i) => i.categoryName?.toLowerCase() === categoryName.toLowerCase()
+      (i) => i.categoryName?.toLowerCase() === categoryName.toLowerCase(),
     );
 
     if (insight && insight.message) {

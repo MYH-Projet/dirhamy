@@ -1,8 +1,12 @@
-import { PrismaClient, TypeCompte, TypeTransaction } from '../generated/prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
+import {
+  PrismaClient,
+  TypeCompte,
+  TypeTransaction,
+} from "../generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
 import pg from "pg";
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcryptjs";
 
 // 1. Setup Database Connection with Driver Adapter
 const connectionString = `${process.env.DATABASE_URL}`;
@@ -11,7 +15,7 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log('🌱 Starting seed...');
+  console.log("🌱 Starting seed...");
 
   // ---------------------------------------------------------
   // 1. CLEANUP
@@ -35,18 +39,17 @@ async function main() {
 
   await prisma.utilisateur.deleteMany();
 
-  console.log('🧹 Database cleaned');
-
+  console.log("🧹 Database cleaned");
 
   // ---------------------------------------------------------
   // 2. USER & BASICS
   // ---------------------------------------------------------
   const user = await prisma.utilisateur.create({
     data: {
-      nom: 'Charkaoui',
-      prenom: 'Mohamed Anas',
-      email: 'mac@example.com',
-      motDePasse: await bcrypt.hash('password123', 10),
+      nom: "Charkaoui",
+      prenom: "Mohamed Anas",
+      email: "mac@example.com",
+      motDePasse: await bcrypt.hash("password123", 10),
     },
   });
 
@@ -54,25 +57,25 @@ async function main() {
 
   // Create Categories
   const catGroceries = await prisma.categorie.create({
-    data: { nom: 'Groceries', limit: 500.0, utilisateurId: user.id },
+    data: { nom: "Groceries", limit: 500.0, utilisateurId: user.id },
   });
   const catRent = await prisma.categorie.create({
-    data: { nom: 'Rent', limit: 1200.0, utilisateurId: user.id },
+    data: { nom: "Rent", limit: 1200.0, utilisateurId: user.id },
   });
   const catSalary = await prisma.categorie.create({
-    data: { nom: 'Salary', limit: null, utilisateurId: user.id },
+    data: { nom: "Salary", limit: null, utilisateurId: user.id },
   });
   const catTransport = await prisma.categorie.create({
-    data: { nom: 'Transport', limit: 100.0, utilisateurId: user.id },
+    data: { nom: "Transport", limit: 100.0, utilisateurId: user.id },
   });
 
   // Create Accounts
   const bankAccount = await prisma.compte.create({
-    data: { nom: 'Main Bank', type: TypeCompte.Banque, utilisateurId: user.id },
+    data: { nom: "Main Bank", type: TypeCompte.Banque, utilisateurId: user.id },
   });
 
   const cashWallet = await prisma.compte.create({
-    data: { nom: 'Cash Wallet', type: TypeCompte.Cash, utilisateurId: user.id },
+    data: { nom: "Cash Wallet", type: TypeCompte.Cash, utilisateurId: user.id },
   });
 
   // ---------------------------------------------------------
@@ -87,7 +90,7 @@ async function main() {
       montant: 3000.0,
       type: TypeTransaction.REVENU,
       date: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1),
-      description: 'Monthly Salary',
+      description: "Monthly Salary",
       compteId: bankAccount.id,
       categorieId: catSalary.id,
     },
@@ -99,7 +102,7 @@ async function main() {
       montant: -1200.0,
       type: TypeTransaction.DEPENSE,
       date: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 2),
-      description: 'December Rent',
+      description: "December Rent",
       compteId: bankAccount.id,
       categorieId: catRent.id,
     },
@@ -107,7 +110,11 @@ async function main() {
 
   // --- C. ATM Withdrawal (TRANSFER) ---
   // We use the 'Transfer' model to link the withdrawal and deposit
-  const transferDate = new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 5);
+  const transferDate = new Date(
+    lastMonth.getFullYear(),
+    lastMonth.getMonth(),
+    5,
+  );
 
   await prisma.transfer.create({
     data: {
@@ -120,39 +127,39 @@ async function main() {
             montant: -200.0,
             type: TypeTransaction.TRANSFER,
             date: transferDate,
-            description: 'ATM Withdrawal - Out',
+            description: "ATM Withdrawal - Out",
             compteId: bankAccount.id,
             categorieId: catTransport.id,
-            idDestination: cashWallet.id
+            idDestination: cashWallet.id,
           },
           // 2. Money entering Cash (Positive)
           {
             montant: 200.0,
             type: TypeTransaction.TRANSFER,
             date: transferDate,
-            description: 'ATM Withdrawal - In',
+            description: "ATM Withdrawal - In",
             compteId: cashWallet.id,
             categorieId: catTransport.id,
-            idDestination: bankAccount.id
-          }
-        ]
-      }
-    }
+            idDestination: bankAccount.id,
+          },
+        ],
+      },
+    },
   });
 
   // --- D. Grocery Shopping (Current Month) ---
   await prisma.transaction.create({
     data: {
-      montant: -85.50,
+      montant: -85.5,
       type: TypeTransaction.DEPENSE,
       date: new Date(),
-      description: 'Supermarket Run',
+      description: "Supermarket Run",
       compteId: cashWallet.id,
       categorieId: catGroceries.id,
     },
   });
 
-  console.log('💸 Created Transactions');
+  console.log("💸 Created Transactions");
 
   // ---------------------------------------------------------
   // 4. SNAPSHOTS
@@ -177,8 +184,8 @@ async function main() {
     },
   });
 
-  console.log('📸 Created Snapshots');
-  console.log('✅ Seeding finished.');
+  console.log("📸 Created Snapshots");
+  console.log("✅ Seeding finished.");
 }
 
 main()
