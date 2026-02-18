@@ -58,9 +58,17 @@ function createBudgetCard(budgetStatus) {
   limitAmount.classList.add("limit-amount");
   limitAmount.textContent = budgetStatus.limit.toFixed(2) + " DH";
 
-  // this is wrong find a way to do it with appendChild or sanitize input to prevent xss
-  cardAmounts.innerHTML = `Spent: ${spentAmount.outerHTML} ${separatationDot.outerHTML} 
-  Limit: ${limitAmount.outerHTML}`;
+  cardAmounts.innerHTML = `<span id='id-amount-spent'>Spent : </span>
+  <strong class="middot">&middot;</strong> <span id='id-amount-limit'>Limit: </span>`;
+
+  cardAmounts.insertBefore(
+    spentAmount,
+    cardAmounts.querySelector("#id-amount-spent").nextElementSibling,
+  );
+  cardAmounts.insertBefore(
+    limitAmount,
+    cardAmounts.querySelector("#id-amount-limit").nextElementSibling,
+  );
 
   const budgetPercentage = Math.abs(budgetStatus.percentage.toFixed(2));
   const classes = budgetPercentages(budgetPercentage);
@@ -70,11 +78,12 @@ function createBudgetCard(budgetStatus) {
 
   const progressUsed = document.createElement("div");
   progressUsed.classList.add("progress-used", classes.progressUsedClass);
-  progressUsed.style.flex = budgetPercentage / 100;
+  progressUsed.style.flex = budgetPercentage < 100 ? budgetPercentage / 100 : 1;
 
   const progressLeft = document.createElement("div");
   progressLeft.classList.add("progress-left");
-  progressLeft.style.flex = 1 - budgetPercentage / 100;
+  progressLeft.style.flex =
+    budgetPercentage < 100 ? 1 - budgetPercentage / 100 : 0;
 
   progressBar.append(progressUsed, progressLeft);
 
@@ -85,7 +94,10 @@ function createBudgetCard(budgetStatus) {
   percentageUsed.textContent = budgetPercentage + "%";
   const amountRemaining = document.createElement("p");
   amountRemaining.classList.add("amount-left");
-  amountRemaining.textContent = budgetStatus.remaining + " DH";
+  amountRemaining.textContent =
+    budgetPercentage <= 100
+      ? `${budgetStatus.remaining} DH left `
+      : `${Math.abs(budgetStatus.remaining)} DH over Budget`;
   cardStats.append(percentageUsed, amountRemaining);
 
   const cardMessage = document.createElement("p");
@@ -110,8 +122,6 @@ function createBudgetCard(budgetStatus) {
 
   return budgetCard;
 }
-
-
 
 function budgetPercentages(percentage) {
   const suffixProgress = "progress-used";
