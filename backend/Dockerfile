@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Build reproducible (meilleur pour CI)
-RUN npm install --include=dev
+RUN npm ci
 
 # Optionnel : seulement si tu utilises psql/pg_isready dans le conteneur
 RUN apk add --no-cache postgresql-client
