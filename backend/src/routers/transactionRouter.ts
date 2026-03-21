@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { 
-    getTransaction, 
-    createTransaction, 
-    updateTransaction, 
-    removeTransaction 
+import {
+    getTransaction,
+    createTransaction,
+    updateTransaction,
+    removeTransaction
 } from '../controllers/transactionControler'; // Adjust path to your controller
 import { validation } from '../Middleware/validateResource';
-import { 
+import {
     createTransactionSchema,
     updateTransactionSchema,
     removeTransactionSchema,
@@ -18,13 +18,13 @@ import { cacheWithDependencies } from '../Middleware/cacheMiddleware';
 const router = Router();
 
 
-router.use(cacheWithDependencies(['balance','budget']))
+router.use(cacheWithDependencies(['balance', 'budget']))
 // ==========================================
 // 1. READ: Get Transactions for a User
 // ==========================================
 // Route: GET /api/transactions/user/:id?cursor=123
 // Params: :id = User ID
-router.get('/user',validation(getTransactionSchema), getTransaction);
+router.get('/user', validation(getTransactionSchema), getTransaction);
 
 
 // ==========================================
@@ -32,13 +32,7 @@ router.get('/user',validation(getTransactionSchema), getTransaction);
 // ==========================================
 // Route: POST /api/transactions
 // Body: { montant, type, description, compteId, ... }
-router.post('/',(req,res,next)=>{
-    console.log("what the f********");
-    next(); 
-},validation(createTransactionSchema),(req,res,next)=>{
-    console.log("what i pass the validate");
-    next(); 
-}, createTransaction);
+router.post('/', validation(createTransactionSchema), createTransaction);
 
 
 // ==========================================
@@ -46,7 +40,7 @@ router.post('/',(req,res,next)=>{
 // ==========================================
 // Route: PUT /api/transactions/:id
 // Params: :id = Transaction ID
-router.put('/:id',validation(updateTransactionSchema), updateTransaction);
+router.put('/:id', validation(updateTransactionSchema), updateTransaction);
 
 
 // ==========================================
@@ -54,6 +48,6 @@ router.put('/:id',validation(updateTransactionSchema), updateTransaction);
 // ==========================================
 // Route: DELETE /api/transactions/:id
 // Params: :id = Transaction ID
-router.delete('/:id',validation(removeTransactionSchema), removeTransaction);
+router.delete('/:id', validation(removeTransactionSchema), removeTransaction);
 
 export default router;
