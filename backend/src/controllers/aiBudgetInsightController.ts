@@ -6,7 +6,7 @@ import { prisma } from '../lib/prisma';
 
 // Budget status type for type safety
 interface BudgetStatus {
-    categoryId: number;
+    categoryId: string;
     categoryName: string;
     startDate: Date;
     limit: number;
@@ -18,8 +18,8 @@ interface BudgetStatus {
 export const budgetInsight = async (req: AuthRequest, res: Response) => {
 
     const user = req.user as JwtPayload;
-    const userId = Number(user.id);
-    if (isNaN(userId)) {
+    const userId = user.id;
+    if (!userId) {
         return res.status(400).json({ error: "Invalid User ID" });
     }
 
@@ -77,7 +77,7 @@ export const budgetInsight = async (req: AuthRequest, res: Response) => {
 /**
  * Fetches budget status data for a user (reusable function, not a route handler)
  */
-export async function getBudgetData(userId: number): Promise<BudgetStatus[]> {
+export async function getBudgetData(userId: string): Promise<BudgetStatus[]> {
     // Find all categories with a defined limit
     const limitedCategories = await prisma.categorie.findMany({
         where: {

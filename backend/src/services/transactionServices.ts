@@ -8,18 +8,18 @@ interface CreateTransactionData {
   type: TypeTransaction;
   description: string;
   date: Date;
-  compteId: number;
-  categorieId: number;
-  idDestination?: number | null;
+  compteId: string;
+  categorieId: string;
+  idDestination?: string | null;
 }
 interface UpdateTransactionData {
   montant: number;
   description: string;
   date: Date;
-  categorieId: number;
+  categorieId: string;
 }
 
-export const checkAccount = async (compteId: number,idDestination:number,categorieId:number, userId: number) => {
+export const checkAccount = async (compteId: string,idDestination:string,categorieId:string, userId: string) => {
     console.log("i m about giting checked")
   const isHasAccount = await prisma.compte.findUnique({
     where: {
@@ -165,8 +165,8 @@ export const createTransaction = async (data: CreateTransactionData) => {
 };
 
 export const checkExistAndOwnershipTransaction = async(
-    transactionId: number, 
-    userId: number
+    transactionId: string,
+    userId: string
 )=>{
     const existingTransaction = await prisma.transaction.findFirst({
         where: { 
@@ -182,9 +182,9 @@ export const checkExistAndOwnershipTransaction = async(
 }
 
 export const checkExistAndOwnershipTransactionCategory = async(
-    transactionId: number, 
-    userId: number,
-    categorieId:number
+    transactionId: string,
+    userId: string,
+    categorieId:string
 )=>{
     const existingTransaction = await prisma.transaction.findFirst({
         where: { 
@@ -212,8 +212,8 @@ export const checkExistAndOwnershipTransactionCategory = async(
 }
 
 export const updateTransaction = async (
-    transactionId: number,
-    existingTransaction: Transaction, 
+    transactionId: string,
+    existingTransaction: Transaction,
     data: UpdateTransactionData
 ) => {
     const { montant, description, date, categorieId } = data;
@@ -359,7 +359,7 @@ export const updateTransaction = async (
 };
 
 export const deleteTransactionService = async (
-    transactionId: number,
+    transactionId: string,
     transactionToDelete: Transaction // Ensure this type is imported
 ) => {
     // ==========================================================

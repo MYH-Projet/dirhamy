@@ -108,7 +108,7 @@ export const setCategoryLimit = async (req: AuthRequest, res: Response) => {
 
     // Verify category belongs to user
     const category = await prisma.categorie.findUnique({
-      where: { id: Number(categoryId) },
+      where: { id: categoryId },
     });
 
     if (!category || category.utilisateurId !== userId) {
@@ -119,7 +119,7 @@ export const setCategoryLimit = async (req: AuthRequest, res: Response) => {
 
     // Update the limit
     const updatedCategory = await prisma.categorie.update({
-      where: { id: Number(categoryId) },
+      where: { id: categoryId },
       data: { limit: parseFloat(limit) },
     });
 
@@ -141,7 +141,7 @@ export const removeBudgetLimit = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ error: "User not authenticated" });
 
     const category = await prisma.categorie.findUnique({
-      where: { id: Number(categoryId) },
+      where: { id: categoryId },
     });
 
     if (!category || category.utilisateurId !== userId) {
@@ -150,7 +150,7 @@ export const removeBudgetLimit = async (req: AuthRequest, res: Response) => {
 
     // Set limit to null to stop tracking
     await prisma.categorie.update({
-      where: { id: Number(categoryId) },
+      where: { id: categoryId },
       data: { limit: null },
     });
 

@@ -9,8 +9,8 @@ export const getBalance = async (req: AuthRequest, res: Response) => {
     if (!user) {
         return res.status(401).json({ error: "Unauthorized" });
     }
-    const userId = Number(user.id);
-    const compteId = Number(req.query.compteId); 
+    const userId = user.id;
+    const compteId = String(req.query.compteId);
 
     try {
         // 1. Verify Compte exists AND belongs to the User (Security)

@@ -5,8 +5,8 @@ import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
+  // MongoDB uses `prisma db push` (no SQL migration history).
   migrations: {
-    path: "prisma/migrations",
     seed: "tsx prisma/seed.ts",
   },
   datasource: {

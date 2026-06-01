@@ -15,9 +15,9 @@ const MAX_MESSAGES = 100;
 export const getConversations = async (req: AuthRequest, res: Response) => {
     try {
         const user = req.user as JwtPayload;
-        const userId = Number(user.id);
+        const userId = user.id;
 
-        if (isNaN(userId)) {
+        if (!userId) {
             return res.status(400).json({ error: "Invalid User ID" });
         }
 
@@ -60,9 +60,9 @@ export const getConversations = async (req: AuthRequest, res: Response) => {
 export const createConversation = async (req: AuthRequest, res: Response) => {
     try {
         const user = req.user as JwtPayload;
-        const userId = Number(user.id);
+        const userId = user.id;
 
-        if (isNaN(userId)) {
+        if (!userId) {
             return res.status(400).json({ error: "Invalid User ID" });
         }
 
@@ -88,10 +88,10 @@ export const createConversation = async (req: AuthRequest, res: Response) => {
 export const deleteConversation = async (req: AuthRequest, res: Response) => {
     try {
         const user = req.user as JwtPayload;
-        const userId = Number(user.id);
-        const conversationId = Number(req.params.id);
+        const userId = user.id;
+        const conversationId = req.params.id;
 
-        if (isNaN(userId) || isNaN(conversationId)) {
+        if (!userId || !conversationId) {
             return res.status(400).json({ error: "Invalid ID" });
         }
 
@@ -124,11 +124,11 @@ export const deleteConversation = async (req: AuthRequest, res: Response) => {
 export const updateConversation = async (req: AuthRequest, res: Response) => {
     try {
         const user = req.user as JwtPayload;
-        const userId = Number(user.id);
-        const conversationId = Number(req.params.id);
+        const userId = user.id;
+        const conversationId = req.params.id;
         const { title } = req.body;
 
-        if (isNaN(userId) || isNaN(conversationId)) {
+        if (!userId || !conversationId) {
             return res.status(400).json({ error: "Invalid ID" });
         }
 
@@ -164,10 +164,10 @@ export const updateConversation = async (req: AuthRequest, res: Response) => {
 export const getMessages = async (req: AuthRequest, res: Response) => {
     try {
         const user = req.user as JwtPayload;
-        const userId = Number(user.id);
-        const conversationId = Number(req.params.id);
+        const userId = user.id;
+        const conversationId = req.params.id;
 
-        if (isNaN(userId) || isNaN(conversationId)) {
+        if (!userId || !conversationId) {
             return res.status(400).json({ error: "Invalid ID" });
         }
 
@@ -203,7 +203,7 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
  * Save a message to a conversation (used internally by aiChatController)
  */
 export const saveMessage = async (
-    conversationId: number,
+    conversationId: string,
     content: string,
     sender: "user" | "ai"
 ): Promise<void> => {
@@ -251,9 +251,9 @@ export const saveMessage = async (
  * Get or create a conversation for the user (helper for aiChatController)
  */
 export const getOrCreateConversation = async (
-    userId: number,
-    conversationId?: number
-): Promise<number> => {
+    userId: string,
+    conversationId?: string
+): Promise<string> => {
     // If conversationId provided, verify it exists and belongs to user
     if (conversationId) {
         const existing = await prisma.conversation.findFirst({

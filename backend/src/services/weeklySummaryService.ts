@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-import { generateEmbedding, formatVectorForPg } from "./embeddingService";
+import { generateEmbedding, cosineSimilarity } from "./embeddingService";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 dotenv.config();
@@ -21,7 +21,7 @@ interface WeeklyData {
  * Aggregate all financial data for a user within a specific week
  */
 export async function aggregateWeeklyData(
-    userId: number,
+    userId: string,
     weekStart: Date,
     weekEnd: Date
 ): Promise<WeeklyData> {
@@ -136,7 +136,7 @@ Do not use markdown formatting.
  * Store a weekly summary with its embedding in the database
  */
 export async function storeSummaryWithEmbedding(
-    userId: number,
+    userId: string,
     summary: string,
     weekStart: Date,
     weekEnd: Date
@@ -149,24 +149,36 @@ export async function storeSummaryWithEmbedding(
         return;
     }
 
-    const vectorString = formatVectorForPg(embedding);
-
-    // Use raw SQL because Prisma doesn't natively support vector type
-    await prisma.$executeRawUnsafe(`
-    INSERT INTO "WeeklySummary" ("utilisateurId", "weekStart", "weekEnd", "summary", "embedding", "createdAt")
-    VALUES ($1, $2, $3, $4, $5::vector, NOW())
-    ON CONFLICT ("utilisateurId", "weekStart") 
-    DO UPDATE SET "summary" = $4, "embedding" = $5::vector, "createdAt" = NOW()
-  `, userId, weekStart, weekEnd, summary, vectorString);
+    // Store the embedding as a native Mongo Float[] (no pgvector on MongoDB).
+    await prisma.weeklySummary.upsert({
+        where: {
+            utilisateurId_weekStart: { utilisateurId: userId, weekStart },
+        },
+        update: {
+            summary,
+            embedding,
+            weekEnd,
+            createdAt: new Date(),
+        },
+        create: {
+            utilisateurId: userId,
+            weekStart,
+            weekEnd,
+            summary,
+            embedding,
+        },
+    });
 
     console.log(`✅ Stored weekly summary for user ${userId}, week of ${weekStart.toISOString()}`);
 }
 
 /**
- * Retrieve the most relevant past summaries based on semantic similarity
+ * Retrieve the most relevant past summaries based on semantic similarity.
+ * MongoDB has no vector index, so we fetch the user's summaries and rank
+ * them in-app by cosine similarity against the query embedding.
  */
 export async function retrieveRelevantSummaries(
-    userId: number,
+    userId: string,
     query: string,
     limit: number = 5
 ): Promise<{ summary: string; weekStart: Date; similarity: number }[]> {
@@ -178,31 +190,26 @@ export async function retrieveRelevantSummaries(
         return [];
     }
 
-    const vectorString = formatVectorForPg(queryEmbedding);
+    const summaries = await prisma.weeklySummary.findMany({
+        where: { utilisateurId: userId, embedding: { isEmpty: false } },
+        select: { summary: true, weekStart: true, embedding: true },
+    });
 
-    // Use cosine similarity search
-    const results = await prisma.$queryRawUnsafe<
-        { summary: string; weekStart: Date; similarity: number }[]
-    >(`
-    SELECT 
-      summary,
-      "weekStart",
-      1 - (embedding <=> $1::vector) as similarity
-    FROM "WeeklySummary"
-    WHERE "utilisateurId" = $2
-      AND embedding IS NOT NULL
-    ORDER BY embedding <=> $1::vector
-    LIMIT $3
-  `, vectorString, userId, limit);
-
-    return results;
+    return summaries
+        .map((s) => ({
+            summary: s.summary,
+            weekStart: s.weekStart,
+            similarity: cosineSimilarity(queryEmbedding, s.embedding),
+        }))
+        .sort((a, b) => b.similarity - a.similarity)
+        .slice(0, limit);
 }
 
 /**
  * Generate and store a weekly summary for a user
  */
 export async function processWeeklySummary(
-    userId: number,
+    userId: string,
     weekStart: Date,
     weekEnd: Date
 ): Promise<void> {

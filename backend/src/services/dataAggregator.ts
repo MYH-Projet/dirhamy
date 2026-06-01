@@ -1,6 +1,6 @@
 import { prisma } from "../lib/prisma";
 
-export async function dataAggregator(userId: number): Promise<string> {
+export async function dataAggregator(userId: string): Promise<string> {
 
   // User profile(his basic infos and shit)
 

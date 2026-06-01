@@ -7,7 +7,7 @@ export async function generateDailySnapshots() {
   console.log('📸 Starting Daily Snapshot Job...');
 
   const BATCH_SIZE=100;
-  let cursorId: number | undefined = undefined;
+  let cursorId: string | undefined = undefined;
   let hasMoreData = true;
   let count = 0;
 

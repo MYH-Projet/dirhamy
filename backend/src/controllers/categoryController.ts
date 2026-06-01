@@ -77,11 +77,11 @@ export const getAllCategories = async (req: AuthRequest, res: Response) => {
 // Get a single Category by ID
 export const getCategoryById = async (req: AuthRequest, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const userId = req.user?.id;
 
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-    if (isNaN(id)) return res.status(400).json({ error: 'Invalid ID provided' });
+    if (!id) return res.status(400).json({ error: 'Invalid ID provided' });
 
     const category = await prisma.categorie.findFirst({
       where: {
@@ -104,7 +104,7 @@ export const getCategoryById = async (req: AuthRequest, res: Response) => {
 // Update a Category
 export const updateCategory = async (req: AuthRequest, res: Response) => {
     try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
 
     if (!req.body) {
         return res.status(400).json({ error: "Request body is missing" });
@@ -114,7 +114,7 @@ export const updateCategory = async (req: AuthRequest, res: Response) => {
 
 
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-    if (isNaN(id)) return res.status(400).json({ error: 'Invalid ID provided' });
+    if (!id) return res.status(400).json({ error: 'Invalid ID provided' });
 
     // 1. Verify existence and ownership
     const existingCategory = await prisma.categorie.findFirst({
@@ -141,11 +141,11 @@ export const updateCategory = async (req: AuthRequest, res: Response) => {
 // Delete a Category
 export const deleteCategory = async (req: AuthRequest, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const userId = req.user?.id;
 
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-    if (isNaN(id)) return res.status(400).json({ error: 'Invalid ID provided' });
+    if (!id) return res.status(400).json({ error: 'Invalid ID provided' });
 
     // 1. Verify existence and ownership
     const existingCategory = await prisma.categorie.findFirst({

@@ -35,7 +35,7 @@ async function testEmbedding() {
     }
 }
 
-async function testDataAggregation(userId: number) {
+async function testDataAggregation(userId: string) {
     console.log("\n🧪 TEST 2: Data Aggregation");
     console.log("===========================");
 
@@ -63,7 +63,7 @@ async function testDataAggregation(userId: number) {
     return data;
 }
 
-async function testSummaryGeneration(userId: number) {
+async function testSummaryGeneration(userId: string) {
     console.log("\n🧪 TEST 3: AI Summary Generation");
     console.log("=================================");
 
@@ -90,7 +90,7 @@ async function testSummaryGeneration(userId: number) {
     return summary;
 }
 
-async function testStorageAndRetrieval(userId: number) {
+async function testStorageAndRetrieval(userId: string) {
     console.log("\n🧪 TEST 4: Storage & Vector Retrieval");
     console.log("=====================================");
 
@@ -108,11 +108,10 @@ async function testStorageAndRetrieval(userId: number) {
     await processWeeklySummary(userId, weekStart, weekEnd);
 
     // Check if it was stored
-    const stored = await prisma.$queryRawUnsafe<{ count: bigint }[]>(
-        `SELECT COUNT(*) as count FROM "WeeklySummary" WHERE "utilisateurId" = $1`,
-        userId
-    );
-    console.log(`✅ Summaries stored for user: ${stored[0].count}`);
+    const stored = await prisma.weeklySummary.count({
+        where: { utilisateurId: userId },
+    });
+    console.log(`✅ Summaries stored for user: ${stored}`);
 
     // Test retrieval
     const query = "How is my spending on food?";
@@ -133,7 +132,7 @@ async function testStorageAndRetrieval(userId: number) {
     return results;
 }
 
-async function testBackfill(userId: number) {
+async function testBackfill(userId: string) {
     console.log("\n🧪 TEST 5: Backfill Historical Summaries");
     console.log("=========================================");
 
@@ -141,11 +140,10 @@ async function testBackfill(userId: number) {
     await backfillWeeklySummaries(userId, 4);
 
     // Count total summaries
-    const count = await prisma.$queryRawUnsafe<{ count: bigint }[]>(
-        `SELECT COUNT(*) as count FROM "WeeklySummary" WHERE "utilisateurId" = $1`,
-        userId
-    );
-    console.log(`✅ Total summaries for user: ${count[0].count}`);
+    const count = await prisma.weeklySummary.count({
+        where: { utilisateurId: userId },
+    });
+    console.log(`✅ Total summaries for user: ${count}`);
 }
 
 async function main() {

@@ -86,7 +86,7 @@ export async function triggerWeeklySummaryJob(): Promise<void> {
  * Generate summaries for past weeks (backfill)
  */
 export async function backfillWeeklySummaries(
-    userId: number,
+    userId: string,
     weeksBack: number = 4
 ): Promise<void> {
     console.log(`🔄 Backfilling ${weeksBack} weeks for user ${userId}...`);

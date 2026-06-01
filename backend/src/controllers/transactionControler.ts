@@ -8,12 +8,12 @@ import { keyGenerator,cache } from "../utils/cache";
 export const getTransaction = async (req: AuthRequest, res: Response) => {
   // 1. Parse User ID
   const user = req.user as JwtPayload;
-  const userId = Number(user.id);
+  const userId = user.id;
   const cacheInfo = keyGenerator(req);
   console.log('key in the controller: ',cacheInfo.key,cacheInfo.tags)
-  // 2. Parse Cursor (from query param ?cursor=123)
+  // 2. Parse Cursor (from query param ?cursor=<objectId>)
   const cursorParam = req.query.cursor;
-  const cursorId = cursorParam ? Number(cursorParam) : undefined;
+  const cursorId = cursorParam ? String(cursorParam) : undefined;
 
   // Config: How many items to load per request
   const LIMIT = 10;
@@ -47,7 +47,7 @@ export const getTransaction = async (req: AuthRequest, res: Response) => {
     });
 
     // 4. Calculate Next Cursor
-    let nextCursor: number | null = null;
+    let nextCursor: string | null = null;
     if (transactions.length === LIMIT) {
       // The ID of the last item becomes the cursor for the next page
       nextCursor = transactions[transactions.length - 1].id;
@@ -73,7 +73,7 @@ export const getTransaction = async (req: AuthRequest, res: Response) => {
 export const createTransaction = async (req: AuthRequest, res: Response) => {
   console.log("hello i m in the controller");
   const user = req.user as JwtPayload;
-  const userId = Number(user.id);
+  const userId = user.id;
   // 2. Cast req.body to our interface so TypeScript knows the fields exist
   const { compteId, categorieId, idDestination } = req.body;
 
@@ -97,9 +97,9 @@ export const createTransaction = async (req: AuthRequest, res: Response) => {
 };
 
 export const removeTransaction = async (req: AuthRequest, res: Response) => {
-  const transactionId = Number(req.params.id);
+  const transactionId = req.params.id;
   const user = req.user as JwtPayload;
-  const userId = Number(user.id);
+  const userId = user.id;
 
   try {
     // 1. Fetch the transaction first to know its Type and Details
@@ -123,9 +123,9 @@ export const removeTransaction = async (req: AuthRequest, res: Response) => {
 };
 
 export const updateTransaction = async (req: AuthRequest, res: Response) => {
-  const transactionId = Number(req.params.id);
+  const transactionId = req.params.id;
   const user = req.user as JwtPayload;
-  const userId = Number(user.id);
+  const userId = user.id;
 
   try {
     const existingTransaction =

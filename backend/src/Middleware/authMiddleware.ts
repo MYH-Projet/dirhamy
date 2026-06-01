@@ -10,7 +10,7 @@ const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET as string;
 
 
 export interface JwtPayload {
-  id: number;
+  id: string;
   nom: string;
   prenom: string;
   email: string;
@@ -74,7 +74,7 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
         return res.status(401).json({ message: 'No refresh token provided' });
     }
     try{
-        const decoded = jwt.verify(refreshToken,REFRESH_TOKEN_SECRET) as { id: number };
+        const decoded = jwt.verify(refreshToken,REFRESH_TOKEN_SECRET) as { id: string };
         const user = await prisma.utilisateur.findUnique({ where: { id: decoded.id } });
         if (!user || user.refreshToken !== refreshToken) {
             throw 'Invalid refresh token';

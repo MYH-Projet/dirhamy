@@ -36,9 +36,9 @@ describe('Transaction Service', () => {
         type: TypeTransaction.TRANSFER,
         description: 'Test Transfer',
         date: pastDate,
-        compteId: 1, // Source
-        categorieId: 2,
-        idDestination: 5 // Destination
+        compteId: "1", // Source
+        categorieId: "2",
+        idDestination: "5" // Destination
       };
 
       // @ts-ignore
@@ -53,13 +53,13 @@ describe('Transaction Service', () => {
       
       // Check Source Update (Decrement)
       expect(prismaMock.balanceSnapshot.updateMany).toHaveBeenCalledWith(expect.objectContaining({
-        where: expect.objectContaining({ compteId: 1 }),
+        where: expect.objectContaining({ compteId: "1" }),
         data: { solde: { decrement: 100 } }
       }));
 
       // Check Destination Update (Increment)
       expect(prismaMock.balanceSnapshot.updateMany).toHaveBeenCalledWith(expect.objectContaining({
-        where: expect.objectContaining({ compteId: 5 }),
+        where: expect.objectContaining({ compteId: "5" }),
         data: { solde: { increment: 100 } }
       }));
     });
@@ -74,8 +74,8 @@ describe('Transaction Service', () => {
         type: TypeTransaction.DEPENSE,
         description: 'Groceries',
         date: yesterday, // <--- Key change: Use yesterday
-        compteId: 1,
-        categorieId: 3,
+        compteId: "1",
+        categorieId: "3",
       };
 
       // @ts-ignore
@@ -86,9 +86,9 @@ describe('Transaction Service', () => {
       // Verify Transaction Creation
       expect(prismaMock.transaction.create).toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({
-            montant: -50, 
+            montant: -50,
             type: TypeTransaction.DEPENSE,
-            compteId: 1
+            compteId: "1"
         })
       }));
 
@@ -96,7 +96,7 @@ describe('Transaction Service', () => {
       expect(prismaMock.balanceSnapshot.updateMany).toHaveBeenCalledTimes(1);
       
       expect(prismaMock.balanceSnapshot.updateMany).toHaveBeenCalledWith(expect.objectContaining({
-          where: expect.objectContaining({ compteId: 1 }),
+          where: expect.objectContaining({ compteId: "1" }),
           data: { solde: { increment: -50 } }
       }));
     });
@@ -110,8 +110,8 @@ describe('Transaction Service', () => {
         type: TypeTransaction.DEPENSE,
         description: 'Coffee',
         date: today, // <--- Key change: Use Today
-        compteId: 1,
-        categorieId: 3,
+        compteId: "1",
+        categorieId: "3",
       };
 
       // @ts-ignore

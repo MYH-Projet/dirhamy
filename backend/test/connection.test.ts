@@ -8,11 +8,11 @@ afterAll(async () => {
 
 describe('Database Connection (Integration)', () => {
   it('should successfully query the database', async () => {
-    // A simple query to verify the DB is reachable
-    const result = await prisma.$queryRaw`SELECT 1`; 
-    
+    // Ping MongoDB to verify the DB is reachable (no SQL on Mongo)
+    const result = await prisma.$runCommandRaw({ ping: 1 });
+
     // Check that we got a result back
     expect(result).toBeDefined();
-    expect(Array.isArray(result)).toBe(true);
+    expect((result as { ok?: number }).ok).toBe(1);
   });
 });

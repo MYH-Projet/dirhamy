@@ -42,8 +42,8 @@ cron.schedule("0 0 */15 * *", () => {
 
 app.get('/', async (req:Request, res:Response) => {
     try {
-    // This runs a simple "1+1" query on the database to check connection
-    await prisma.$queryRaw`SELECT 1`; 
+    // Ping MongoDB to check the connection (Mongo has no SQL "SELECT 1")
+    await prisma.$runCommandRaw({ ping: 1 });
     res.status(200).json({ message: "Database is connected!", status: "OK" });
   } catch (error) {
     console.error(error);

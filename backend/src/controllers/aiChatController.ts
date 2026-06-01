@@ -9,14 +9,14 @@ export const chat = async (req: AuthRequest, res: Response) => {
 
   // get user id from the token and verify if it's valid
   const user = req.user as JwtPayload;
-  const userId = Number(user.id);
-  if (isNaN(userId)) {
+  const userId = user.id;
+  if (!userId) {
     return res.status(400).json({ error: "Invalid User ID" });
   }
 
   // getting the user's request and conversationId
   const userMessage = req.body.message;
-  let conversationId = req.body.conversationId ? Number(req.body.conversationId) : undefined;
+  let conversationId = req.body.conversationId ? String(req.body.conversationId) : undefined;
 
   // Get or create conversation
   try {

@@ -1,17 +1,22 @@
-version: "3.9"
-
 services:
   db:
-    image: pgvector/pgvector:pg15
+    image: mongo:7
     container_name: dirhamy-db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: dirhamy
+    # Single-node replica set is required for Prisma interactive $transaction.
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     ports:
-      - "5431:5432"
+      - "27017:27017"
     volumes:
-      - dirhamy-pgdata:/var/lib/postgresql/data
+      - dirhamy-mongodata:/data/db
+    # The healthcheck initiates the replica set once, then reports healthy only
+    # when the node has become PRIMARY. Backend waits on `service_healthy`.
+    healthcheck:
+      test: >
+        mongosh --quiet --eval "try { rs.status().ok } catch (e) { rs.initiate({_id:'rs0',members:[{_id:0,host:'db:27017'}]}).ok }"
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 10s
 
   backend:
     env_file:
@@ -19,11 +24,11 @@ services:
     build:
       context: ./backend
       args:
-        DATABASE_URL: postgresql://postgres:postgres@db:5432/dirhamy
+        DATABASE_URL: mongodb://db:27017/dirhamy?directConnection=true
     container_name: dirhamy-backend
     restart: always
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/dirhamy
+      DATABASE_URL: mongodb://db:27017/dirhamy?directConnection=true
       PORT: "3000"
       JWT_SECRET: anas
       REFRESH_TOKEN_SECRET: anas
@@ -33,8 +38,10 @@ services:
       REDIS_URL: redis
 
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     ports:
       - "3000:3000"
       - "5555:5555"
@@ -43,13 +50,9 @@ services:
       - /app/node_modules
     command: >
       sh -c "
-        echo 'Waiting for Postgres...' &&
-        until pg_isready -h db -p 5432 -U postgres; do
-          sleep 1;
-        done &&
-        echo 'Postgres is ready' &&
-        npx prisma migrate deploy &&
+        echo 'MongoDB replica set is ready' &&
         npx prisma generate &&
+        npx prisma db push &&
         npx prisma db seed &&
         npm run dev
       "
@@ -75,5 +78,5 @@ services:
     volumes:
       - dirhamy-redisdata:/data
 volumes:
-  dirhamy-pgdata:
+  dirhamy-mongodata:
   dirhamy-redisdata:
