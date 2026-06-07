@@ -1,16 +1,15 @@
 import { Request, Response } from 'express';
-import {prisma} from '../lib/prisma';
+import { prisma } from '../lib/prisma';
 import { AuthRequest, JwtPayload } from '../Middleware/authMiddleware';
 import { cache, keyGenerator } from '../utils/cache';
-import { error } from 'console';
 
 
 // Create a new Category
 export const createCategory = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.body) {
-            return res.status(400).json({ error: "Request body is missing" });
-        }
+      return res.status(400).json({ error: "Request body is missing" });
+    }
     const { nom } = req.body;
     const userId = req.user?.id;
 
@@ -23,14 +22,14 @@ export const createCategory = async (req: AuthRequest, res: Response) => {
     }
 
     const categorie = await prisma.categorie.findFirst({
-      where:{
-        utilisateurId:userId,
+      where: {
+        utilisateurId: userId,
         nom,
       }
     })
 
-    if(categorie){
-      return res.status(402).json({error:"that category is already exist "})
+    if (categorie) {
+      return res.status(402).json({ error: "that category is already exist " })
     }
 
     const newCategory = await prisma.categorie.create({
@@ -65,7 +64,7 @@ export const getAllCategories = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    cache(cacheInfo,categories);
+    cache(cacheInfo, categories);
 
     res.status(200).json(categories);
   } catch (error) {
@@ -103,11 +102,11 @@ export const getCategoryById = async (req: AuthRequest, res: Response) => {
 
 // Update a Category
 export const updateCategory = async (req: AuthRequest, res: Response) => {
-    try {
+  try {
     const id = parseInt(req.params.id);
 
     if (!req.body) {
-        return res.status(400).json({ error: "Request body is missing" });
+      return res.status(400).json({ error: "Request body is missing" });
     }
     const { nom } = req.body;
     const userId = req.user?.id;
@@ -157,15 +156,16 @@ export const deleteCategory = async (req: AuthRequest, res: Response) => {
     }
 
     // 2. Delete
-    await prisma.categorie.delete({
+    await prisma.categorie.update({
       where: { id },
+      data: { deletedAt: new Date() }
     });
 
     res.status(200).json({ message: 'Category deleted successfully' });
   } catch (error: any) {
     if (error.code === 'P2003') {
-      return res.status(400).json({ 
-        error: 'Cannot delete this category because it is used in existing transactions.' 
+      return res.status(400).json({
+        error: 'Cannot delete this category because it is used in existing transactions.'
       });
     }
     console.error('Error deleting category:', error);

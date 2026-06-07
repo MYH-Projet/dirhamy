@@ -3,20 +3,20 @@ import { AuthRequest, JwtPayload } from "../Middleware/authMiddleware";
 import { prisma } from "../lib/prisma";
 import * as transactionServices from "../services/transactionServices";
 import { AppError } from "../utils/AppError";
-import { keyGenerator,cache } from "../utils/cache";
+import { keyGenerator, cache } from "../utils/cache";
 
 export const getTransaction = async (req: AuthRequest, res: Response) => {
   // 1. Parse User ID
   const user = req.user as JwtPayload;
   const userId = Number(user.id);
   const cacheInfo = keyGenerator(req);
-  console.log('key in the controller: ',cacheInfo.key,cacheInfo.tags)
+  console.log('key in the controller: ', cacheInfo.key, cacheInfo.tags)
   // 2. Parse Cursor (from query param ?cursor=123)
   const cursorParam = req.query.cursor;
   const cursorId = cursorParam ? Number(cursorParam) : undefined;
 
   // Config: How many items to load per request
-  const LIMIT = 10;
+  const LIMIT = req.query.limit ? Number(req.query.limit) : 10;
 
   try {
     // 3. Fetch Data
@@ -25,6 +25,7 @@ export const getTransaction = async (req: AuthRequest, res: Response) => {
         // Filter: Transactions where the account belongs to this user
         compte: {
           utilisateurId: userId,
+          deletedAt: null
         },
       },
       take: LIMIT,
@@ -53,7 +54,7 @@ export const getTransaction = async (req: AuthRequest, res: Response) => {
       nextCursor = transactions[transactions.length - 1].id;
     }
 
-    const result ={
+    const result = {
       data: transactions,
       meta: {
         nextCursor: nextCursor,
@@ -61,7 +62,7 @@ export const getTransaction = async (req: AuthRequest, res: Response) => {
       },
     }
 
-    await cache(cacheInfo,result);
+    await cache(cacheInfo, result);
     // 5. Send Response
     return res.status(200).json(result);
   } catch (e) {

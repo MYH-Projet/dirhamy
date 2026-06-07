@@ -33,16 +33,17 @@ model Utilisateur {
   refreshToken String?
 
   // Relationships
-  comptes    Compte[]
-  categories Categorie[]
+  comptes         Compte[]
+  categories      Categorie[]
   weeklySummaries WeeklySummary[]
-  conversations Conversation[]
+  conversations   Conversation[]
 }
 
 model Compte {
-  id   Int        @id @default(autoincrement())
-  nom  String
-  type TypeCompte
+  id        Int        @id @default(autoincrement())
+  nom       String
+  type      TypeCompte
+  updatedAt DateTime   @updatedAt
 
   // Foreign Key
   utilisateurId Int
@@ -56,9 +57,11 @@ model Compte {
 }
 
 model Categorie {
-  id    Int    @id @default(autoincrement())
-  nom   String
-  limit Float?
+  id        Int       @id @default(autoincrement())
+  nom       String
+  limit     Float?
+  deletedAt DateTime?
+  updatedAt DateTime  @updatedAt
 
   // Foreign Key
   utilisateurId Int
@@ -85,8 +88,11 @@ model BudgetSnapshot {
 }
 
 model Transfer {
-  id           Int           @id @default(autoincrement())
-  createdAt    DateTime      @default(now())
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+  updatedAt DateTime  @updatedAt
+
   // This relation links to the transactions
   transactions Transaction[]
 }
@@ -97,6 +103,8 @@ model Transaction {
   type        TypeTransaction
   date        DateTime        @default(now())
   description String
+  deletedAt   DateTime?
+  updatedAt   DateTime        @updatedAt
 
   // Foreign Keys
   compteId Int
@@ -125,19 +133,19 @@ model BalanceSnapshot {
   @@index([compteId, date]) // Important for finding the "latest" snapshot quickly
 }
 
-
 //weejly summary for the Embeddings
 
 model WeeklySummary {
-  id          Int       @id @default(autoincrement())
-  weekStart   DateTime  // Start of the week (e.g., Monday 00:00)
-  weekEnd     DateTime  // End of the week (e.g., Sunday 23:59)
-  summary     String    // Text summary of user behavior
-  embedding   Unsupported("vector(768)")? // Gemini text-embedding-004 produces 768 dims
-  createdAt   DateTime  @default(now())
+  id            Int                         @id @default(autoincrement())
+  weekStart     DateTime // Start of the week (e.g., Monday 00:00)
+  weekEnd       DateTime // End of the week (e.g., Sunday 23:59)
+  summary       String // Text summary of user behavior
+  embedding     Unsupported("vector(768)")? // Gemini text-embedding-004 produces 768 dims
+  createdAt     DateTime                    @default(now())
   // Foreign Key
   utilisateurId Int
-  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
+  utilisateur   Utilisateur                 @relation(fields: [utilisateurId], references: [id])
+
   @@unique([utilisateurId, weekStart])
   @@index([utilisateurId])
 }
@@ -161,7 +169,7 @@ model Conversation {
 model ChatMessage {
   id        Int      @id @default(autoincrement())
   content   String
-  sender    String   // "user" or "ai"
+  sender    String // "user" or "ai"
   createdAt DateTime @default(now())
 
   conversationId Int
