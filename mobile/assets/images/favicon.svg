@@ -1,0 +1,19 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(20 12) scale(1.2)">
+    <!-- Circle -->
+    <circle cx="16" cy="20" r="12" fill="#0d9488" />
+
+    <!-- Rounded rectangle -->
+    <rect
+      x="32"
+      y="8"
+      width="24"
+      height="64"
+      rx="12"
+      ry="12"
+      transform="rotate(35 44 40)"
+      fill="#0d9488"
+    />
+  </g>
+</svg>
+

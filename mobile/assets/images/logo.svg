@@ -1,0 +1,24 @@
+<svg width="400" height="100" viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .text {
+        font-family: ui-sans-serif, sans-serif;
+        font-size: 65px;
+        font-weight: 700;
+        fill: #18212c; 
+      }
+      .icon {
+        fill: #0d9488;
+      }
+    </style>
+  </defs>
+
+  <g transform="translate(20, 15)">
+    <circle cx="15" cy="18" r="11" class="icon" />
+    
+    <rect x="28" y="5" width="22" height="60" rx="11" ry="11" 
+          transform="rotate(35 39 35)" class="icon" />
+  </g>
+
+  <text x="110" y="72" class="text">Dirhamy</text>
+</svg>
