@@ -1,7 +1,3 @@
-
-
-
-
 import '../models/transaction_model.dart';
 import '../models/dbContext.dart';
 
@@ -17,7 +13,7 @@ class TransactionRepository {
 
   Future<TransactionModel> getTransactionById(int id) async {
     final db = await DbContext.db;
-    return await db.query('transactions', where: 'localId = ?', whereArgs: [id]).then((List<Map<String, dynamic>> maps) {
+    return await db.query('transactions', where: 'localId = ? and deletedAt IS NULL', whereArgs: [id]).then((List<Map<String, dynamic>> maps) {
       return TransactionModel.fromJson(maps[0]);
     });
   }
@@ -65,5 +61,14 @@ class TransactionRepository {
       where: 'localId = ?', 
       whereArgs: [id]
     );
+  }
+
+  Future<double> getBalance(int compteId) async {
+    final db = await DbContext.db;
+    return await db.query('transactions',where: 'deletedAt IS NULL AND compteId = ?', whereArgs: [compteId],).then((List<Map<String, dynamic>> maps) {
+      return maps.fold<double>(0.0, (double sum, Map<String, dynamic> map) {
+        return sum + (TransactionModel.fromJson(map).amount).toDouble();
+      });
+    });
   }
 }

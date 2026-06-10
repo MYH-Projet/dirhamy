@@ -67,6 +67,7 @@ flutter:
   assets:
     - .env
     - assets/images/logo.svg
+    - assets/images/favicon.svg
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
