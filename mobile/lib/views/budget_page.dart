@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../controllers/budget_controller.dart';
+import '../controllers/category_controller.dart';
+import 'set_budget_sheet.dart';
 
 class BudgetPage extends StatelessWidget {
   const BudgetPage({super.key});
@@ -21,7 +23,22 @@ class BudgetPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                if (CategoryController().categories.isNotEmpty) {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (ctx) => SetBudgetSheet(
+                      categories: CategoryController().categories,
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please create a category first.')),
+                  );
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary.withOpacity(0.1),
                 foregroundColor: AppColors.primary,
@@ -93,7 +110,28 @@ class BudgetPage extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(cat.nom, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(cat.nom, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.edit_outlined, color: Colors.grey, size: 20),
+                                        onPressed: () {
+                                          showModalBottomSheet(
+                                            context: context,
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.transparent,
+                                            builder: (ctx) => SetBudgetSheet(
+                                              categories: CategoryController().categories,
+                                              initialCategory: cat,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                   const SizedBox(height: 4),
                                   Text(
                                     hasLimit ? 'Spent: ${spent.toStringAsFixed(2)} DH · Limit: ${limit.toStringAsFixed(2)} DH' : 'Spent: ${spent.toStringAsFixed(2)} DH (No Limit Set)', 

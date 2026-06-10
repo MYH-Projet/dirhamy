@@ -40,7 +40,7 @@ class BudgetController extends ChangeNotifier {
       }
 
       // Show categories that either have a budget limit or have spending this month
-      categories = cats.where((c) => (c.budgetLimit != null && c.budgetLimit! > 0) || (spent[c.localId] ?? 0) > 0).toList();
+      categories = cats.where((c) => (c.budgetLimit != null && c.budgetLimit! > 0) ).toList();
       spentByCategory = spent;
     } catch (e) {
       debugPrint('Error loading budgets: $e');
