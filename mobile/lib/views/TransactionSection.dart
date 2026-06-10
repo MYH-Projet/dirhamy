@@ -76,17 +76,32 @@ class TransactionSection extends StatelessWidget {
                   itemCount: transactions.length,
                   itemBuilder: (context, index) {
                     final item = transactions[index];
-                    return _buildTransactionItem(
-                      context,
-                      item.transaction.date.toIso8601String().split('T')[0],
-                      item.category?.nom ?? 'Unknown',
-                      item.transaction.type == 'transfer'
-                          ? Icons.swap_horiz
-                          : item.transaction.type == 'income'
-                              ? Icons.north_east
-                              : Icons.south_west,
-                      item.transaction.type == 'expense',
-                      item.transaction.amount,
+                    return GestureDetector(
+                      onLongPress: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (ctx) => AddTransactionSheet(
+                            transactionToEdit: item.transaction,
+                            onTransactionAdded: () {
+                              // Handled automatically by the controller
+                            },
+                          ),
+                        );
+                      },
+                      child: _buildTransactionItem(
+                        context,
+                        item.transaction.date.toIso8601String().split('T')[0],
+                        item.category?.nom ?? 'Unknown',
+                        item.transaction.type == 'transfer'
+                            ? Icons.swap_horiz
+                            : item.transaction.type == 'income'
+                                ? Icons.north_east
+                                : Icons.south_west,
+                        item.transaction.type == 'expense',
+                        item.transaction.amount,
+                      ),
                     );
                   },
                 ),

@@ -43,4 +43,12 @@ class TransactionController extends ChangeNotifier {
     await AccountController().loadAccountsAndBalances();
     await BudgetController().loadBudgets();
   }
+
+  Future<void> updateTransaction(TransactionModel transaction) async {
+    await _repository.updateTransaction(transaction);
+    // Reload transactions list, account balances, and budgets!
+    await loadTransactions();
+    await AccountController().loadAccountsAndBalances();
+    await BudgetController().loadBudgets();
+  }
 }

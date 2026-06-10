@@ -47,4 +47,11 @@ class CategoryController extends ChangeNotifier {
     // Trigger budget update as category list has changed
     await BudgetController().loadBudgets();
   }
+
+  Future<void> updateCategory(CategorieModel category) async {
+    await _repository.updateCategory(category);
+    await loadCategories();
+    // Trigger budget update as category list has changed
+    await BudgetController().loadBudgets();
+  }
 }

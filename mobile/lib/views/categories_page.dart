@@ -11,11 +11,14 @@ class CategoriesPage extends StatefulWidget {
 
 class _CategoriesPageState extends State<CategoriesPage> {
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _editNameController = TextEditingController();
   final CategoryController _categoryController = CategoryController();
+  int? _editingCategoryId;
 
   @override
   void dispose() {
     _nameController.dispose();
+    _editNameController.dispose();
     super.dispose();
   }
 
@@ -100,6 +103,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
                               separatorBuilder: (context, index) => const SizedBox(height: 12),
                               itemBuilder: (context, index) {
                                 final cat = categories[index];
+                                final isEditing = cat.localId == _editingCategoryId;
+
                                 return Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                   decoration: BoxDecoration(
@@ -113,23 +118,66 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                     children: [
                                       const Icon(Icons.category, color: Colors.black87),
                                       const SizedBox(width: 16),
-                                      Expanded(child: Text(cat.nom, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500))),
-                                      IconButton(
-                                        icon: const Icon(Icons.edit, color: Colors.grey),
-                                        onPressed: () {
-                                          // Edit logic goes here
-                                        },
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: AppColors.redish,
-                                          borderRadius: BorderRadius.circular(8),
+                                      if (isEditing) ...[
+                                        Expanded(
+                                          child: TextField(
+                                            controller: _editNameController,
+                                            autofocus: true,
+                                            decoration: const InputDecoration(
+                                              border: InputBorder.none,
+                                              hintText: 'Category name',
+                                            ),
+                                          ),
                                         ),
-                                        child: IconButton(
-                                          icon: const Icon(Icons.delete_outline, color: Colors.white),
-                                          onPressed: () => _deleteCategory(cat.localId),
+                                        IconButton(
+                                          icon: const Icon(Icons.check, color: AppColors.primary),
+                                          onPressed: () async {
+                                            final newName = _editNameController.text.trim();
+                                            if (newName.isNotEmpty) {
+                                              cat.nom = newName;
+                                              cat.updatedAt = DateTime.now();
+                                              await _categoryController.updateCategory(cat);
+                                            }
+                                            setState(() {
+                                              _editingCategoryId = null;
+                                            });
+                                          },
                                         ),
-                                      ),
+                                        IconButton(
+                                          icon: const Icon(Icons.close, color: Colors.grey),
+                                          onPressed: () {
+                                            setState(() {
+                                              _editingCategoryId = null;
+                                            });
+                                          },
+                                        ),
+                                      ] else ...[
+                                        Expanded(
+                                          child: Text(
+                                            cat.nom,
+                                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.edit, color: Colors.grey),
+                                          onPressed: () {
+                                            setState(() {
+                                              _editingCategoryId = cat.localId;
+                                              _editNameController.text = cat.nom;
+                                            });
+                                          },
+                                        ),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: AppColors.redish,
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: IconButton(
+                                            icon: const Icon(Icons.delete_outline, color: Colors.white),
+                                            onPressed: () => _deleteCategory(cat.localId),
+                                          ),
+                                        ),
+                                      ],
                                     ],
                                   ),
                                 );

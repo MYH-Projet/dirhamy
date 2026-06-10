@@ -9,8 +9,13 @@ import '../controllers/transaction_controller.dart';
 
 class AddTransactionSheet extends StatefulWidget {
   final VoidCallback onTransactionAdded;
+  final TransactionModel? transactionToEdit;
   
-  const AddTransactionSheet({super.key, required this.onTransactionAdded});
+  const AddTransactionSheet({
+    super.key, 
+    required this.onTransactionAdded,
+    this.transactionToEdit,
+  });
 
   @override
   State<AddTransactionSheet> createState() => _AddTransactionSheetState();
@@ -31,6 +36,11 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   @override
   void initState() {
     super.initState();
+    if (widget.transactionToEdit != null) {
+      _type = widget.transactionToEdit!.type;
+      _selectedDate = widget.transactionToEdit!.date;
+      _amountController.text = widget.transactionToEdit!.amount.toString();
+    }
     _loadData();
   }
 
@@ -50,17 +60,39 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
       setState(() {
         _accounts = accounts;
         if (_accounts.isNotEmpty) {
-          _selectedAccount = _selectedAccount ?? _accounts.first;
-          if (_accounts.length > 1) {
-            _selectedToAccount = _selectedToAccount ?? _accounts[1];
+          if (widget.transactionToEdit != null) {
+            _selectedAccount = _accounts.firstWhere(
+              (a) => a.localId == widget.transactionToEdit!.compteId,
+              orElse: () => _accounts.first,
+            );
+            if (widget.transactionToEdit!.idDestination != null) {
+              _selectedToAccount = _accounts.firstWhere(
+                (a) => a.localId == widget.transactionToEdit!.idDestination,
+                orElse: () => _accounts.length > 1 ? _accounts[1] : _accounts.first,
+              );
+            } else {
+              _selectedToAccount = _accounts.length > 1 ? _accounts[1] : _accounts.first;
+            }
           } else {
-            _selectedToAccount = _selectedToAccount ?? _accounts.first;
+            _selectedAccount = _selectedAccount ?? _accounts.first;
+            if (_accounts.length > 1) {
+              _selectedToAccount = _selectedToAccount ?? _accounts[1];
+            } else {
+              _selectedToAccount = _selectedToAccount ?? _accounts.first;
+            }
           }
         }
         
         _categories = categories;
         if (_categories.isNotEmpty) {
-          _selectedCategory = _selectedCategory ?? _categories.first;
+          if (widget.transactionToEdit != null) {
+            _selectedCategory = _categories.firstWhere(
+              (c) => c.localId == widget.transactionToEdit!.categorieId,
+              orElse: () => _categories.first,
+            );
+          } else {
+            _selectedCategory = _selectedCategory ?? _categories.first;
+          }
         }
       });
     }
@@ -80,7 +112,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
     }
   }
 
-  Future<void> _addTransaction() async {
+  Future<void> _saveTransaction() async {
     final amountText = _amountController.text.trim();
     if (amountText.isEmpty || _selectedAccount == null) return;
     if (_type != 'transfer' && _selectedCategory == null) return;
@@ -89,19 +121,32 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
     final amount = double.tryParse(amountText);
     if (amount == null) return;
     
-    final newTx = TransactionModel(
-      amount: amount,
-      type: _type,
-      date: _selectedDate,
-      description: '',
-      updatedAt: DateTime.now(),
-      compteId: _selectedAccount!.localId,
-      idDestination: _type == 'transfer' ? _selectedToAccount!.localId : null,
-      categorieId: _selectedCategory!.localId,
-      syncStatus: 0,
-    );
+    if (widget.transactionToEdit != null) {
+      final tx = widget.transactionToEdit!;
+      tx.amount = amount;
+      tx.type = _type;
+      tx.date = _selectedDate;
+      tx.compteId = _selectedAccount!.localId;
+      tx.idDestination = _type == 'transfer' ? _selectedToAccount!.localId : null;
+      tx.categorieId = _selectedCategory!.localId;
+      tx.updatedAt = DateTime.now();
+
+      await TransactionController().updateTransaction(tx);
+    } else {
+      final newTx = TransactionModel(
+        amount: amount,
+        type: _type,
+        date: _selectedDate,
+        description: '',
+        updatedAt: DateTime.now(),
+        compteId: _selectedAccount!.localId,
+        idDestination: _type == 'transfer' ? _selectedToAccount!.localId : null,
+        categorieId: _selectedCategory!.localId,
+        syncStatus: 0,
+      );
+      await TransactionController().addTransaction(newTx);
+    }
     
-    await TransactionController().addTransaction(newTx);
     widget.onTransactionAdded();
     if (mounted) Navigator.pop(context);
   }
@@ -136,9 +181,9 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                       icon: const Icon(Icons.close),
                       onPressed: () => Navigator.pop(context),
                     ),
-                    const Text(
-                      'Add Transaction',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    Text(
+                      widget.transactionToEdit != null ? 'Update Transaction' : 'Add Transaction',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(width: 48), // to balance the close button
                   ],
@@ -362,12 +407,12 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: _addTransaction,
+                    onPressed: _saveTransaction,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: const Text('Add', style: TextStyle(fontSize: 18, color: Colors.white)),
+                    child: Text(widget.transactionToEdit != null ? 'Update' : 'Add', style: const TextStyle(fontSize: 18, color: Colors.white)),
                   ),
                 ),
                 const SizedBox(height: 16),
