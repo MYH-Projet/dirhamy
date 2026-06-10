@@ -28,6 +28,18 @@ class CompteModel {
     );
   }
 
+  factory CompteModel.fromDbMap(Map<String, dynamic> map) {
+    return CompteModel(
+      localId: map['localId'],
+      serverId: map['serverId'],
+      nom: map['nom'],
+      type: map['type'],
+      updatedAt: DateTime.parse(map['updatedAt']),
+      deletedAt: map['deletedAt'] != null ? DateTime.parse(map['deletedAt']) : null,
+      syncStatus: map['syncStatus'] ?? 1,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       if (localId != null) 'localId': localId,

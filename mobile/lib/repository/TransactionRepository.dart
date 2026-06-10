@@ -1,4 +1,5 @@
 import '../models/transaction_model.dart';
+import '../models/categorie_model.dart';
 import '../models/dbContext.dart';
 
 class TransactionRepository {
@@ -6,7 +7,7 @@ class TransactionRepository {
     final db = await DbContext.db;
     return await db.query('transactions', where: 'deletedAt IS NULL').then((List<Map<String, dynamic>> maps) {
       return List.generate(maps.length, (int i) {
-        return TransactionModel.fromJson(maps[i]);
+        return TransactionModel.fromDbMap(maps[i]);
       });
     });
   }
@@ -24,6 +25,15 @@ class TransactionRepository {
     // Offline first: 0 means "Pending Create" on the server
     transaction.syncStatus = 0; 
     transaction.updatedAt = DateTime.now();
+
+    if (transaction.type == 'transfer') {
+      final transferId = await db.insert('transfers', {
+        'createdAt': DateTime.now().toIso8601String(),
+        'updatedAt': DateTime.now().toIso8601String(),
+        'syncStatus': 0,
+      });
+      transaction.transferId = transferId;
+    }
 
     return await db.insert('transactions', transaction.toMap());
   }
@@ -70,5 +80,56 @@ class TransactionRepository {
         return sum + (TransactionModel.fromJson(map).amount).toDouble();
       });
     });
+  }
+
+  Future<List<TransactionWithCategory>> getRecentTransactionsWithCategory({
+    int limit = 10,
+    int skip = 0,
+  }) async {
+    final db = await DbContext.db;
+    
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+      SELECT 
+        t.*, 
+        c.nom AS categoryName, 
+        c.budgetLimit AS categoryBudgetLimit,
+        c.updatedAt AS categoryUpdatedAt,
+        c.deletedAt AS categoryDeletedAt,
+        c.syncStatus AS categorySyncStatus,
+        c.serverId AS categoryServerId
+      FROM transactions t
+      LEFT JOIN categories c ON t.categorieId = c.localId
+      WHERE t.deletedAt IS NULL
+      ORDER BY t.date DESC
+      LIMIT ? OFFSET ?
+    ''', [limit, skip]);
+
+    return maps.map((map) {
+      final transaction = TransactionModel.fromDbMap(map); 
+
+      CategorieModel? category;
+      if (map['categorieId'] != null) {
+        category = CategorieModel(
+          localId: map['categorieId'],
+          serverId: map['categoryServerId'],
+          nom: map['categoryName'] ?? 'Unknown',
+          budgetLimit: map['categoryBudgetLimit'] != null 
+              ? (map['categoryBudgetLimit'] as num).toDouble() 
+              : null,
+          updatedAt: map['categoryUpdatedAt'] != null 
+              ? DateTime.parse(map['categoryUpdatedAt']) 
+              : DateTime.now(),
+          deletedAt: map['categoryDeletedAt'] != null 
+              ? DateTime.parse(map['categoryDeletedAt']) 
+              : null,
+          syncStatus: map['categorySyncStatus'] ?? 1,
+        );
+      }
+
+      return TransactionWithCategory(
+        transaction: transaction,
+        category: category,
+      );
+    }).toList();
   }
 }

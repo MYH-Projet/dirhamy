@@ -1,9 +1,9 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../theme/app_colors.dart';
 import 'transactoins.dart';
+import 'budget_page.dart';
+import 'categories_page.dart';
 
 class Layout extends StatefulWidget {
   const Layout({super.key});
@@ -84,8 +84,8 @@ class _LayoutState extends State<Layout> {
           index: _selectedIndex,
           children: [
             const TransactionsPage(),
-            Container(child: const Text('Budget')),
-            Container(child: const Text('Category')),
+            const BudgetPage(),
+            const CategoriesPage(),
             Container(child: const Text('Chats')),
           ],
         ),

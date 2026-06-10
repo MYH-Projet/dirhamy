@@ -28,6 +28,18 @@ class CategorieModel {
     );
   }
 
+  factory CategorieModel.fromDbMap(Map<String, dynamic> map) {
+    return CategorieModel(
+      localId: map['localId'],
+      serverId: map['serverId'],
+      nom: map['nom'],
+      budgetLimit: map['budgetLimit'] != null ? (map['budgetLimit'] as num).toDouble() : null,
+      updatedAt: DateTime.parse(map['updatedAt']),
+      deletedAt: map['deletedAt'] != null ? DateTime.parse(map['deletedAt']) : null,
+      syncStatus: map['syncStatus'] ?? 1,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       if (localId != null) 'localId': localId,

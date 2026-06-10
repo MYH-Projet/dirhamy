@@ -1,3 +1,5 @@
+import 'categorie_model.dart';
+
 class TransactionModel {
   int? localId;
   int? serverId;
@@ -46,6 +48,24 @@ class TransactionModel {
     );
   }
 
+  factory TransactionModel.fromDbMap(Map<String, dynamic> map) {
+    return TransactionModel(
+      localId: map['localId'],
+      serverId: map['serverId'],
+      amount: (map['amount'] as num).toDouble(),
+      type: map['type'],
+      date: DateTime.parse(map['date']),
+      description: map['description'],
+      updatedAt: DateTime.parse(map['updatedAt']),
+      deletedAt: map['deletedAt'] != null ? DateTime.parse(map['deletedAt']) : null,
+      syncStatus: map['syncStatus'] ?? 1,
+      compteId: map['compteId'],
+      idDestination: map['idDestination'],
+      transferId: map['transferId'],
+      categorieId: map['categorieId'],
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       if (localId != null) 'localId': localId,
@@ -63,4 +83,14 @@ class TransactionModel {
       if (categorieId != null) 'categorieId': categorieId,
     };
   }
+}
+
+class TransactionWithCategory {
+  final TransactionModel transaction;
+  final CategorieModel? category;
+
+  TransactionWithCategory({
+    required this.transaction,
+    this.category,
+  });
 }
