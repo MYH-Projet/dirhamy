@@ -154,4 +154,60 @@ class TransactionRepository {
       );
     }).toList();
   }
+
+  Future<List<TransactionWithCategory>> getRecentTransactionsForBudget({
+    int limit = 10,
+    int skip = 0,
+    DateTime? date,
+    int? categorieId,
+  }) async {
+    final db = await DbContext.db;
+    
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+      SELECT 
+        t.*, 
+        c.nom AS categoryName, 
+        c.budgetLimit AS categoryBudgetLimit,
+        c.updatedAt AS categoryUpdatedAt,
+        c.deletedAt AS categoryDeletedAt,
+        c.syncStatus AS categorySyncStatus,
+        c.serverId AS categoryServerId
+      FROM transactions t
+      LEFT JOIN categories c ON t.categorieId = c.localId
+      WHERE t.deletedAt IS NULL
+      AND t.type = 'expense'
+      AND c.localId = ?
+      AND t.date >= ?
+      ORDER BY t.date DESC
+      LIMIT ? OFFSET ?
+    ''', [categorieId, date?.toIso8601String(), limit, skip]);
+
+    return maps.map((map) {
+      final transaction = TransactionModel.fromDbMap(map); 
+
+      CategorieModel? category;
+      if (map['categorieId'] != null) {
+        category = CategorieModel(
+          localId: map['categorieId'],
+          serverId: map['categoryServerId'],
+          nom: map['categoryName'] ?? 'Unknown',
+          budgetLimit: map['categoryBudgetLimit'] != null 
+              ? (map['categoryBudgetLimit'] as num).toDouble() 
+              : null,
+          updatedAt: map['categoryUpdatedAt'] != null 
+              ? DateTime.parse(map['categoryUpdatedAt']) 
+              : DateTime.now(),
+          deletedAt: map['categoryDeletedAt'] != null 
+              ? DateTime.parse(map['categoryDeletedAt']) 
+              : null,
+          syncStatus: map['categorySyncStatus'] ?? 1,
+        );
+      }
+
+      return TransactionWithCategory(
+        transaction: transaction,
+        category: category,
+      );
+    }).toList();
+  }
 }

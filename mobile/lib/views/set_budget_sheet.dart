@@ -24,7 +24,17 @@ class _SetBudgetSheetState extends State<SetBudgetSheet> {
   @override
   void initState() {
     super.initState();
-    _selectedCategory = widget.initialCategory ?? (widget.categories.isNotEmpty ? widget.categories.first : null);
+    if (widget.initialCategory != null && widget.categories.isNotEmpty) {
+      try {
+        _selectedCategory = widget.categories.firstWhere(
+          (c) => c.localId == widget.initialCategory!.localId
+        );
+      } catch (e) {
+        _selectedCategory = widget.categories.first;
+      }
+    } else {
+      _selectedCategory = widget.categories.isNotEmpty ? widget.categories.first : null;
+    }
     _updateLimitText();
   }
 
