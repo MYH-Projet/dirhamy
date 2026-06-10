@@ -1,18 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../theme/app_colors.dart';
 import 'transactoins.dart';
 import 'budget_page.dart';
 import 'categories_page.dart';
+import '../controllers/account_controller.dart';
+import '../controllers/category_controller.dart';
+import '../controllers/transaction_controller.dart';
+import '../controllers/budget_controller.dart';
 
 class Layout extends StatefulWidget {
   const Layout({super.key});
 
+  @override
   State<Layout> createState() => _LayoutState();
 }
 
 class _LayoutState extends State<Layout> {
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initial fetch of all application states
+    AccountController().loadAccountsAndBalances();
+    CategoryController().loadCategories();
+    TransactionController().loadTransactions();
+    BudgetController().loadBudgets();
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -86,7 +100,7 @@ class _LayoutState extends State<Layout> {
             const TransactionsPage(),
             const BudgetPage(),
             const CategoriesPage(),
-            Container(child: const Text('Chats')),
+            const Center(child: Text('Chats')),
           ],
         ),
       ),

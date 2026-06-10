@@ -75,11 +75,33 @@ class TransactionRepository {
 
   Future<double> getBalance(int compteId) async {
     final db = await DbContext.db;
-    return await db.query('transactions',where: 'deletedAt IS NULL AND compteId = ?', whereArgs: [compteId],).then((List<Map<String, dynamic>> maps) {
-      return maps.fold<double>(0.0, (double sum, Map<String, dynamic> map) {
-        return sum + (TransactionModel.fromJson(map).amount).toDouble();
-      });
-    });
+    final List<Map<String, dynamic>> maps = await db.query(
+      'transactions',
+      where: 'deletedAt IS NULL AND (compteId = ? OR idDestination = ?)',
+      whereArgs: [compteId, compteId],
+    );
+
+    double balance = 0.0;
+    for (final map in maps) {
+      final tx = TransactionModel.fromDbMap(map);
+      if (tx.type == 'income') {
+        if (tx.compteId == compteId) {
+          balance += tx.amount;
+        }
+      } else if (tx.type == 'expense') {
+        if (tx.compteId == compteId) {
+          balance -= tx.amount;
+        }
+      } else if (tx.type == 'transfer') {
+        if (tx.compteId == compteId) {
+          balance -= tx.amount;
+        }
+        if (tx.idDestination == compteId) {
+          balance += tx.amount;
+        }
+      }
+    }
+    return balance;
   }
 
   Future<List<TransactionWithCategory>> getRecentTransactionsWithCategory({

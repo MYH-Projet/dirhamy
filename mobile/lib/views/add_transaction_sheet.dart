@@ -3,9 +3,9 @@ import '../theme/app_colors.dart';
 import '../models/compte_model.dart';
 import '../models/categorie_model.dart';
 import '../models/transaction_model.dart';
-import '../repository/AccountRepository.dart';
-import '../repository/CategorieRepository.dart';
-import '../repository/TransactionRepository.dart';
+import '../controllers/account_controller.dart';
+import '../controllers/category_controller.dart';
+import '../controllers/transaction_controller.dart';
 
 class AddTransactionSheet extends StatefulWidget {
   final VoidCallback onTransactionAdded;
@@ -35,24 +35,32 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   }
 
   Future<void> _loadData() async {
-    final accounts = await AccountRepository().getAllAccounts();
-    final categories = await CategorieRepository().getAllCategories();
+    // Ensure data is loaded in controllers
+    if (AccountController().accounts.isEmpty) {
+      await AccountController().loadAccountsAndBalances();
+    }
+    if (CategoryController().categories.isEmpty) {
+      await CategoryController().loadCategories();
+    }
+
+    final accounts = AccountController().accounts;
+    final categories = CategoryController().categories;
     
     if (mounted) {
       setState(() {
         _accounts = accounts;
         if (_accounts.isNotEmpty) {
-          _selectedAccount = _accounts.first;
+          _selectedAccount = _selectedAccount ?? _accounts.first;
           if (_accounts.length > 1) {
-            _selectedToAccount = _accounts[1];
+            _selectedToAccount = _selectedToAccount ?? _accounts[1];
           } else {
-            _selectedToAccount = _accounts.first;
+            _selectedToAccount = _selectedToAccount ?? _accounts.first;
           }
         }
         
         _categories = categories;
         if (_categories.isNotEmpty) {
-          _selectedCategory = _categories.first;
+          _selectedCategory = _selectedCategory ?? _categories.first;
         }
       });
     }
@@ -89,11 +97,11 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
       updatedAt: DateTime.now(),
       compteId: _selectedAccount!.localId,
       idDestination: _type == 'transfer' ? _selectedToAccount!.localId : null,
-      categorieId: _type == 'transfer' ? null : _selectedCategory!.localId,
+      categorieId: _selectedCategory!.localId,
       syncStatus: 0,
     );
     
-    await TransactionRepository().addTransaction(newTx);
+    await TransactionController().addTransaction(newTx);
     widget.onTransactionAdded();
     if (mounted) Navigator.pop(context);
   }
@@ -269,8 +277,8 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                ] else ...[
-                  const Text('Category', style: TextStyle(fontSize: 16)),
+                ],
+                const Text('Category', style: TextStyle(fontSize: 16)),
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -296,7 +304,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                ],
                 
                 const Text('Date', style: TextStyle(fontSize: 16)),
                 const SizedBox(height: 8),

@@ -4,35 +4,22 @@ import 'TransactionSection.dart';
 import '../theme/app_colors.dart';
 import 'add_transaction_sheet.dart';
 
-class TransactionsPage extends StatefulWidget {
+class TransactionsPage extends StatelessWidget {
   const TransactionsPage({super.key});
-
-  @override
-  State<TransactionsPage> createState() => _TransactionsPageState();
-}
-
-class _TransactionsPageState extends State<TransactionsPage> {
-  Key _refreshKey = UniqueKey();
-
-  void _refresh() {
-    setState(() {
-      _refreshKey = UniqueKey();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              BalanceSection(key: ValueKey('balance_$_refreshKey')),
-              const SizedBox(height: 24),
-              TransactionSection(key: ValueKey('transactions_$_refreshKey')),
+              BalanceSection(),
+              SizedBox(height: 24),
+              TransactionSection(),
             ],
           ),
         ),
@@ -44,7 +31,9 @@ class _TransactionsPageState extends State<TransactionsPage> {
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
             builder: (ctx) => AddTransactionSheet(
-              onTransactionAdded: _refresh,
+              onTransactionAdded: () {
+                // State updates are handled automatically by the controllers
+              },
             ),
           );
         },
