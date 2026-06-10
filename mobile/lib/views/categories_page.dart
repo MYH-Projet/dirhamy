@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../controllers/category_controller.dart';
+import '../utils/category_icons.dart';
 
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
@@ -13,7 +14,27 @@ class _CategoriesPageState extends State<CategoriesPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _editNameController = TextEditingController();
   final CategoryController _categoryController = CategoryController();
+  
   int? _editingCategoryId;
+  String _selectedIcon = 'local_offer';
+  String? _editIcon;
+
+  final List<String> _availableIcons = [
+    'local_offer',
+    'shopping_cart',
+    'restaurant',
+    'directions_car',
+    'home',
+    'medical_services',
+    'movie',
+    'card_giftcard',
+    'receipt_long',
+    'work',
+    'school',
+    'fitness_center',
+    'flight',
+    'coffee',
+  ];
 
   @override
   void dispose() {
@@ -26,13 +47,69 @@ class _CategoriesPageState extends State<CategoriesPage> {
     final name = _nameController.text.trim();
     if (name.isEmpty) return;
     
-    await _categoryController.addCategory(name);
+    await _categoryController.addCategory(name, icon: _selectedIcon);
     _nameController.clear();
+    setState(() {
+      _selectedIcon = 'local_offer';
+    });
   }
 
   Future<void> _deleteCategory(int? id) async {
     if (id == null) return;
     await _categoryController.deleteCategory(id);
+  }
+
+  void _showIconPicker({required bool isEditing}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Category Icon'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: GridView.builder(
+            shrinkWrap: true,
+            itemCount: _availableIcons.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 5,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            itemBuilder: (context, index) {
+              final iconKey = _availableIcons[index];
+              final currentSelected = isEditing ? _editIcon : _selectedIcon;
+              final isSelected = iconKey == currentSelected;
+
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (isEditing) {
+                      _editIcon = iconKey;
+                    } else {
+                      _selectedIcon = iconKey;
+                    }
+                  });
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.primary.withOpacity(0.15) : Colors.transparent,
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : Colors.grey.shade300,
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    CategoryIcons.getIcon(iconKey),
+                    color: isSelected ? AppColors.primary : Colors.black87,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -66,10 +143,19 @@ class _CategoriesPageState extends State<CategoriesPage> {
                   ),
                   child: Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(color: AppColors.lightestGray, borderRadius: BorderRadius.circular(8)),
-                        child: const Icon(Icons.local_offer_outlined, color: Colors.grey),
+                      GestureDetector(
+                        onTap: () => _showIconPicker(isEditing: false),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            CategoryIcons.getIcon(_selectedIcon),
+                            color: AppColors.primary,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -116,9 +202,22 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                   ),
                                   child: Row(
                                     children: [
-                                      const Icon(Icons.category, color: Colors.black87),
-                                      const SizedBox(width: 16),
                                       if (isEditing) ...[
+                                        GestureDetector(
+                                          onTap: () => _showIconPicker(isEditing: true),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primary.withOpacity(0.1),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Icon(
+                                              CategoryIcons.getIcon(_editIcon),
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16),
                                         Expanded(
                                           child: TextField(
                                             controller: _editNameController,
@@ -135,11 +234,13 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                             final newName = _editNameController.text.trim();
                                             if (newName.isNotEmpty) {
                                               cat.nom = newName;
+                                              cat.icon = _editIcon;
                                               cat.updatedAt = DateTime.now();
                                               await _categoryController.updateCategory(cat);
                                             }
                                             setState(() {
                                               _editingCategoryId = null;
+                                              _editIcon = null;
                                             });
                                           },
                                         ),
@@ -148,10 +249,16 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                           onPressed: () {
                                             setState(() {
                                               _editingCategoryId = null;
+                                              _editIcon = null;
                                             });
                                           },
                                         ),
                                       ] else ...[
+                                        Icon(
+                                          CategoryIcons.getIcon(cat.icon),
+                                          color: Colors.black87,
+                                        ),
+                                        const SizedBox(width: 16),
                                         Expanded(
                                           child: Text(
                                             cat.nom,
@@ -164,6 +271,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                             setState(() {
                                               _editingCategoryId = cat.localId;
                                               _editNameController.text = cat.nom;
+                                              _editIcon = cat.icon ?? 'local_offer';
                                             });
                                           },
                                         ),

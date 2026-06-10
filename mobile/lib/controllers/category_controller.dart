@@ -27,10 +27,11 @@ class CategoryController extends ChangeNotifier {
     }
   }
 
-  Future<void> addCategory(String name) async {
+  Future<void> addCategory(String name, {String? icon}) async {
     if (name.isEmpty) return;
     final newCat = CategorieModel(
       nom: name,
+      icon: icon ?? 'local_offer',
       updatedAt: DateTime.now(),
       syncStatus: 0,
     );

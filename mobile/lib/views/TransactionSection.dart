@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../controllers/transaction_controller.dart';
 import '../theme/app_colors.dart';
+import '../utils/category_icons.dart';
 import 'add_transaction_sheet.dart';
 
 class TransactionSection extends StatelessWidget {
@@ -96,9 +97,7 @@ class TransactionSection extends StatelessWidget {
                         item.category?.nom ?? 'Unknown',
                         item.transaction.type == 'transfer'
                             ? Icons.swap_horiz
-                            : item.transaction.type == 'income'
-                                ? Icons.north_east
-                                : Icons.south_west,
+                            : CategoryIcons.getIcon(item.category?.icon),
                         item.transaction.type == 'expense',
                         item.transaction.amount,
                       ),
