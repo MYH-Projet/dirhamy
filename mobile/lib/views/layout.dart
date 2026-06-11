@@ -9,7 +9,9 @@ import '../controllers/category_controller.dart';
 import '../controllers/transaction_controller.dart';
 import '../controllers/budget_controller.dart';
 import '../controllers/auth_controller.dart';
+import '../controllers/sync_controller.dart';
 import '../services/auth_service.dart';
+import 'user_page.dart';
 
 class Layout extends StatefulWidget {
   const Layout({super.key});
@@ -24,7 +26,10 @@ class _LayoutState extends State<Layout> {
   @override
   void initState() {
     super.initState();
-    // Initial fetch of all application states
+    _refreshData();
+  }
+
+  void _refreshData() {
     AccountController().loadAccountsAndBalances();
     CategoryController().loadCategories();
     TransactionController().loadTransactions();
@@ -68,17 +73,15 @@ class _LayoutState extends State<Layout> {
                 Row(
                   children: [
                     IconButton(
-                      onPressed: () async {
+                      onPressed: () {
                         final authController = AuthController();
                         if (authController.isAuthenticated) {
-                          final token = await AuthService.getStoredCookie();
-                          print('you are connected');
-                          print('your token is: $token');
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const UserPage()));
                         } else {
                           Navigator.push(context, MaterialPageRoute(builder: (context) => const AuthPage()));
                         }
                       }, 
-                      icon: const Icon(Icons.sync)
+                      icon: const Icon(Icons.person)
                     ),
                     IconButton(
                       onPressed: () {}, 

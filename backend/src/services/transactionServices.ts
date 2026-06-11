@@ -35,21 +35,23 @@ export const checkAccount = async (compteId: number, idDestination: number, cate
         }
     })
 
-    const isHasDestinationAccount = await prisma.compte.findUnique({
-        where: {
-            id: idDestination,
-            utilisateurId: userId
+    if (idDestination) {
+        const isHasDestinationAccount = await prisma.compte.findUnique({
+            where: {
+                id: idDestination,
+                utilisateurId: userId
+            }
+        });
+        if (!isHasDestinationAccount) {
+            throw new AppError("Forbidden: You do not own destination account", 403);
         }
-    })
+    }
 
     if (!isHasAccount) {
         throw new AppError("Forbidden: You do not own this source account", 403);
     }
     if (!isHasCategory) {
         throw new AppError("Forbidden: You do not own this category", 403);
-    }
-    if (!isHasDestinationAccount) {
-        throw new AppError("Forbidden: You do not own destination account", 403);
     }
 };
 

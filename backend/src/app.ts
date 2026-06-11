@@ -15,6 +15,7 @@ import balanceRouters from './routers/balanceRouter'
 import categorieRoutes from './routers/categorieRoutes';
 import budgetRouter from './routers/budgetRoutes';
 import aiRouter from './routers/aiRouter';
+import syncRouter from './routers/syncRouter';
 
 import {authenticateToken , AuthRequest} from './Middleware/authMiddleware'
 import { limitApiTraffic } from './Middleware/ratelimiterMiddleware';
@@ -60,6 +61,7 @@ app.use('/balance',balanceRouters);
 app.use('/categories', categorieRoutes);
 app.use('/budget',budgetRouter);
 app.use('/ai', aiRouter);
+app.use('/sync', syncRouter);
 app.get('/profile',async (req: AuthRequest, res) => {
   
   res.json({ 

@@ -22,10 +22,10 @@ export const getTransaction = async (req: AuthRequest, res: Response) => {
     // 3. Fetch Data
     const transactions = await prisma.transaction.findMany({
       where: {
+        deletedAt: null,
         // Filter: Transactions where the account belongs to this user
         compte: {
           utilisateurId: userId,
-          deletedAt: null
         },
       },
       take: LIMIT,

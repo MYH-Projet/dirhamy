@@ -41,7 +41,12 @@ export const syncData = async (req: AuthRequest, res: Response) => {
     const transactions = await prisma.transaction.findMany({
       where: {
         compte: { utilisateurId: userId },
-        updatedAt: { gt: sinceDate }
+        updatedAt: { gt: sinceDate },
+        OR: [
+          { type: 'REVENU' },
+          { type: 'DEPENSE' },
+          { type: 'TRANSFER', montant: { lt: 0 } } // Send only the sender side of transfers!
+        ]
       }
     });
 
