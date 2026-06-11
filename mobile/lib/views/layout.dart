@@ -3,10 +3,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'transactoins.dart';
 import 'budget_page.dart';
 import 'categories_page.dart';
+import 'auth_page.dart';
 import '../controllers/account_controller.dart';
 import '../controllers/category_controller.dart';
 import '../controllers/transaction_controller.dart';
 import '../controllers/budget_controller.dart';
+import '../controllers/auth_controller.dart';
+import '../services/auth_service.dart';
 
 class Layout extends StatefulWidget {
   const Layout({super.key});
@@ -62,11 +65,26 @@ class _LayoutState extends State<Layout> {
                     )
                   ],
                 ),
-                IconButton(
-                  onPressed: () {
-                    
-                  }, 
-                  icon: Icon(Icons.notifications)
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () async {
+                        final authController = AuthController();
+                        if (authController.isAuthenticated) {
+                          final token = await AuthService.getStoredCookie();
+                          print('you are connected');
+                          print('your token is: $token');
+                        } else {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const AuthPage()));
+                        }
+                      }, 
+                      icon: const Icon(Icons.sync)
+                    ),
+                    IconButton(
+                      onPressed: () {}, 
+                      icon: const Icon(Icons.notifications)
+                    ),
+                  ],
                 )
               ],
             )
