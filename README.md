@@ -10,7 +10,8 @@ L'application répond à toutes les exigences du sujet et inclut les fonctionnal
 - ✅ **Gestion des Transactions :** Ajout, modification et suppression de revenus, dépenses et transferts (CRUD complet).
 - ✅ **Catégories & Budgets :** Classification personnalisée avec suivi des limites budgétaires.
 - ✅ **Statistiques :** Visualisation claire des dépenses, des revenus et des soldes de comptes actuels.
-- ✅ **Fonctionnement Hors-Ligne (Offline-First) :** Utilisation de SQLite pour le stockage local avec un système de synchronisation intelligent avec un backend API REST.
+- 🔄 **Synchronisation Bidirectionnelle :** Système de synchronisation robuste entre la base de données locale (SQLite) et le serveur distant, garantissant l'intégrité des données même après une perte de connexion.
+- 🚧 **Chat IA (En Cours de Développement) :** Assistant financier intégré pour vous donner des conseils personnalisés sur vos budgets et transactions.
 - ✅ **Interface Moderne & Responsive :** Design attractif, composants personnalisés et animations fluides.
 
 ## 🏗 Architecture MVC
