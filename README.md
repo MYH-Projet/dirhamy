@@ -22,10 +22,16 @@ Afin d'assurer un code propre, lisible et maintenable, le projet respecte rigour
 - 📁 **Services (`lib/services/`) :** Encapsulent la logique réseau et les requêtes HTTP vers le backend.
 
 ## 📸 Captures d'Écran
-*(Note: Veuillez ajouter de vraies captures d'écran de l'application dans votre dépôt)*
-| Connexion | Tableau de bord | Ajout Transaction | Profil & Sync |
+
+| Connexion | Tableau de bord | Ajout Transaction | Budget & Limites |
 | :---: | :---: | :---: | :---: |
-| ![Login](https://via.placeholder.com/200x400.png?text=Login) | ![Dashboard](https://via.placeholder.com/200x400.png?text=Dashboard) | ![Add](https://via.placeholder.com/200x400.png?text=Add+Transaction) | ![Profile](https://via.placeholder.com/200x400.png?text=Profile) |
+| ![Login](screenshots/login.png) | ![Dashboard](screenshots/dashboard.png) | ![Add Transaction](screenshots/add_transaction.png) | ![Budget](screenshots/budget.png) |
+
+| MAJ Budget | Gestion Catégories | Ajout Catégorie |
+| :---: | :---: | :---: |
+| ![Update Budget](screenshots/update_budget.png) | ![Categories](screenshots/categories.png) | ![Add Category](screenshots/add_category.png) |
+
+*(Assurez-vous de placer vos images dans un dossier `screenshots` à la racine de ce fichier, nommées comme ci-dessus)*
 
 ## 🛠 Technologies et Outils Utilisés
 *   **Frontend Mobile :** Flutter (Dart)
